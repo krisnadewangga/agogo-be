@@ -99,9 +99,15 @@
     <!-- CKEDITOR -->
     <script src="{{ asset('assets/bower_components/ckeditor/ckeditor.js') }}"></script>
 
+    <script type="text/javascript"> 
+      @if (Auth::check()) var user_id =  {{ Auth::user()->id }} @else var user_id = '' @endif 
+    </script>
+    <!-- NOTIFIKASI -->
+    <script src="{{ asset('assets/dist/js/notifikasi.js') }}"></script>
     <!-- page script -->
     <script>
       $(function () {
+         loadNotifikasi();
          var t = $('.dataTables').DataTable();
          t.on( 'order.dt search.dt', function () {
             t.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
@@ -114,6 +120,8 @@
          $('textarea').each(function(){
             $(this).val($(this).val().trim());
          });
+
+         
       
       })
     </script>
