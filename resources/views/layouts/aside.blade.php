@@ -19,7 +19,8 @@
             </a>
             <ul class="treeview-menu">
               <li><a href="{{ route('level.index') }}"><i class="fa fa-circle-o"></i>Level</a></li>
-              <li><a href="{{ route('administrator.index') }}"><i class="fa fa-circle-o"></i>Administrator</a></li>
+              <li><a href="{{ route('administrator.index') }}"><i class="fa fa-circle-o"></i>Admin</a></li>
+               <li><a href="{{ route('kurir.index') }}"><i class="fa fa-circle-o"></i>Kurir</a></li>
               <li><a href="../layout/boxed.html"><i class="fa fa-circle-o"></i>Member</a></li>
             </ul>
           </li>
@@ -39,14 +40,16 @@
           <li class="treeview">
             <a href="#">
               <i class="fa fa-files-o"></i>
-              <span>Master Pengiriman</span>
+              <span>Transaksi</span>
               
             </a>
             <ul class="treeview-menu">
-              <li><a href="{{ route('kurir.index') }}"><i class="fa fa-circle-o"></i>Kurir</a></li>
-              
+              <li ><a href="{{ route('transaksi.index') }}"><i class="fa fa-files-o"></i> <span>Transaksi</span></a></li>
+               <li ><a href="{{ route('pengiriman.index') }}"><i class="fa fa-files-o"></i> <span>Pengiriman</span></a></li>
             </ul>
           </li>
+
+          
 
         </ul>
       </section>
