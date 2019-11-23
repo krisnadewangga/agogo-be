@@ -43,7 +43,9 @@ class MasterController extends Controller
 		    						 item.margin,
 		    						 item.stock,
 		    						 item.v_rasa, 
-		    						 (select gambar from gambar_item where item_id = item.id and utama = '1') as gambar_utama")
+		    						 (select gambar from gambar_item where item_id = item.id and utama = '1') as gambar_utama,
+                     item.deskripsi")
+
 					->where([
 						['item.status_aktif','=','1'],
 						['item.stock','>','0']
@@ -104,7 +106,8 @@ class MasterController extends Controller
 		    						 item.margin,
 		    						 item.stock,
 		    						 item.v_rasa, 
-		    						 (select gambar from gambar_item where item_id = item.id and utama = '1') as gambar_utama")
+		    						 (select gambar from gambar_item where item_id = item.id and utama = '1') as gambar_utama,
+                     item.deskripsi")
 					->where([
 						['item.status_aktif','=','1'],
 						['item.stock','>','0'],

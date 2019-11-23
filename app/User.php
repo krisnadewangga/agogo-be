@@ -49,4 +49,11 @@ class User extends Authenticatable
     {
         return $this->hasOne(DetailKonsumen::class);
     }
+
+    Public function Transaksi()
+    {
+        return $this->hasMany(Transaksi::class);
+    }
+
+    
 }

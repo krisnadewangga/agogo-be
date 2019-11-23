@@ -74,7 +74,7 @@
 		        	<option value="">-- Pilih Kategori --</option>
 		        </select>
 
-		        @error('nama')
+		        @error('kategori')
 		            <label class="control-label" for="inputError">
                     	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
                 	</label>    

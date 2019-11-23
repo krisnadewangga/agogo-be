@@ -14,8 +14,9 @@
 
 Auth::routes();
 
-
 Route::get('/', 'HomeController@index')->name('home');
+Route::get('/load_notif','NotifikasiController@loadNotif')->name('load_notif');
+Route::get('/baca_notif','NotifikasiController@bacaNotif')->name('baca_notif');
 
 Route::get('/aktifasi/{id}','AktifasiAkunController@Aktifasi')->name('aktifasi');
 Route::resource('level','LevelController');
@@ -30,10 +31,11 @@ Route::POST('/input_stock/{id}','StockerController@store')->name('input_stock');
 Route::DELETE('/hapus_stock/{id}','StockerController@destroy')->name('hapus_stock');
 
 Route::resource('kurir','KurirController');
+Route::resource('transaksi','TransaksiController');
+Route::resource('pengiriman','PengirimanController');
 
 Route::get('coba',function(){
 	return view('welcome');
 });
-
 
 // Route::put('/level_update/{id}','LevelController@update')->name('level_update');
