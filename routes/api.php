@@ -27,6 +27,8 @@ Route::get('list_item_all','Api\MasterController@ListItemAll');
 Route::get('list_item_perkat','Api\MasterController@ListItemPerKat');
 Route::get('detail_item','Api\MasterController@DetailItem');
 
+Route::post('transaksi','Api\TransaksiController@Store');
+
 Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
     return "Cache is cleared";

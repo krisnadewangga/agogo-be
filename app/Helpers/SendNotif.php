@@ -158,10 +158,11 @@ class SendNotif{
                                       'penerima_id' => $penerima_id,
                                       'judul_id' => $judul_id,
                                       'judul' =>$judul,
+                                      'isi' => $judul,
                                       'jenis_notif' => $jenis_notif,
                                       'dibaca' => '0'
                                     ]);
-        event(new PusherEvent($pengirim_nama." , ".$judul, [$penerima_id]));
+        // event(new PusherEvent($pengirim_nama." , ".$judul, [$penerima_id]));
 
     }
 
