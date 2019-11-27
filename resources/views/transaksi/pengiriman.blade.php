@@ -6,6 +6,11 @@
                                                           array('judul' => 'Pengiriman','link' => '#')
                                                     	) 
                                   ])
+        @if (session('success'))
+		 	@component("components.alert", ["type" => "success"])
+				{{ session('success') }}
+			@endcomponent
+		@endif
         <div class="card">
         	<div class="table-responsive" style="margin-top: 10px;">
 				<table class="dataTables table  table-bordered">
@@ -17,6 +22,7 @@
 						<th>Pemesan</th>
 						<th ><center>Jumlah Pesanan</center></th>
 						<th ><center>Kurir</center></th>
+						<th ><center>Jenis Transaksi</center></th>
 						<th style="width: 50px; text-align: center;">Aksi</th>
 						</tr>
 					</thead>
@@ -24,11 +30,20 @@
 						@foreach($pengiriman as $key)
 							<tr>
 								<td align="center"></td>
-								<td>{{ $key->created_at->format('d M Y H:i a') }}</td>
+								<td>{{ $key->created_at->format('d M Y H:i A') }}</td>
 								<td>{{ $key->Transaksi->no_transaksi }}</td>
 								<td>{{ $key->Transaksi->User->name }}</td>
 								<td align="center">{{ $key->Transaksi->ItemTransaksi()->count() }} Pesanan</td>
 								<td align="center">{{ $key->Kurir->nama}}</td>
+								<td align="center">
+									@if($key->Transaksi->metode_pembayaran == 1)
+		       							<span class="label label-warning ">TopUp</span>
+			       					@elseif($key->Transaksi->metode_pembayaran == 2)
+			       						<span class="label label-info">COD</span>
+			       					@elseif($key->Transaksi->metode_pembayaran == 3)
+			       						<span class="label label-success">Bayar Ditempat</span>
+			       					@endif
+								</td>
 								<td align="center">
 									<a href="{{ route('transaksi.show', $key->Transaksi->id ) }}">
 										<button class="btn btn-warning btn-sm"><i class="fa fa-search"></i></button>

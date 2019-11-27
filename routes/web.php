@@ -16,6 +16,9 @@ Auth::routes();
 
 Route::get('/', 'HomeController@index')->name('home');
 Route::get('/load_notif','NotifikasiController@loadNotif')->name('load_notif');
+Route::get('/get_jum_pesanan','NotifikasiController@GetJumPesanan')->name('get_jum_pesanan');
+Route::get('/get_jum_pengiriman','NotifikasiController@GetJumPengiriman')->name('get_jum_pengiriman');
+
 Route::get('/baca_notif','NotifikasiController@bacaNotif')->name('baca_notif');
 
 Route::get('/aktifasi/{id}','AktifasiAkunController@Aktifasi')->name('aktifasi');
@@ -31,8 +34,23 @@ Route::POST('/input_stock/{id}','StockerController@store')->name('input_stock');
 Route::DELETE('/hapus_stock/{id}','StockerController@destroy')->name('hapus_stock');
 
 Route::resource('kurir','KurirController');
+Route::post('/set_ongkir','KurirController@SetOngkir')->name('set_ongkir');
+
 Route::resource('transaksi','TransaksiController');
+Route::get('/batal_transaksi','TransaksiController@BatalTransaksi')->name('batal_transaksi');
+Route::post('/ambil_pesanan','TransaksiController@AmbilPesanan')->name('ambil_pesanan');
+Route::resource('topup_saldo','TopupSaldoController');
+Route::get('/list_topup_saldo','TopupSaldoController@ListTopupSaldo')->name('list_topup_saldo');
+Route::get('/cari_user','TopupSaldoController@CariUser')->name('cari_user');
+
+
 Route::resource('pengiriman','PengirimanController');
+
+Route::get('pesanan_diterima/{id}','TransaksiController@pesananDiterima')->name('pesanan_diterima');
+
+Route::get('/lap_pendapatan','LaporanController@LapPendapatan')->name('lap_pendapatan');
+Route::post('/filter_laporan','LaporanController@FilterLaporan')->name('filter_laporan');
+Route::get('/lap_user','LaporanController@LapUser')->name('lap_user');
 
 Route::get('coba',function(){
 	return view('welcome');

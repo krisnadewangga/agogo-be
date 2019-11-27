@@ -1,9 +1,9 @@
 @extends('layouts.app1')
 
 @section('content')
-	@component('components.card', ['title' => 'Detail Transaksi', 
+	@component('components.card', ['title' => 'Detail Pesanan', 
 								   'breadcumbs' => array(
-                                                          array('judul' => 'Transaksi','link' => '../transaksi'),
+                                                          array('judul' => 'Pesanan','link' => '../transaksi'),
                                                           array('judul' => $transaksi->no_transaksi,'link' => '#')
 
                                                     	) 
@@ -35,11 +35,11 @@
 									<tr>
 										<th style="width: 5px;">No</th>
 										<th>Item</th>
-										<th><center>Jumlah</center></th>
-										<th><center>Harga</center></th>
-										<th><center>Diskon ?</center></th>
-										<th><center>Harga Diskon</center></th>
-										<th><center>Total</center></th>
+										<th style="width: 100px;"><center>Jumlah</center></th>
+										<th style="width: 100px;"><center>Harga</center></th>
+										<!-- <th><center>Diskon ?</center></th>
+										<th><center>Harga Diskon</center></th> -->
+										<th style="width: 100px;"><center>Total</center></th>
 									</tr>
 								</thead>
 								<tbody style=" font-size:14px;">
@@ -55,7 +55,7 @@
 													<label class="label label-success text-white" >Rp. {{ number_format($key->harga,'0','','.') }}</label> 
 												@endif
 											</td>
-											<td align="center">
+											<!-- <td align="center">
 												@if($key->diskon > 0)
 													<label class="label label-warning text-white" >
 														{{ $key->diskon }} %
@@ -77,7 +77,7 @@
 													</label>
 												@endif
 												
-											</td>
+											</td> -->
 											<td align="center">Rp. {{ number_format($key->total,'0','','.') }} </td>
 										</tr>
 									@endforeach
@@ -93,46 +93,203 @@
 						@endif
 				</div>
 				
-				<div class="bg-white" style="margin-top: 10px; background-color: #FFFFFF; padding:10px;">
-				
-					<div class="row">
-						<div class="col-md-12">
-							<h4 style="margin-top: 5px; margin-bottom: 5px;"><b>Pengiriman</b></h4>
-							<div class="table-responsive">
-								<table class="table">
-									<tr>
-										<td >
-											<i class="fa fa-user bg-success text-green" style="padding:5px;"></i> &nbsp;{{ $transaksi->User->name }}
-										</td>
-										<td>
-											<i class="fa fa-phone bg-warning text-orange" style="padding:5px;"></i> &nbsp;{{ $transaksi->User->DetailKonsumen->no_hp }} 
-										</td>
-											
-										<td>
-											<i class="fa fa-clock-o bg-danger text-red" style="padding:5px;"></i> &nbsp; {{ $transaksi->waktu_kirim}}
-										</td>
-										<td >
-											<i class="fa fa-map-marker bg-info text-blue" style="padding:6px;"></i> &nbsp;{{ $transaksi->detail_alamat }} - <label class="label  label-default text-yellow ">{{ $transaksi->jarak_tempuh }} KM</label>
-										</td>
-
-
-										@if($transaksi->status > '1')
-											<td align="center">
-												@if($transaksi->status == '2')
-													<label class="label label-warning">Pengiriman</label> 
-												@else if($transaksi->status == '3')
-													<label class="label label-warning">Pesanan Diterima</label> 
-												@endif
-												<small style="cursor: pointer;" data-toggle="modal" data-target="#modal_profil"><u>Profil Kurir</u></small>
-											</td>
-										@endif
-									</tr>
+				@if($transaksi->metode_pembayaran != '3')
+					<div class="bg-white" style="margin-top: 10px; background-color: #FFFFFF; padding:10px;">
+						<div class="row">
+							<div class="col-md-8">
+								<h4 style="margin-top: 5px; margin-bottom: 5px;"><b>Pengiriman</b></h4>
+								<div>
+									Klik <u>Lihat Detail</u> Untuk Melihat Deskripsi Pengiriman
+								</div>
+							</div>
+							<div class="col-md-4 text-right">
+								@php
+									$waktu_skrang = strtotime(date('Y-m-d H:i:s'));
+									$batas_ambe = strtotime($transaksi->waktu_kirim);
+								@endphp
+								@if( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '1') )
+									<label class="label label-danger">Pesanan Expired</label>
+								@elseif( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '3') )
+									<label class="label label-danger">Pesanan Dibatalkan</label>
+								@else
 									
-								</table>	
+									@if($transaksi->status == '1')
+										<label class="label label-warning">Menunggu Pengiriman</label>
+									@elseif($transaksi->status == '2')
+										<label class="label label-info">Sedang Pengiriman</label>
+									@elseif($transaksi->status == '5')
+										<label class="label label-success">Pesanan Diterima</label>
+									@endif
+								@endif
+
+								<h6 style="margin-bottom: 0px; margin-top: 5px; cursor:pointer;" onclick="$('#bodi_pengiriman').toggle('slow')"><u>Lihat Detail</u></h6>
+								
+							</div>
+						</div>
+						
+						<div id="bodi_pengiriman" hidden>
+							<div class="row" style="margin-top: 10px; margin-bottom: 10px; ">
+								<div class="col-md-12">
+									<div class="table-responsive">
+										<table class="table table-bordered">
+											<thead>
+												<th>Nama Pemesan</th>
+												<th>No Hp</th>
+												<th>Akan Dikirimkan</th>
+												<th><center>Alamat</center></th>
+												@if($transaksi->status >= '2' && $transaksi->status != '3')
+													<th><center>Waktu Pengiriman</center></th>
+												@endif
+
+												@if($transaksi->status == '5')
+													<th><center>Waktu Diterima</center></th>
+												@endif
+
+												@if($transaksi->status == '3')
+													<th><center>Dibatalkan Oleh</center></th>
+												@endif
+
+											</thead>
+											<tbody>
+												<tr>
+													<td>{{ $transaksi->User->name }}</td>
+													<td>{{ $transaksi->User->DetailKonsumen->no_hp }}</td>
+													<td>
+														{{ $transaksi->waktu_kirim->format('d M Y H:i A') }}
+													</td>
+													<td align="center">
+														{{ $transaksi->detail_alamat }} 
+														<hr style="margin:3px;"></hr>
+														<small>Jarak Tempuh : <label class="label  label-default text-yellow ">{{ $transaksi->jarak_tempuh }} KM </small>
+													</td>
+													
+													@if( $transaksi->status >= '2' && $transaksi->status != '3' )
+														<td align="center">
+															{{$transaksi->Pengiriman->created_at->format('d M Y H:i A')}}
+															<hr style="margin:3px;"></hr>
+															<small class="label label-info" style="cursor: pointer;" data-toggle="modal" data-target="#modal_profil">Profil Kurir</small>
+														</td>
+													@endif
+
+
+													@if($transaksi->status == '5')
+														<td align="center">
+															{{ $transaksi->Pengiriman->updated_at->format('d M Y H:i A') }}
+															<hr style="margin:3px;"></hr>
+															<label class="label label-success">{{ $transaksi->Pengiriman->diterima_oleh}}</label>
+															
+															
+														</td>
+													@endif
+
+													@if($transaksi->status == '3')
+														<td align="center">
+															<label class="label label-danger">{{ $transaksi->BatalPesanan->input_by}}</label>
+															<hr style="margin:3px;"></hr>
+															{{ $transaksi->BatalPesanan->created_at->format('d M Y H:i A') }}
+														</td>
+													@endif
+												</tr>
+											</tbody>
+										</table>
+									</div>
+									
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+
+					
+				@else 
+					<div class="bg-white" style="margin-top: 10px; background-color: #FFFFFF; padding:10px;">
+						<div class="row">
+							<div class="col-md-8">
+								<h4 style="margin-top: 5px; margin-bottom: 5px;"><b>Pengambilan</b></h4>
+								<div>
+									Klik <u>Lihat Detail</u> Untuk Melihat Deskripsi Pengambilan
+								</div>
+							</div>
+							<div class="col-md-4 text-right">
+								@php
+									$waktu_skrang = strtotime(date('Y-m-d H:i:s'));
+									$batas_ambe = strtotime($transaksi->waktu_kirim);
+								@endphp
+								@if( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '1') )
+									<label class="label label-danger">Pesanan Expired</label>
+								@elseif( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '3') )
+									<label class="label label-danger">Pesanan Dibatalkan</label>
+								@else
+									@if($transaksi->status == '1')
+										<label class="label label-warning">Menunggu Pengambilan</label>
+									@elseif($transaksi->status == '5')
+										<label class="label label-success">Pesanan Telah Diambil</label>
+									@endif
+								@endif
+
+								<h6 style="margin-bottom: 0px; margin-top: 5px; cursor:pointer;" onclick="$('#bodi_pengambilan').toggle('slow')"><u>Lihat Detail</u></h6>
+								
+							</div>
+						</div>
+						
+						<div id="bodi_pengambilan" hidden>
+							<div class="row" style="margin-top: 10px; margin-bottom: 10px; ">
+								<div class="col-md-12">
+									<div class="table-responsive">
+										<table class="table table-bordered">
+											<thead>
+												<th>Nama Pemesan</th>
+												<th>No Hp</th>
+												<th>Akan Diambil</th>
+												<th><center>Alamat</center></th>
+
+												@if($transaksi->status == '5')
+													<th><center>Waktu Ambil</center></th>
+												@endif
+
+												@if($transaksi->status == '3')
+													<th><center>Dibatalkan Oleh</center></th>
+												@endif
+											</thead>
+											<tbody>
+												<tr>
+													<td>{{ $transaksi->User->name }}</td>
+													<td>{{ $transaksi->User->DetailKonsumen->no_hp }}</td>
+													<td>
+														{{ $transaksi->waktu_kirim->format('d M Y H:i A') }}
+													</td>
+													<td align="center">
+														{{ $transaksi->detail_alamat }} 
+													</td>
+													
+													@if($transaksi->status == '5')
+														<td align="center">
+															{{ $transaksi->AmbilPesanan->created_at->format('d M Y H:i A') }}
+															<hr style="margin:3px;"></hr>
+															<small>Diambil Oleh : </small><label class="label label-success">{{ $transaksi->AmbilPesanan->diambil_oleh}}</label>
+														</td>
+													@endif
+
+													@if($transaksi->status == '3')
+														<td align="center">
+															<label class="label label-danger">{{ $transaksi->BatalPesanan->input_by}}</label>
+															<hr style="margin:3px;"></hr>
+															{{ $transaksi->BatalPesanan->created_at->format('d M Y H:i A') }}
+														</td>
+													@endif
+												</tr>
+											</tbody>
+										</table>
+									</div>
+									
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+					
+					
+				@endif
 
 				<div class="bg-white" style="margin-top: 10px; background-color: #FFFFFF; padding:10px;">
 					<div class="row">
@@ -143,18 +300,47 @@
 							</div>
 						</div>
 						<div class="col-md-4 text-right">
-							<h3 style="margin:0px;"> Rp. {{number_format($transaksi->total_bayar,'0','','.') }} </h3>
-							<h6 style="margin-bottom: 0px; margin-top: 5px; cursor:pointer;" data-toggle="modal" data-target="#modal_rincian" ><u>Lihat Rincian</u></h6>
 							
+							@if($transaksi->metode_pembayaran != '3')
+								<h3 style="margin:0px;"> Rp. {{number_format($transaksi->total_bayar,'0','','.') }} </h3>
+
+								<h6 style="margin-bottom: 0px; margin-top: 5px; cursor:pointer;" data-toggle="modal" data-target="#modal_rincian" ><u>Lihat Rincian</u></h6>
+							@else
+								<h3 style="margin:0px;"> Rp. {{number_format($transaksi->total_bayar,'0','','.') }} </h3>
+								<h6 style="margin-bottom: 0px; margin-top: 5px; cursor:pointer;" ><u>Total Bayar</u></h6>
+							@endif
 						</div>
 					</div>
 				</div>
 
-				@if($transaksi->status == '1')
+				@if($transaksi->status == '1' && $transaksi->metode_pembayaran != '3')
 					<div style="margin-top: 10px;">
 						<button class="btn btn-primary" data-target="#modal_input" data-toggle="modal">Mulai Pengiriman</button>
+
+						@if( ($waktu_skrang > $batas_ambe) && ($transaksi->metode_pembayaran == '2') )
+							<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
+						@endif
+					</div>
+				@elseif($transaksi->status == '1' && $transaksi->metode_pembayaran == '3')
+					<div style="margin-top: 10px;">
+						<button class="btn btn-primary" data-target="#modal_ambil_pesanan" data-toggle="modal">Pesanan Diambil</button>
+						
+						@if($waktu_skrang > $batas_ambe )
+							<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
+						@endif
 					</div>
 				@endif
+
+
+				@if($transaksi->status == '2')
+					<div style="margin-top: 10px;">
+						<a href="{{ route('pesanan_diterima', $transaksi->id ) }}" onclick="return(confirm('Apakah Anda Yakin ?'))"><button class="btn btn-primary">Pesanan Diterima</button></a>
+						@if($transaksi->metode_pembayaran != '1')
+							<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
+						@endif
+					</div>
+				@endif
+
 			</div>
 		</div>	
 
@@ -166,6 +352,10 @@
 				@endif
 				@if(Session::get('gagal') == 'simpan' )
 					$("#modal_input").modal('show');
+				@endif
+
+				@if(Session::get('gagal') == 'simpan_ambil_pesanan')
+					$("#modal_ambil_pesanan").modal('show');
 				@endif
 	 		});
 	 	
@@ -179,61 +369,63 @@
 	     	}
      	</script>
 
-     	<!-- modal profil kurir -->
-     	<div class="modal fade"  id="modal_profil">
-		<!-- Add the bg color to the header using any of the bg-* classes -->
-	        <div class="modal-dialog">
-			    <div class="modal-content">
-			    	
-			    	<!-- Widget: user widget style 1 -->
-			          <div class="box box-widget widget-user">
-			            <!-- Add the bg color to the header using any of the bg-* classes -->
-			           
-			            <div class="widget-user-header bg-aqua-active">
-			              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          				  <span aria-hidden="true">&times;</span></button>
-			              
-			              <h3 class="widget-user-username">{{ $transaksi->Pengiriman->Kurir->nama }}</h3>
-			              <h5 class="widget-user-desc">Kurir</h5>
-			            </div>
-			            <div class="widget-user-image ">
-			              <img class="img-circle" src="{{ asset('upload/images-100/'.$transaksi->Pengiriman->Kurir->foto) }}" alt="User Avatar">
-			            </div>
-			            <div class="box-footer" style="padding-top:40px;">
-			              <div class="row">
-			                <div class="col-sm-4 border-right">
-			                  <div class="description-block">
-			                    <h5 class="description-header">{{ $transaksi->Pengiriman->Kurir->merek }}</h5>
-			                    <span class="description-text">JENIS KENDARAAN</span>
-			                  </div>
-			                  <!-- /.description-block -->
-			                </div>
-			                <!-- /.col -->
-			                <div class="col-sm-4 border-right">
-			                  <div class="description-block">
-			                    <h5 class="description-header">{{ $transaksi->Pengiriman->Kurir->no_polisi }}</h5>
-			                    <span class="description-text">NO POLISI</span>
-			                  </div>
-			                  <!-- /.description-block -->
-			                </div>
-			                <!-- /.col -->
-			                <div class="col-sm-4">
-			                  <div class="description-block">
-			                    <h5 class="description-header">{{ $transaksi->Pengiriman->Kurir->no_hp }}</h5>
-			                    <span class="description-text">NO HP</span>
-			                  </div>
-			                  <!-- /.description-block -->
-			                </div>
-			                <!-- /.col -->
-			              </div>
-			              <!-- /.row -->
-			            </div>
-			          </div>
-			          <!-- /.widget-user -->	
-	    			
+     	@if( ($transaksi->metode_pembayaran == '1' && $transaksi->status > '1') || ($transaksi->metode_pembayaran == '2' && $transaksi->status >= '2' && $transaksi->status != '3' ) )
+	     	<div class="modal fade"  id="modal_profil">
+				<!-- Add the bg color to the header using any of the bg-* classes -->
+		        <div class="modal-dialog">
+				    <div class="modal-content">
+				    	
+				    	<!-- Widget: user widget style 1 -->
+				          <div class="box box-widget widget-user">
+				            <!-- Add the bg color to the header using any of the bg-* classes -->
+				           
+				            <div class="widget-user-header bg-aqua-active">
+				              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          				  <span aria-hidden="true">&times;</span></button>
+				              
+				              <h3 class="widget-user-username">{{ $transaksi->Pengiriman->Kurir->nama }}</h3>
+				              <h5 class="widget-user-desc">Kurir</h5>
+				            </div>
+				            <div class="widget-user-image ">
+				              <img class="img-circle" src="{{ asset('upload/images-100/'.$transaksi->Pengiriman->Kurir->foto) }}" alt="User Avatar">
+				            </div>
+				            <div class="box-footer" style="padding-top:40px;">
+				              <div class="row">
+				                <div class="col-sm-4 border-right">
+				                  <div class="description-block">
+				                    <h5 class="description-header">{{ $transaksi->Pengiriman->Kurir->merek }}</h5>
+				                    <span class="description-text">JENIS KENDARAAN</span>
+				                  </div>
+				                  <!-- /.description-block -->
+				                </div>
+				                <!-- /.col -->
+				                <div class="col-sm-4 border-right">
+				                  <div class="description-block">
+				                    <h5 class="description-header">{{ $transaksi->Pengiriman->Kurir->no_polisi }}</h5>
+				                    <span class="description-text">NO POLISI</span>
+				                  </div>
+				                  <!-- /.description-block -->
+				                </div>
+				                <!-- /.col -->
+				                <div class="col-sm-4">
+				                  <div class="description-block">
+				                    <h5 class="description-header">{{ $transaksi->Pengiriman->Kurir->no_hp }}</h5>
+				                    <span class="description-text">NO HP</span>
+				                  </div>
+				                  <!-- /.description-block -->
+				                </div>
+				                <!-- /.col -->
+				              </div>
+				              <!-- /.row -->
+				            </div>
+				          </div>
+				          <!-- /.widget-user -->	
+		    			
+					</div>
 				</div>
 			</div>
-		</div>
+		@endif
+    
     @endcomponent
 
     @component("components.modal", ["id" => "modal_rincian" ,"kop_modal" => "Rincian Belanja"])
@@ -303,7 +495,26 @@
 		</form>
 	@endcomponent
 
+	@component("components.modal", ["id" => "modal_ambil_pesanan" ,"kop_modal" => "Form Ambil Pesanan"])
+		<form method="POST" action="{{ route('ambil_pesanan') }}">
+			@csrf
+			<input type="hidden" name="transaksi_id" value="{{ $transaksi->id }}">
+			<div class="form-group @error('diambil_oleh') has-error @enderror ">
+		        <label>Diambil Oleh ?</label>&nbsp; <label class="label label-warning">Silahkan Ganti Nama Pengambil Apabila Pesanan Diambil Oleh Orang Lain</label>
+		        <input id="diambil_oleh" type="text" class="form-control" value="{{ $transaksi->User->name }}" name="diambil_oleh" >
+		        @error('diambil_oleh')
+		            <label class="control-label" for="inputError">
+                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
+                	</label>    
+		        @enderror 
+	        </div>
 
+
+	        <div class="text-right">
+	        	 <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
+	        </div>
+		</form>
+	@endcomponent
 
 	
 	

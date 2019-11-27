@@ -76,3 +76,22 @@ function refreshNotif(){
 
     });
 }
+
+function getJumPesanan(){
+    $.ajax({
+        url : "get_jum_pesanan",
+        success:function(msg){
+            $(".jumPesanan").html(msg);
+        }
+    });
+}
+
+function getJumPengiriman()
+{
+    $.ajax({
+        url : "get_jum_pengiriman",
+        success :function(msg){
+            $(".jumPengiriman").html(msg);
+        }
+    });
+}
