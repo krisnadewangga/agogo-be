@@ -106,10 +106,10 @@
 					<div class="row" style="margin-top: 20px;">
 						<div class="col-md-12">
 							<div style="background-color:#ffffff; padding:10px;">
-								<h4><b>Detail Item</b></h4>
+								<h4><b>Deskripsi Item</b></h4>
 								<div style="padding:20px;">
 									
-									<div style="border:1px solid #CCC; padding:30px 20px 10px 20px; margin-bottom:10px;" >
+								<!-- 	<div style="border:1px solid #CCC; padding:30px 20px 10px 20px; margin-bottom:10px;" >
 										<div class="row">
 											<div class="col-md-12">
 												<div>
@@ -144,9 +144,11 @@
 												
 											</table>
 										</div>
-									</div>
+									</div> -->
+
+
 									<div class="form-group @error('deskripsi') has-error @enderror" >
-										<label>Deskripsi Item</label>
+										<label>Masukan Deskripsi Yang Menggambarkan Item</label>
 										<textarea name="deskripsi" class="form-control" style="height:75px;">
 											{{ old('deskripsi') }}
 										</textarea>

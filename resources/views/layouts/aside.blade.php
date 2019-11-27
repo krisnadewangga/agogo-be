@@ -5,49 +5,64 @@
         <!-- sidebar menu: : style can be found in sidebar.less -->
         <ul class="sidebar-menu" data-widget="tree">
           <li class="header">MAIN NAVIGATION</li>
-          <li >
+          <li class="" id="m_dashboard">
             <a href="#">
               <i class="fa fa-dashboard"></i> <span>Dashboard</span>
               
             </a>
            
           </li>
-          <li class="treeview">
+          <li class="treeview" id="m_user">
             <a href="#">
-              <i class="fa fa-files-o"></i>
+              <i class="fa  fa-users"></i>
               <span>Master User</span>
             </a>
             <ul class="treeview-menu">
-              <li><a href="{{ route('level.index') }}"><i class="fa fa-circle-o"></i>Level</a></li>
-              <li><a href="{{ route('administrator.index') }}"><i class="fa fa-circle-o"></i>Admin</a></li>
-               <li><a href="{{ route('kurir.index') }}"><i class="fa fa-circle-o"></i>Kurir</a></li>
-              <li><a href="../layout/boxed.html"><i class="fa fa-circle-o"></i>Member</a></li>
+              <li id="sm_level"><a href="{{ route('level.index') }}"><i class="fa fa-circle-o"></i>Level</a></li>
+              <li id="sm_admin"><a href="{{ route('administrator.index') }}"><i class="fa fa-circle-o"></i>Admin</a></li>
+               <li id="sm_kurir"><a href="{{ route('kurir.index') }}"><i class="fa fa-circle-o"></i>Kurir</a></li>
+              
             </ul>
           </li>
 
-          <li class="treeview">
+          <li class="treeview" id="m_item">
             <a href="#">
-              <i class="fa fa-files-o"></i>
+              <i class="fa fa-suitcase"></i>
               <span>Master Item</span>
               
             </a>
             <ul class="treeview-menu">
-              <li><a href="{{ route('kategori.index') }}"><i class="fa fa-circle-o"></i>Kategori</a></li>
-              <li><a href="{{ route('item.index') }}"><i class="fa fa-circle-o"></i>Item</a></li>
+              <li id="sm_kategori"><a href="{{ route('kategori.index') }}"><i class="fa fa-circle-o"></i>Kategori</a></li>
+              <li id="sm_item"><a href="{{ route('item.index') }}"><i class="fa fa-circle-o"></i>Item</a></li>
             </ul>
           </li>
           
-          <li class="treeview">
+          <li class="treeview" id="m_transaksi">
             <a href="#">
-              <i class="fa fa-files-o"></i>
+              <i class="fa fa-exchange"></i>
               <span>Transaksi</span>
               
             </a>
             <ul class="treeview-menu">
-              <li ><a href="{{ route('transaksi.index') }}"><i class="fa fa-files-o"></i> <span>Transaksi</span></a></li>
-               <li ><a href="{{ route('pengiriman.index') }}"><i class="fa fa-files-o"></i> <span>Pengiriman</span></a></li>
+              <li id="sm_transaksi"><a href="{{ route('transaksi.index') }}"><i class="fa fa-circle-o"></i> <span>Pesanan</span></a></li>
+               <li id="sm_pengiriman"><a href="{{ route('pengiriman.index') }}"><i class="fa fa-circle-o"></i> <span>Pengiriman</span></a></li>
+               <li id="sm_topup"><a href="{{ route('topup_saldo.index') }}"><i class="fa fa-circle-o"></i> <span>TopUp Saldo</span></a></li>
             </ul>
           </li>
+
+          <li class="treeview" id="m_laporan">
+            <a href="#">
+              <i class="fa fa-files-o"></i>
+              <span>Laporan</span>
+              
+            </a>
+            <ul class="treeview-menu">
+              <li id="sm_user" ><a href="{{ route('lap_user') }}"><i class="fa fa-circle-o"></i> <span>User</span></a></li>
+              <li id="sm_pendapatan"><a href="{{ route('lap_pendapatan') }}"><i class="fa fa-circle-o"></i> <span>Pendapatan</span></a></li>
+               
+            </ul>
+          </li>
+
 
           
 

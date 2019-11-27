@@ -15,6 +15,9 @@
     <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap/dist/css/bootstrap.min.css') }}">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/font-awesome/css/font-awesome.min.css') }}">
+     <!-- bootstrap datepicker -->
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }} ">
+
     <!-- Ionicons -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/Ionicons/css/ionicons.min.css') }}">
     <!-- DataTables -->
@@ -99,15 +102,25 @@
     <!-- CKEDITOR -->
     <script src="{{ asset('assets/bower_components/ckeditor/ckeditor.js') }}"></script>
 
+    <!-- bootstrap datepicker -->
+    <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
+    
     <script type="text/javascript"> 
       @if (Auth::check()) var user_id =  {{ Auth::user()->id }} @else var user_id = '' @endif 
     </script>
     <!-- NOTIFIKASI -->
     <script src="{{ asset('assets/dist/js/notifikasi.js') }}"></script>
     <!-- page script -->
+    
     <script>
+      var menu_active = "{{ $menu_active }}";
       $(function () {
+
+         activeMenu();
          loadNotifikasi();
+         getJumPesanan();
+         getJumPengiriman();
+
          var t = $('.dataTables').DataTable();
          t.on( 'order.dt search.dt', function () {
             t.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
@@ -121,9 +134,21 @@
             $(this).val($(this).val().trim());
          });
 
-         
+          //Date picker
+        $('.datepicker').datepicker({
+          autoclose: true
+        })
       
       })
+
+      function activeMenu(){
+        var pisah = menu_active.split('|');
+        $(".treeview").prop('class','treeview');
+        $(".submenu").prop('class','');
+
+        $("#m_"+pisah[0]).prop('class','treeview active menu-open');
+        $("#sm_"+pisah[1]).prop('class','active');
+      }
     </script>
    
 </head>

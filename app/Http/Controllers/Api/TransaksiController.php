@@ -10,6 +10,8 @@ use App\Transaksi;
 use App\Notifikasi;
 use App\User;
 use App\Item;
+use App\Ongkir;
+use App\ItemTransaksi;
 use App\Helpers\Acak;
 use App\Helpers\SendNotif;
 use Validator;
@@ -95,17 +97,20 @@ class TransaksiController extends Controller
 	    	$saldo = $sel_user->DetailKonsumen->saldo;
 	    	$status_member = $sel_user->DetailKonsumen->status_member;
 
+	    	$min_stock_item = $this->UpdateStock($itemTransaksi);
 	    	if($req['metode_pembayaran'] == '1' && $status_member == '1'){
 	    		if($saldo > $req['total_bayar'] ){
 			    	$req_transaksi['durasi_kirim'] = $req['durasi_kirim'];
+			    	$req_transaksi['tgl_bayar'] = Carbon::now();
+
 	    			$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 	    			
 	    			$new_saldo = $saldo - $req['total_bayar'];
 	    			$this->UpdateSaldo($req['user_id'],$new_saldo);
 
-	    			if($req['durasi_kirim'] == 0){
-	    				$this->UpdateStock($itemTransaksi);
-	    			}
+	    			// if($req['durasi_kirim'] == 0){
+	    			// 	$this->UpdateStock($itemTransaksi);
+	    			// }
 
 	    			$success = 1;
 	    			$msg = "Berhasil Simpan Transaksi";
@@ -120,17 +125,18 @@ class TransaksiController extends Controller
 	    		$req_transaksi['durasi_kirim'] = $req['durasi_kirim'];
 	    		$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 	    		
-	    		if($req['durasi_kirim'] == 0){
-	    			$this->UpdateStock($itemTransaksi);
-	    		}
+	    		// if($req['durasi_kirim'] == 0){
+	    		// 	$this->UpdateStock($itemTransaksi);
+	    		// }
 
 	    		$success = 1;
 	    		$msg = "Berhasil Simpan Transaksi";
 	    		
 
 	    	}else if($req['metode_pembayaran'] == '3' && ($status_member == "1" || $status_member == "0")){
-
+	    		$req_transaksi['durasi_kirim'] = 0;
 	    		$req_transaksi['waktu_kirim'] = $req['waktu_ambil'];
+	    		// return $req_transaksi;
 	    		$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 	    		
 	    		$success = 1;
@@ -147,6 +153,105 @@ class TransaksiController extends Controller
 
     }
     
+    public function ListTransaksi(Request $request)
+    {
+    	$req = $request->all();
+        $messsages = ['dataPerpage.required' => 'dataPerpage Tidak Bisa Kosong',
+                      'page.required' => 'page Tidak Bisa Kosong',
+                  	  'user_id.required' => 'user_id Tidak Bisa Kosong'];
+        $rules = ['page' => 'required', 'dataPerpage' => 'required','user_id' => 'required'];
+
+        $validator = Validator::make($req, $rules,$messsages);
+        if($validator->fails()){
+              $success = 0;
+              $msg = $validator->messages()->all();
+              $kr = 400;
+              $pageSaatIni = 0;
+              $tampilPS = 0;
+        }else{
+        	 $page = $req['page'];
+             $dataPerpage = $req['dataPerpage'];
+             $offset = ($page - 1) * $dataPerpage;
+        	 
+        	 $list_transaksi = Transaksi::where('user_id','=',$req['user_id'])
+        	 							  ->selectRaw("id,user_id,no_transaksi,banyak_item,total_bayar,metode_pembayaran,status,created_at,updated_at")
+        	  							  ->orderBy('transaksi.id','DESC')
+										  ->limit($dataPerpage)
+										  ->offset($offset)->get();
+
+	         $jumdat = Transaksi::where('user_id','=',$req['user_id'])->count();
+	         $jumHal = ceil($jumdat / $dataPerpage);
+	         $pageSaatIni = (int) $page;
+	         $pageSelanjutnya = $page+1;
+	         if( ($pageSaatIni == $jumHal) || ($jumHal == 0) ){
+	             $tampilPS = 0;
+	         }else{
+	             $tampilPS = $pageSelanjutnya;
+	         }
+
+	         $success = 1;
+	         $msg = $list_transaksi;
+	         $kr = 200;
+        }
+        
+        return response()->json(['success' => $success,'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'msg' => $msg], $kr);
+    }
+
+    public function DetailTransaksi(Request $request)
+    {
+    	$req = $request->all();
+        $rules = ['transaksi_id' => 'required'];
+        $messsages = ['transaksi_id.required' => 'transaksi_id Tidak Bisa Kosong' ];
+       
+        $validator = Validator::make($req, $rules,$messsages);
+        if($validator->fails()){
+            $success = 0;
+            $msg = $validator->messages()->all();
+            $kr = 400;
+        }else{
+        	$transaksi = Transaksi::select("id",
+								        	"user_id",
+								        	"no_transaksi",
+								        	"banyak_item",
+								        	"total_transaksi",
+								        	"jarak_tempuh",
+								        	"total_biaya_pengiriman",
+								        	"total_bayar",
+								        	"alamat_lain",
+								        	"lat",
+								        	"long",
+								        	"detail_alamat",
+								        	"durasi_kirim",
+								        	"waktu_kirim",
+								        	"metode_pembayaran",
+								        	"status",
+								        	"created_at",
+								        	"updated_at")
+        							->where('id','=',$req['transaksi_id'])
+        							->first();
+        	$selItem = ItemTransaksi::join('item','item.id','=','item_transaksi.item_id')
+        							  ->where('item_transaksi.transaksi_id','=',$transaksi->id)
+        							  ->select('item_transaksi.*','item.nama_item')
+        							  ->get();
+        	
+        	$transaksi['item_transaksi'] = $selItem;
+        	
+
+        	if($transaksi->metode_pembayaran != "3"){
+        		$kurir = $transaksi->Pengiriman->Kurir;
+        		$transaksi['pengiriman'] = $kurir;
+        	}else{
+        		$transaksi->AmbilPesanan;	
+        	}
+        	$transaksi->BatalPesanan;
+        	
+        	$success = 1;
+          	$msg = $transaksi;
+          	$kr = 200;
+        }
+        return response()->json(['success' => $success,'msg' => $msg], $kr);
+    }
+
     public function SimpanTransaksi($req_transaksi,$itemTransaksi)
     {
     	$maxKD = Transaksi::where('no_transaksi','LIKE','T'.date('Ymd').'%')->orderBy('id','DESC')->first();
@@ -154,12 +259,14 @@ class TransaksiController extends Controller
         $req_transaksi['no_transaksi'] = $nexKD;
 
         if(isset($req_transaksi['durasi_kirim'])){
-        	if($req_transaksi['durasi_kirim'] == 0){
-	        	$waktu_kirim = Carbon::now();
-	        }else{
-	        	$waktu_kirim = Carbon::now()->addMinutes($req_transaksi['durasi_kirim']);
-	        }
-	        $req_transaksi['waktu_kirim'] = $waktu_kirim;
+        	if($req_transaksi['metode_pembayaran'] != '3'){
+        		if($req_transaksi['durasi_kirim'] == 0){
+		        	$waktu_kirim = Carbon::now();
+		        }else{
+		        	$waktu_kirim = Carbon::now()->addMinutes($req_transaksi['durasi_kirim']);
+		        }
+		        $req_transaksi['waktu_kirim'] = $waktu_kirim;
+        	}
         }
 
         $ins_transaksi = Transaksi::create($req_transaksi);
@@ -185,6 +292,19 @@ class TransaksiController extends Controller
     	}
     }
 
+    public function GetOngkir()
+    {
+    	$ongkir = Ongkir::first();
+    	if(is_null($ongkir)){
+    		$success = 0;
+    		$response = "Biaya Ongkir Belum Di Set";
+    	}else{
+    		$success = 1;
+    		$response = ['biaya_ongkir' => $ongkir->biaya_ongkir];
+    	}
+
+    	return response()->json(['success' => $success, 'msg' => $response], 200);
+    }
     
 
 }

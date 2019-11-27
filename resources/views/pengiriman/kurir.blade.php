@@ -8,7 +8,7 @@
                                   ])
         <div class="card">
 			<button class="btn btn-primary" data-toggle="modal" data-target="#modal_input">Create</button>
-			<button class="btn btn-warning" data-toggle="modal" data-target="#modal_input">SetOngkir</button>
+			<button class="btn btn-warning" data-toggle="modal" data-target="#modal_input_ongkir">SetOngkir</button>
 			<hr></hr>
 
 			@if (session('success'))
@@ -86,6 +86,10 @@
 			@if(Session::get('gagal') == 'simpan' )
 				$("#modal_input").modal('show');
 			@endif
+
+			@if(Session::get('gagal') == 'simpan_ongkir')
+				$("#modal_input_ongkir").modal('show');
+			@endif
  		});
  	
 
@@ -101,7 +105,7 @@
      	}
      </script>
 
-     @component("components.modal", ["id" => "modal_input" ,"kop_modal" => "Form Input Kurir"])
+    @component("components.modal", ["id" => "modal_input" ,"kop_modal" => "Form Input Kurir"])
 		<form method="POST" action="{{ route('kurir.store') }}" enctype="multipart/form-data">
 			@csrf
 
@@ -177,6 +181,38 @@
                 	</label>    
 		        @enderror 
 	        </div>
+
+	        <div class="text-right">
+	        	 <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
+	        </div>
+		</form>
+	@endcomponent
+
+	@component("components.modal", ["id" => "modal_input_ongkir" ,"kop_modal" => "Form Set Ongkir"])
+		<form method="POST" action="{{ route('set_ongkir') }}" >
+			@csrf
+
+			<div class="form-group @error('biaya_ongkir') has-error @enderror ">
+		        <label>Biaya Ongkir</label>
+		        <input id="biaya_ongkir" type="text" class="form-control " value="{{ is_null($ongkir) ? '0' : $ongkir->biaya_ongkir }}" name="biaya_ongkir" autocomplete>
+		        @error('biaya_ongkir')
+		            <label class="control-label" for="inputError">
+                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
+                	</label>    
+		        @enderror 
+	        	
+	        </div>
+	        
+	    	@if( is_null($ongkir) )
+	        	<div style="padding:10px; margin-bottom: 5px; margin-top: -10px;" class="bg-warning text-yellow">
+	        		Silahkan Atur Biaya Untuk Ongkir
+	        	</div>
+	        @else
+	        	<hr style="margin:5px 0px 5px 0px;"></hr>
+	        	<h5>Dibuat Oleh : {{ $ongkir->dibuat_oleh }}</h5>
+	        	<h5>{{ $ongkir->updated_at->format('d M Y H:i A') }}</h5>
+	        @endif
+
 
 	        <div class="text-right">
 	        	 <button type="submit" class="btn btn-primary btn-sm">Simpan</button>

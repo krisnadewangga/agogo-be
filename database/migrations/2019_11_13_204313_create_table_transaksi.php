@@ -35,6 +35,7 @@ class CreateTableTransaksi extends Migration
             $table->enum('metode_pembayaran',['1','2','3']);//1=bukpay, 2=cod, 3=bayarditempat
             $table->enum('transaksi_member',['0','1'])->default(0); //0 = bukan member, 1=member
             $table->enum('status',['1','2','3','4','5']); //1= Mempersiapkan Item, 2=pengiriman, 3=item diterima, 4=feedback, 5=selesai
+            $table->datetime('tgl_bayar')->nullable();
 
             $table->text('catatan')->default('-');
             $table->integer('durasi_kirim')->default(0);

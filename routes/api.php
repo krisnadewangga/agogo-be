@@ -28,6 +28,13 @@ Route::get('list_item_perkat','Api\MasterController@ListItemPerKat');
 Route::get('detail_item','Api\MasterController@DetailItem');
 
 Route::post('transaksi','Api\TransaksiController@Store');
+Route::get('list_transaksi','Api\TransaksiController@ListTransaksi');
+Route::get('detail_transaksi','Api\TransaksiController@DetailTransaksi');
+Route::get('get_ongkir','Api\TransaksiController@GetOngkir');
+
+//notifikasi
+Route::get('list_notifikasi', 'Api\NotifikasiController@tampilNotifikasi');
+Route::POST('read_notifiikasi', 'Api\NotifikasiController@readNotifikasi');
 
 Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
