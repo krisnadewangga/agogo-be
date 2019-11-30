@@ -20,11 +20,27 @@
           <ul class="nav navbar-nav">
             
             <!-- Notifications: style can be found in dropdown.less -->
+            <li class="notifications-menu">
+               <a href="{{ route('transaksi.index') }}">
+                <i class="fa fa-shopping-cart"></i>
+                <span class="label label-warning jumPesanan"></span>
+              </a>
+            </li>
+
+            <li class="notifications-menu">
+               <a href="{{ route('pengiriman.index') }}">
+                <i class="fa fa-send"></i>
+                <span class="label label-warning jumPengiriman"></span>
+              </a>
+            </li>
+             
+
             <li class="dropdown notifications-menu">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <i class="fa fa-bell-o"></i>
                 <span class="label label-warning jumNotif"></span>
               </a>
+              
               <ul class="dropdown-menu">
                 <li class="header">Anda Memiliki <u class="jumNotif"></u> Notifikasi</li>
                 <li>

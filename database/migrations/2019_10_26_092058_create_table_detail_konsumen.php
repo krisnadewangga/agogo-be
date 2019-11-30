@@ -16,6 +16,8 @@ class CreateTableDetailKonsumen extends Migration
         Schema::create('detail_konsumen', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
+            $table->date('tgl_lahir')->nullable();
+            $table->enum('jenis_kelamin',['0','1'])->nullable();//0 = Laki-Laki, 1 = Perempuan
             $table->string('no_hp');
             $table->text('alamat')->nullable();
             $table->text('lat')->nullable();

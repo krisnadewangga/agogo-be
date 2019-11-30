@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\DetailKonsumen;
 
 class User extends Authenticatable
 {
@@ -38,7 +39,21 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+  
+    protected $appends = array('ket_tgl_lahir');
 
+    public function getKetTglLahirAttribute()
+    {
+      $sel_tglLahir = DetailKonsumen::where('id',$this->id)->select('tgl_lahir')->first();
+      if(!empty($sel_tglLahir->tgl_lahir) ){
+        $tgl_lahir = $sel_tglLahir->tgl_lahir->format('d M Y');
+      }else{
+        $tgl_lahir = "<label class='label label-warning'>Belum Ditentukan</label>";
+      }
+
+      return $tgl_lahir;
+    }
+  
     public function Level()
     {
         return $this->belongsTo(Level::class);
@@ -50,10 +65,14 @@ class User extends Authenticatable
         return $this->hasOne(DetailKonsumen::class);
     }
 
-    Public function Transaksi()
+    public function Transaksi()
     {
         return $this->hasMany(Transaksi::class);
     }
 
+    public function HistoriTopup()
+    {
+        return $this->hasMany(HistoriTopup::class);
+    }
     
 }

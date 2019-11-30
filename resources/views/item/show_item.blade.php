@@ -106,7 +106,7 @@
 											</div>
 										</div>
 									</div>
-
+<!-- 
 									<div style="border:1px solid #CCC; padding:20px 20px 10px 20px; margin-bottom:10px; margin-top: 10px;" >
 										<div class="row">
 											<div class="col-md-12">
@@ -142,7 +142,8 @@
 												
 											</table>
 										</div>
-									</div>
+									</div> -->
+									
 									<div class="form-group @error('deskripsi') has-error @enderror" >
 										<label>Deskripsi Item</label>
 										<textarea name="deskripsi" class="form-control" style="height:75px;">

@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Pengiriman;
 use App\Transaksi;
+use App\Notifikasi;
 use Carbon\Carbon;
+use Auth;
 
 class PengirimanController extends Controller
 {
@@ -16,10 +18,10 @@ class PengirimanController extends Controller
      */
     public function index()
     {
-       $pengiriman = Pengiriman::where('status','0')->get();
-
-       return view('transaksi.pengiriman',compact('pengiriman'));
-
+       $pengiriman = Pengiriman::where('status','0')->orderBy('created_at','desc')->get();
+       $menu_active = "transaksi|pengiriman";
+       return view('transaksi.pengiriman',compact('pengiriman','menu_active'));
+       
     }
 
     /**
@@ -57,6 +59,19 @@ class PengirimanController extends Controller
         $find->update(['status' => '2']);   
         
         //Insert Notifikasi
+        $dnotif =
+        [
+        'pengirim_id' => Auth::User()->id,
+        'penerima_id' => $find->user_id,
+        'judul_id' => $find->id,
+        'judul' => 'Transaksi '.$find->no_transaksi,
+        'isi' => 'Pesanan Dengan Nomo Transaksi '.$find->no_transaksi.' Telah Dikirimkan Kerumah Anda',
+        'jenis_notif' => 2,
+        'dibaca' => '0'
+        ];
+        
+        $notif = Notifikasi::create($dnotif);
+        return redirect()->back()->with("success","Berhasil Mengaktifkan Pengiriman");
     }
 
     /**

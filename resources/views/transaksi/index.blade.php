@@ -1,9 +1,9 @@
 @extends('layouts.app1')
 
 @section('content')
-	@component('components.card', ['title' => 'Transaksi', 
+	@component('components.card', ['title' => 'Pesanan', 
 								   'breadcumbs' => array(
-                                                          array('judul' => 'Transaksi','link' => '#')
+                                                          array('judul' => 'Pesanan','link' => '#')
                                                     	) 
                                   ])
         <div class="card">
@@ -28,6 +28,7 @@
 						<th ><center>Jumlah Pesanan</center></th>
 						<th ><center>Total Bayar</center></th>
 						<th ><center>Jenis Transaksi</center></th>
+						<th ><center>Status</center></th>
 						<th style="width: 50px; text-align: center;">Aksi</th>
 						</tr>
 					</thead>
@@ -42,12 +43,23 @@
 								<td>Rp. {{ number_format($key->total_bayar,'0','','.') }}</td>
 								<td align="center">
 									@if($key['metode_pembayaran'] == 1)
-		       							<span class="label label-warning ">Bukpay</span>
+		       							<span class="label label-warning ">TopUp</span>
 			       					@elseif($key['metode_pembayaran'] == 2)
 			       						<span class="label label-info">COD</span>
 			       					@elseif($key['metode_pembayaran'] == 3)
 			       						<span class="label label-success">Bayar Ditempat</span>
 			       					@endif
+								</td>
+								<td align="center">
+									@php
+										$waktu_skrang = strtotime(date('Y-m-d H:i:s'));
+										$batas_ambe = strtotime($key['waktu_kirim']);
+									@endphp
+									@if($waktu_skrang < $batas_ambe )
+										<label class="label label-info">Aktif</label>
+									@else
+										<label class="label label-danger">Expired</label>
+									@endif
 								</td>
 								<td align="center">
 									<a href="{{ route('transaksi.show', $key->id ) }}">
