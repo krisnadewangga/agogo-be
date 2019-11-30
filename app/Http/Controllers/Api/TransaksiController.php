@@ -35,17 +35,11 @@ class TransaksiController extends Controller
 					'detail_alamat' => 'required',
 					'metode_pembayaran' => ['required', 
 											Rule::in(['1', '2', '3'])],
-					'banyak_item' => 'required'
+					'banyak_item' => 'required',
+					'waktu_kirim' => 'required'
 		         ];
 	
 		
-		if($req['metode_pembayaran'] == '1' || $req['metode_pembayaran'] == '2'){
-			$rules['waktu_kirim'] = "required";
-		}else if($req['metode_pembayaran'] == '3'){
-			$rules['waktu_ambil'] = "required";
-		}
-
-	
 		$itemTransaksi = [];
 		for($i=1; $i<=$req['banyak_item']; $i++){
 			
@@ -92,7 +86,8 @@ class TransaksiController extends Controller
     									'detail_alamat',
     									'metode_pembayaran',
     									'banyak_item',
-    									'catatan');	
+    									'catatan',
+    									'waktu_kirim');	
 
 	    	$sel_user = User::findOrFail($req['user_id']);
 	    	$saldo = $sel_user->DetailKonsumen->saldo;
@@ -101,7 +96,6 @@ class TransaksiController extends Controller
 	    	$min_stock_item = $this->UpdateStock($itemTransaksi);
 	    	if($req['metode_pembayaran'] == '1' && $status_member == '1'){
 	    		if($saldo > $req['total_bayar'] ){
-			    	$req_transaksi['waktu_kirim'] = $req['waktu_kirim'];
 			    	$req_transaksi['tgl_bayar'] = Carbon::now();
 			    	// return $req_transaksi;
 	    			$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
@@ -123,7 +117,7 @@ class TransaksiController extends Controller
 	    		$success = 0;
 	    		$msg = "Maaf! Silahkan Daftarkan Akun Anda Menjadi Member";
 	    	}else if( $req['metode_pembayaran'] == '2' && ($status_member == "1" || $status_member == "0" ) ){
-	    		$req_transaksi['waktu_kirim'] = $req['waktu_kirim'];
+	    		
 	    		$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 	    		
 	    		// if($req['durasi_kirim'] == 0){
@@ -136,7 +130,7 @@ class TransaksiController extends Controller
 
 	    	}else if($req['metode_pembayaran'] == '3' && ($status_member == "1" || $status_member == "0")){
 	    		// $req_transaksi['durasi_kirim'] = 0;
-	    		$req_transaksi['waktu_kirim'] = $req['waktu_ambil'];
+	    	
 	    		// return $req_transaksi;
 	    		$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 	    		
