@@ -10,7 +10,10 @@ use Auth;
 class StockerController extends Controller
 {
     
-
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function store(Request $request, $id)
     {
         $req = $request->all();
