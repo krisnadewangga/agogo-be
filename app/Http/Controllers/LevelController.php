@@ -13,6 +13,11 @@ class LevelController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     public function index()
     {
         $level = Level::where('status_aktif','1')->get();
