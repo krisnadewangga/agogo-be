@@ -123,7 +123,7 @@ class TransaksiController extends Controller
 	    		$success = 0;
 	    		$msg = "Maaf! Silahkan Daftarkan Akun Anda Menjadi Member";
 	    	}else if( $req['metode_pembayaran'] == '2' && ($status_member == "1" || $status_member == "0" ) ){
-	    		$req_transaksi['durasi_kirim'] = $req['durasi_kirim'];
+	    		$req_transaksi['waktu_kirim'] = $req['waktu_kirim'];
 	    		$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 	    		
 	    		// if($req['durasi_kirim'] == 0){
