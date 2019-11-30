@@ -16,7 +16,8 @@ class LevelController extends Controller
     public function index()
     {
         $level = Level::where('status_aktif','1')->get();
-        return view('user.level', compact('level'));
+        $menu_active = "user|level";
+        return view('user.level', compact('level','menu_active'));
     }
 
     /**

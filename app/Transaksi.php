@@ -3,7 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Carbon\Carbon;
 class Transaksi extends Model
 {
     protected $table = "transaksi";
@@ -26,9 +26,11 @@ class Transaksi extends Model
                  'catatan',
                  'durasi_kirim',
                  'waktu_kirim',
+                 'tgl_bayar',
     					   'status'];
+    protected $dates = ['waktu_kirim','tgl_bayar'];
 
-  	protected $appends = array('ket_metodepembayaran');
+  	protected $appends = array('ket_metodepembayaran','ket_status_transaksi');
 
     public function getKetMetodepembayaranAttribute()
     {
@@ -39,7 +41,35 @@ class Transaksi extends Model
       }else if($attr == "2"){
          $ket = "COD";
       }else if($attr == "3"){
-         $ket = "Bayar Langsung";
+         $ket = "Bayar Ditempat";
+      }
+
+      return $ket;
+    }
+
+    public function getKetStatusTransaksiAttribute()
+    {
+      $attr = $this->status;
+      $mp = $this->metode_pembayaran;
+
+      if($mp == "1" || $mp == "2"){
+         if($attr == "1"){
+           $ket = "Mempersiapkan Pesanan";
+         }else if($attr == "2"){
+           $ket = "Pengiriman Pesanan";
+         }else if($attr == "5"){
+           $ket = "Pesanan Diterima";
+         }else if($attr == "3"){
+           $ket = "Pesanan Dibatalkan";
+         }
+      }else{
+         if($attr == "1"){
+           $ket = "Menunggu Pengambilan Pesanan";
+         }else if($attr == "5"){
+           $ket = "Pesanan Telah Diambil";
+         }else if($attr == "3"){
+           $ket = "Pesanan Dibatalkan";
+         }
       }
 
       return $ket;
@@ -63,6 +93,16 @@ class Transaksi extends Model
     public function Pengiriman()
     {
       return $this->hasOne(Pengiriman::class);
+    }
+
+    public function AmbilPesanan()
+    {
+      return $this->hasOne(AmbilPesanan::class);
+    }
+
+    public function BatalPesanan()
+    {
+      return $this->hasOne(BatalPesanan::class);
     }
 
 }

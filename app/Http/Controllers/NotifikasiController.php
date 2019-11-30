@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Notifikasi;
 use App\User;
+use App\Transaksi;
+use App\Pengiriman;
 use Auth;
 
 class NotifikasiController extends Controller
@@ -38,5 +40,17 @@ class NotifikasiController extends Controller
             $status = 0;
         }
         return response()->json(['status' => $status]);
+    }
+
+    public function GetJumPesanan()
+    {
+       $transaksi = Transaksi::where('status','1')->count();
+       return $transaksi;
+    }
+    
+    public function GetJumPengiriman()
+    {
+       $pengiriman = Pengiriman::where('status','0')->count();
+       return $pengiriman;
     }
 }

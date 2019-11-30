@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\KompresFoto;
 use App\Kurir;
-
+use App\Ongkir;
+use Auth;
 
 class KurirController extends Controller
 {
@@ -17,7 +18,9 @@ class KurirController extends Controller
     public function index()
     {
         $kurir = Kurir::all();
-        return view('pengiriman.kurir', compact('kurir'));
+        $ongkir = Ongkir::first();
+        $menu_active = "user|kurir";
+        return view('pengiriman.kurir', compact('kurir','menu_active','ongkir'));
     }
 
     /**
@@ -57,6 +60,27 @@ class KurirController extends Controller
         return redirect()->back()->with('success','Berhasil Input Kurir');
 
     }
+
+    public function SetOngkir(Request $request )
+    {
+        $req = $request->all();
+        $validator = \Validator::make($req,['biaya_ongkir' => 'required|numeric']);
+
+        if($validator->fails()){
+            return redirect()->back()->withErrors($validator)->withInput()->with('gagal','simpan_ongkir');
+        }
+
+        $data = ['biaya_ongkir' => $req['biaya_ongkir'], 'dibuat_oleh' => "Admin - ".Auth::User()->name ];
+        $count = Ongkir::count();
+        if($count > 0){
+            $sel_ongkir = Ongkir::first();
+            $sel_ongkir->update($data);
+        }else{
+            $input = Ongkir::create($data);
+        }
+    
+        return redirect()->back()->with('success','Berhasil Set Ongkir');
+    }   
 
     /**
      * Display the specified resource.
