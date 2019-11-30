@@ -9,6 +9,11 @@ use Carbon\Carbon;
 
 class LaporanController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     public function LapPendapatan()
     {
     	$transaksi = Transaksi::where([ 

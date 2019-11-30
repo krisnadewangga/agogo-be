@@ -40,7 +40,7 @@ class TransaksiController extends Controller
 	
 		
 		if($req['metode_pembayaran'] == '1' || $req['metode_pembayaran'] == '2'){
-			$rules['durasi_kirim'] = "required";
+			$rules['waktu_kirim'] = "required";
 		}else if($req['metode_pembayaran'] == '3'){
 			$rules['waktu_ambil'] = "required";
 		}
@@ -48,6 +48,7 @@ class TransaksiController extends Controller
 	
 		$itemTransaksi = [];
 		for($i=1; $i<=$req['banyak_item']; $i++){
+			
 			$rules['item_id'.$i] = 'required';
 			$rules['jumlah'.$i] = 'required|numeric';
 			$rules['harga'.$i] = 'required|numeric';
@@ -100,9 +101,9 @@ class TransaksiController extends Controller
 	    	$min_stock_item = $this->UpdateStock($itemTransaksi);
 	    	if($req['metode_pembayaran'] == '1' && $status_member == '1'){
 	    		if($saldo > $req['total_bayar'] ){
-			    	$req_transaksi['durasi_kirim'] = $req['durasi_kirim'];
+			    	$req_transaksi['waktu_kirim'] = $req['waktu_kirim'];
 			    	$req_transaksi['tgl_bayar'] = Carbon::now();
-
+			    	// return $req_transaksi;
 	    			$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 	    			
 	    			$new_saldo = $saldo - $req['total_bayar'];
@@ -116,7 +117,7 @@ class TransaksiController extends Controller
 	    			$msg = "Berhasil Simpan Transaksi";
 	    		}else{
 	    			$success = 0;
-	    			$msg = "Saldo Bukpay Anda Tidak Cukup";
+	    			$msg = "Saldo Anda Tidak Cukup";
 	    		}
 	    	}else if($req['metode_pembayaran'] == '1' && $status_member != "1"){
 	    		$success = 0;
@@ -134,7 +135,7 @@ class TransaksiController extends Controller
 	    		
 
 	    	}else if($req['metode_pembayaran'] == '3' && ($status_member == "1" || $status_member == "0")){
-	    		$req_transaksi['durasi_kirim'] = 0;
+	    		// $req_transaksi['durasi_kirim'] = 0;
 	    		$req_transaksi['waktu_kirim'] = $req['waktu_ambil'];
 	    		// return $req_transaksi;
 	    		$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
@@ -258,16 +259,16 @@ class TransaksiController extends Controller
         $nexKD = Acak::AmbilId($maxKD['no_transaksi'],'T'.date('Ymd'),9,3);
         $req_transaksi['no_transaksi'] = $nexKD;
 
-        if(isset($req_transaksi['durasi_kirim'])){
-        	if($req_transaksi['metode_pembayaran'] != '3'){
-        		if($req_transaksi['durasi_kirim'] == 0){
-		        	$waktu_kirim = Carbon::now();
-		        }else{
-		        	$waktu_kirim = Carbon::now()->addMinutes($req_transaksi['durasi_kirim']);
-		        }
-		        $req_transaksi['waktu_kirim'] = $waktu_kirim;
-        	}
-        }
+        // if(isset($req_transaksi['durasi_kirim'])){
+        // 	if($req_transaksi['metode_pembayaran'] != '3'){
+        // 		if($req_transaksi['durasi_kirim'] == 0){
+		      //   	$waktu_kirim = Carbon::now();
+		      //   }else{
+		      //   	$waktu_kirim = Carbon::now()->addMinutes($req_transaksi['durasi_kirim']);
+		      //   }
+		      //   $req_transaksi['waktu_kirim'] = $waktu_kirim;
+        // 	}
+        // }
 
         $ins_transaksi = Transaksi::create($req_transaksi);
         $find = Transaksi::findOrFail($ins_transaksi->id);

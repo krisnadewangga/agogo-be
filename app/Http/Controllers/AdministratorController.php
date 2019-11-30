@@ -13,6 +13,11 @@ class AdministratorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     public function index()
     {
        $administrator = User::where('level_id','2')->get();

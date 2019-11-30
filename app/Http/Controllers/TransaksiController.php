@@ -12,6 +12,11 @@ use Auth;
 
 class TransaksiController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     public function index()
     {
     	$transaksi = Transaksi::where('status','1')->orderBy('created_at','desc')->get();
