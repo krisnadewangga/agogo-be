@@ -24,7 +24,7 @@ class KurirController extends Controller
     {
         $kurir = Kurir::all();
         $ongkir = Ongkir::first();
-        $menu_active = "user|kurir";
+        $menu_active = "user|kurir|0";
         return view('pengiriman.kurir', compact('kurir','menu_active','ongkir'));
     }
 

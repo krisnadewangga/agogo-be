@@ -66,7 +66,7 @@
 						@foreach($transaksi as $key)
 							<tr>
 								<td align="center"></td>
-								<td>{{ $key->tgl_bayar->format('d M Y H:i a') }}</td>
+								<td>{{ $key->tgl_bayar->format('d M Y H:i A') }}</td>
 								<td>{{ $key->no_transaksi }}</td>
 								<td>{{ $key->User->name }}</td>
 								<td align="center">{{ $key->ItemTransaksi()->count() }} Pesanan</td>
@@ -90,8 +90,22 @@
 					</tbody>
 				</table>
 			</div>
-			<h5 style="margin-bottom: 3px;"><u>Total Pendapatan</u></h5>
-			<h1 style="margin-top: 0px;">Rp {{ number_format($total_pendapatan,'0','','.') }}</h1>
+			<hr style="margin-top: 5px; margin-bottom: 5px;"></hr>
+			<div class="row">
+				<div class="col-md-4 text-center">
+					<h5 style="margin-bottom: 3px;"><u>Total Pendapatan</u></h5>
+					<h1 style="margin-top: 0px;">Rp {{ number_format($total_pendapatan,'0','','.') }}</h1>
+				</div>
+				<div class="col-md-4 text-center">
+					<h5 style="margin-bottom: 3px;"><u>Total Pendapatan Bersih/Item</u></h5>
+					<h1 style="margin-top: 0px;">Rp {{ number_format($total_bersih_item,'0','','.') }}</h1>
+				</div>
+				<div class="col-md-4 text-center">
+					<h5 style="margin-bottom: 3px;"><u>Total Pendapatan Dari Pengiriman</u></h5>
+					<h1 style="margin-top: 0px;">Rp {{ number_format($total_pengiriman,'0','','.') }}</h1>
+				</div>
+			</div>
+			
         </div>
     @endcomponent
 @endsection

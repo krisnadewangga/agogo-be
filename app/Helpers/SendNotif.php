@@ -127,8 +127,8 @@ class SendNotif{
 
 
         $topic = new Topics();
-	// ganti topic(user
-        $topic->topic('userBungkus'.$id_user);
+	    // ganti topic(user
+        $topic->topic('userAgogo'.$id_user);
 
 
         $optionBuiler = new OptionsBuilder();
@@ -162,7 +162,7 @@ class SendNotif{
                                       'jenis_notif' => $jenis_notif,
                                       'dibaca' => '0'
                                     ]);
-        // event(new PusherEvent($pengirim_nama." , ".$judul, [$penerima_id]));
+        event(new PusherEvent($pengirim_nama." , ".$judul, [$penerima_id]));
 
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Helpers\SendNotif;
 use App\Pengiriman;
 use App\Transaksi;
 use App\Notifikasi;
@@ -24,7 +25,7 @@ class PengirimanController extends Controller
     public function index()
     {
        $pengiriman = Pengiriman::where('status','0')->orderBy('created_at','desc')->get();
-       $menu_active = "transaksi|pengiriman";
+       $menu_active = "transaksi|pengiriman|0";
        return view('transaksi.pengiriman',compact('pengiriman','menu_active'));
        
     }
@@ -70,12 +71,16 @@ class PengirimanController extends Controller
         'penerima_id' => $find->user_id,
         'judul_id' => $find->id,
         'judul' => 'Transaksi '.$find->no_transaksi,
-        'isi' => 'Pesanan Dengan Nomo Transaksi '.$find->no_transaksi.' Telah Dikirimkan Kerumah Anda',
+        'isi' => 'Pesanan Dengan Nomor Transaksi '.$find->no_transaksi.' Telah Dikirimkan Kerumah Anda',
         'jenis_notif' => 2,
         'dibaca' => '0'
         ];
         
         $notif = Notifikasi::create($dnotif);
+
+        //NotifGCM
+        SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'pengiriman', $notif->judul_id);
+
         return redirect()->back()->with("success","Berhasil Mengaktifkan Pengiriman");
     }
 

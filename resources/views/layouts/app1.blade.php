@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Agogo') }}</title>
+    <title>AgogoBakery.com</title>
 
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -108,16 +108,20 @@
     <script type="text/javascript"> 
       @if (Auth::check()) var user_id =  {{ Auth::user()->id }} @else var user_id = '' @endif 
     </script>
+
+    <!-- Pusher -->
+    <script src="https://js.pusher.com/3.1/pusher.min.js"></script>
+
+    <script type="text/javascript">var menu_active = "{{ $menu_active }}";</script>
     <!-- NOTIFIKASI -->
     <script src="{{ asset('assets/dist/js/notifikasi.js') }}"></script>
     <!-- page script -->
     
     <script>
-      var menu_active = "{{ $menu_active }}";
+      
       $(function () {
-
-         activeMenu();
          loadNotifikasi();
+         activeMenu();
          getJumPesanan();
          getJumPengiriman();
 
@@ -138,7 +142,31 @@
         $('.datepicker').datepicker({
           autoclose: true
         })
-      
+        
+        var pusher = new Pusher('{{ env('MIX_PUSHER_APP_KEY') }}', {
+                              cluster: '{{ env('MIX_PUSHER_APP_CLUSTER') }}',
+                              encrypted: true
+                            });
+
+
+        @if (Auth::check())
+          var channel = pusher.subscribe('agogo.{{ Auth::user()->id }}');
+          channel.bind('App\\Events\\PusherEvent', function(data) {
+              // this is called when the event notification is received...
+              loadNotifikasi();
+              getJumPesanan();
+              getJumPengiriman();
+              
+          });
+          
+        @else
+        var channel = pusher.subscribe('agogo');
+          channel.bind('App\\Events\\PusherEvent', function(data) {
+              // this is called when the event notification is received...
+              console.log('oke');
+          });
+        @endif
+
       })
 
       function activeMenu(){
@@ -169,15 +197,43 @@
     <!-- /.content-wrapper -->
 
     <footer class="main-footer">
-      <div class="pull-right hidden-xs">
-        <b>Version</b> 2.4.0
-      </div>
-      <strong>Copyright &copy; 2014-2016 <a href="https://adminlte.io">Almsaeed Studio</a>.</strong> All rights
-      reserved.
+     
+      <strong>copyright © 2019 <a href='http://suaratech.com/'>Cv. Azkha Indo Pratama</a>.  All rights reserved.
+      reserved.</strong>
     </footer>
 
   </div>
+  <script type="text/javascript">
+    
+      $(document).ready(function(){
+        
+        @if(Session::get('gagal') == 'gambar_fp' )
+          $("#modal_ganti_fp").modal('show');
+        @endif
+      });
+      
 
+  </script>
+   @component("components.modal", ["id" => "modal_ganti_fp" ,"kop_modal" => "Ganti Foto Profil"])
+
+      <form method="POST" action="{{ route('submit_ganti_fp') }}" enctype="multipart/form-data">
+        @csrf
+            <div class="form-group @error('gambar') has-error @enderror ">
+              <label>Pilih Foto</label>
+              <input id="gambar" type="file"  name="gambar" >
+              @error('gambar')
+                  <label class="control-label" for="inputError">
+                        <i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
+                    </label>    
+              @enderror 
+            </div>
+
+            <div class="text-right">
+               <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
+            </div>
+
+      </form>
+    @endcomponent
 
 </body>
 </html>

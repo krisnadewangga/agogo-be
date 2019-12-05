@@ -165,10 +165,10 @@
 			              <!-- /.tab-pane -->
 
 			              <div class="tab-pane" id="tab_2">
-			              		<table class="table-galeri"  style="margin-top: 10px;">
+			              		<table class="table-galeri" style="margin-top: 10px;">
 			              			<tr>
-			              				<td rowspan="5">
-			              					<img src="{{ asset('upload/images-400/'.$gambarUtama->gambar ) }}" height="150">
+			              				<td rowspan="4">
+			              					<img src="{{ asset('upload/images-400/'.$gambarUtama->gambar ) }}" height="100">
 			              				</td>
 			              			</tr>
 			              			<tr>
@@ -181,11 +181,7 @@
 			              				<td>:</td>
 			              				<td>{{ $item->Kategori->kategori }}</td>
 			              			</tr>
-			              			<tr>
-			              				<td>Varian</td>
-			              				<td>:</td>
-			              				<td>{{ $item->v_rasa != '' ? $item->v_rasa : 'Tdk. Ada Varian' }}</td>
-			              			</tr>
+			              			
 			              			<tr>
 			              				<td colspan="3">
 			              					<button class="btn btn-primary btn-sm " data-target="#modal_input_gambar" data-toggle="modal" style="width: 100%;">Tambah Gambar</button>
@@ -241,8 +237,8 @@
 			              <div class="tab-pane" id="tab_3">
 				              	<table class="table-galeri"  style="margin-top: 10px;">
 			              			<tr>
-			              				<td rowspan="5">
-			              					<img src="{{ asset('upload/images-400/'.$gambarUtama->gambar ) }}" height="150">
+			              				<td rowspan="4">
+			              					<img src="{{ asset('upload/images-400/'.$gambarUtama->gambar ) }}" height="100">
 			              				</td>
 			              			</tr>
 			              			<tr>
@@ -255,11 +251,7 @@
 			              				<td>:</td>
 			              				<td>{{ $item->Kategori->kategori }}</td>
 			              			</tr>
-			              			<tr>
-			              				<td>Varian</td>
-			              				<td>:</td>
-			              				<td>{{ $item->v_rasa != '' ? $item->v_rasa : 'Tdk. Ada Varian' }}</td>
-			              			</tr>
+			              		
 			              			<tr>
 			              				<td colspan="3">
 			              					<button class="btn btn-primary btn-sm " data-target="#modal_tambah_stock" data-toggle="modal" style="width: 100%;">Tambah Stock</button>
@@ -284,7 +276,7 @@
 										@foreach($stocker as $keyStocker)
 											<tr>
 												<td align="center"></td>
-												<td>{{ $keyStocker->created_at }}</td>
+												<td>{{ $keyStocker->created_at->format("d M Y H:i A") }}</td>
 												<td>{{ $keyStocker->jumlah }} PCS</td>
 												<td>{{ $keyStocker->input_by }} </td>
 												@if(Auth::User()->level_id == '1')
