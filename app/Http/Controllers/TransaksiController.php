@@ -8,6 +8,8 @@ use App\Kurir;
 use App\Item;
 use App\Notifikasi;
 use Carbon\Carbon;
+use App\Helpers\SendNotif;
+
 use Auth;
 
 class TransaksiController extends Controller
@@ -20,16 +22,29 @@ class TransaksiController extends Controller
     public function index()
     {
     	$transaksi = Transaksi::where('status','1')->orderBy('created_at','desc')->get();
-        $menu_active = "transaksi|transaksi";
+        $menu_active = "transaksi|transaksi|0";
     	return view('transaksi.index',compact('transaksi','menu_active'));
     }
 
     public function show($id)
     {
     	$transaksi = Transaksi::findOrFail($id);
-        $kurir = Kurir::where('status_aktif','1')->get();
-    	// return $transaksi;
-        $menu_active = "transaksi|transaksi";
+        $kurir = Kurir::where('status_aktif','1')
+                       ->whereNotIn('kurir.id',function ($query) {
+                            $query->select('kurir_id')
+                                  ->from('pengiriman')
+                                  ->where('pengiriman.status','0')
+                                  ->distinct();
+                       })
+                       ->get();
+    	
+        $findNot = Notifikasi::where('judul_id',$id)->where('dibaca','0')->first();
+
+        if(isset($findNot->id)){
+            $findNot->Update(['dibaca' => '1']);
+        }
+
+        $menu_active = "transaksi|transaksi|1";
     	return view('transaksi.detail',compact('transaksi','kurir','menu_active'));
     }
 
@@ -42,6 +57,23 @@ class TransaksiController extends Controller
                                           'diterima_oleh' => 'Admin - '.Auth::user()->name,
                                           'status' => '1']);
 
+        //Insert Notifikasi
+        $dnotif =
+        [
+        'pengirim_id' => Auth::User()->id,
+        'penerima_id' => $transaksi->user_id,
+        'judul_id' => $transaksi->id,
+        'judul' => 'Transaksi '.$transaksi->no_transaksi,
+        'isi' => 'Pesanan Dengan Nomor Transaksi '.$transaksi->no_transaksi.' Telah Diterima, Terimakasih Telah Berbelanja Di AgogoBakery',
+        'jenis_notif' => 2,
+        'dibaca' => '0'
+        ];
+        
+        $notif = Notifikasi::create($dnotif);
+
+        //NotifGCM
+        SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'pengiriman', $notif->judul_id);
+        
         return redirect()->back()->with("success","Berhasil Menyelesaikan Transaksi");
     }
 

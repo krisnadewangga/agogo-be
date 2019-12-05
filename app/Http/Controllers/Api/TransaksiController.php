@@ -139,12 +139,15 @@ class TransaksiController extends Controller
 
 	    	}
 	    	
-	    	$admin = User::where('level_id','2')->first();
-            SendNotif::SendNotifPus($sel_user->id,$sel_user->name,$admin->id,$ins_transaksi->id,$sel_user->name.' Baru Saja Melakukan Transaksi','1');
+	    	if($success == "1"){
+	    		$admin = User::where('level_id','2')->first();
+            	SendNotif::SendNotifPus($sel_user->id,$sel_user->name,$admin->id,$ins_transaksi->id,$sel_user->name.' Baru Saja Melakukan Transaksi','1');
+	    	}
+	    	
 
 	    }
 
-	    return response()->json(['success' => $success,'msg' => $msg]);
+	    return response()->json(['success' => $success,'msg' => $msg],200);
 
     }
     

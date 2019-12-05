@@ -49,30 +49,43 @@
                     
                   </ul>
                 </li>
-                <li class="footer"><a href="#">View all</a></li>
+                <li class="footer text-left">
+                  <a href="{{ route('list_notifikasi') }}"><u>Lihat Semua</u></a>
+                </li>
               </ul>
             </li>
            
             <!-- User Account: style can be found in dropdown.less -->
             <li class="dropdown user user-menu">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <img src="{{asset('assets/dist/img/user2-160x160.jpg') }}" class="user-image" alt="User Image">
+                @if(!empty(Auth::User()->foto))
+                   <img src="{{ asset('upload/images-100/'.Auth::User()->foto) }}" class="user-image" alt="User Image">
+                @else
+                   <img src="{{asset('assets/dist/img/user.png') }}" class="user-image" alt="User Image">
+                @endif
+                
                 <span class="hidden-xs">{{ Auth::user()->name }}</span>
               </a>
               <ul class="dropdown-menu">
                 <!-- User image -->
                 <li class="user-header">
-                  <img src="{{asset('assets/dist/img/user2-160x160.jpg') }}" class="img-circle" alt="User Image">
+                  @if(!empty(Auth::User()->foto))
+                    <img src="{{ asset('upload/images-400/'.Auth::User()->foto) }}" class="img-circle" alt="User Image">
+                  @else
+                     <img src="{{asset('assets/dist/img/user.png') }}" class="img-circle" alt="User Image">
+                  @endif
+                 
 
                   <p>
-                    Alexander Pierce - Web Developer
-                    <small>Member since Nov. 2012</small>
+                    <small><span style="cursor: pointer;" data-target="#modal_ganti_fp" data-toggle="modal"><u>Ganti Foto Profil</u></span></small>
+                    {{ Auth::User()->name }} - @if(Auth::User()->level_id == 1)SuperAdmin @else Administrator @endif
+                   
                   </p>
                 </li>
                
                 <li class="user-footer">
                   <div class="pull-left">
-                    <a href="#" class="btn btn-default btn-flat">Profile</a>
+                    <a href="{{ route('in_ganti_password') }}" class="btn btn btn-flat">Ganti Password</a>
                   </div>
                   <div class="pull-right">
                     <a  class="btn btn-default btn-flat" href="{{ route('logout') }}"

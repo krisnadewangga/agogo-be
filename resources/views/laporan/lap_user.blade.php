@@ -68,7 +68,7 @@
 							<th>Jenis Kelamain</th>
 							<th>TGL Lahir</th>
 							<th>No Hp</th>
-							<th>Alamat</th>
+							
 							<th><center>Jenis User</center></th>
 						</tr>
 					</thead>
@@ -94,8 +94,7 @@
 										<label class="label label-warning">Belum Ditentukan</label>
 									@endif
 								</td>
-								<td>{{ $key->DetailKonsumen->no_hp }}</td>
-								<td>{{ $key->DetailKonsumen->alamat }}</td>
+								<td>{{ $key->no_hp }}</td>
 								<td align="center">
 									@if($key->DetailKonsumen->status_member == '1')
 										<label class="label label-success">Member</label>

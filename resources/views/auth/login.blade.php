@@ -18,7 +18,7 @@
           
           <div class="form-group has-feedback @error('email') has-error @enderror ">    
 
-            <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus placeholder="Email">
+            <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autocomplete="off" autofocus placeholder="Email" >
             <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
 
             @error('email')

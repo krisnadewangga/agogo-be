@@ -153,7 +153,7 @@
 											<tbody>
 												<tr>
 													<td>{{ $transaksi->User->name }}</td>
-													<td>{{ $transaksi->User->DetailKonsumen->no_hp }}</td>
+													<td>{{ $transaksi->User->no_hp }}</td>
 													<td>
 														{{ $transaksi->waktu_kirim->format('d M Y H:i A') }}
 													</td>
@@ -323,7 +323,7 @@
 					</div>
 				@elseif($transaksi->status == '1' && $transaksi->metode_pembayaran == '3')
 					<div style="margin-top: 10px;">
-						<button class="btn btn-primary" data-target="#modal_ambil_pesanan" data-toggle="modal">Pesanan Diambil</button>
+						<button class="btn btn-success" data-target="#modal_ambil_pesanan" data-toggle="modal">Pesanan Diambil</button>
 						
 						@if($waktu_skrang > $batas_ambe )
 							<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
@@ -334,7 +334,7 @@
 
 				@if($transaksi->status == '2')
 					<div style="margin-top: 10px;">
-						<a href="{{ route('pesanan_diterima', $transaksi->id ) }}" onclick="return(confirm('Apakah Anda Yakin ?'))"><button class="btn btn-primary">Pesanan Diterima</button></a>
+						<a href="{{ route('pesanan_diterima', $transaksi->id ) }}" onclick="return(confirm('Apakah Anda Yakin ?'))"><button class="btn btn-success">Pesanan Diterima</button></a>
 						@if($transaksi->metode_pembayaran != '1')
 							<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
 						@endif
