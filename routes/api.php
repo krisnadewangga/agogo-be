@@ -20,11 +20,16 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('register','Api\UserController@register');
 Route::post('lengkapi_alamat', 'Api\UserController@LengkapiALamat');
 Route::get('profil_user','Api\UserController@ProfilUser');
+Route::post('update_profil','Api\UserController@updateProfil');
+Route::post('reset_password','Api\UserController@resetPassword');
 Route::post('login','Api\UserController@login');
+
 
 Route::get('list_kategori','Api\MasterController@ListKategori');
 Route::get('list_item_all','Api\MasterController@ListItemAll');
 Route::get('list_item_perkat','Api\MasterController@ListItemPerKat');
+Route::get('cari_item','Api\MasterController@CariItem');
+Route::get('top_ten','Api\MasterController@topTen');
 Route::get('detail_item','Api\MasterController@DetailItem');
 
 Route::post('transaksi','Api\TransaksiController@Store');

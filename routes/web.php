@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\PusherEvent;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,8 +19,11 @@ Route::get('/', 'HomeController@index')->name('home');
 Route::get('/load_notif','NotifikasiController@loadNotif')->name('load_notif');
 Route::get('/get_jum_pesanan','NotifikasiController@GetJumPesanan')->name('get_jum_pesanan');
 Route::get('/get_jum_pengiriman','NotifikasiController@GetJumPengiriman')->name('get_jum_pengiriman');
-
+Route::get('/list_notifikasi','NotifikasiController@index')->name('list_notifikasi');
 Route::get('/baca_notif','NotifikasiController@bacaNotif')->name('baca_notif');
+Route::get('/in_ganti_password','ProfilController@inGantiPassword')->name('in_ganti_password');
+Route::POST('/submit_ganti_password','ProfilController@gantiPassword')->name('submitGantiPassword');
+Route::POST('/submit_ganti_fp','ProfilController@gantiFotoProfil')->name('submit_ganti_fp');
 
 Route::get('/aktifasi/{id}','AktifasiAkunController@Aktifasi')->name('aktifasi');
 Route::resource('level','LevelController');
@@ -52,8 +56,9 @@ Route::get('/lap_pendapatan','LaporanController@LapPendapatan')->name('lap_penda
 Route::post('/filter_laporan','LaporanController@FilterLaporan')->name('filter_laporan');
 Route::get('/lap_user','LaporanController@LapUser')->name('lap_user');
 
+
 Route::get('coba',function(){
-	return view('welcome');
+	event(new PusherEvent('coba pusher'));
 });
 
 // Route::put('/level_update/{id}','LevelController@update')->name('level_update');

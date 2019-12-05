@@ -37,7 +37,6 @@
 							<th>Jenis Kelamin</th>
 							<th>TGL Lahir</th>
 							<th>No Hp</th>
-							<th>Alamat</th>
 							<th><center>Status User</center></th>
 							<th><center>Aksi</center></th>
 						</thead>
@@ -60,6 +59,12 @@
 				@if(Session::get('gagal') == 'simpan' )
 					$("#modal_topup").modal('show');
 				@endif
+
+				$("input[name='param']").on('keypress',function(e){
+					 if(e.which === 13){
+					 	cari_nama();
+			         }
+				});
 	 		});
 
 			function cari_nama(){
@@ -70,7 +75,7 @@
 					beforeSend:function(){
 						$("#bodi_tbl_search").html(`
 													<tr>
-														<td colspan='8' align='center'>
+														<td colspan='7' align='center'>
 															<label class='label label-warning'><i class='fa fa-spinner fa-pulse fa-fw' ></i> Sedang Mempersiapkan Data</label>
 														</td>
 													</tr>
@@ -82,7 +87,7 @@
 						if(msg.jumlah == '0'){
 							$("#bodi_tbl_search").html(`
 													<tr>
-														<td colspan='8' align='center'>
+														<td colspan='7' align='center'>
 															<label class='label label-danger'><i class='fa fa-warning' ></i>&nbsp; Data User TIdak Ditemukan</label>
 														</td>
 													</tr>
@@ -106,7 +111,7 @@
 									html += `</td>
 										  	 <td>`+value.ket_tgl_lahir+`</td>
 										  	 <td>`+value.no_hp+`</td>
-										  	 <td>`+value.alamat+`</td>
+										  
 										  	 <td align='center'><label class='label label-info'>`; 
 										  	 	
 										  	 	if(value.status_member == '0'){

@@ -1,8 +1,15 @@
 var host = window.location.host;
+var pisah_not = menu_active.split('|');
+if(pisah_not[2] == "1"){
+    url = "../";
+}else{
+    url = "";
+}
+
 function loadNotifikasi(){
 
     $.ajax({
-    	url : "load_notif",
+    	url : url+"load_notif",
     	data : "user_id="+user_id,
     	beforeSend:function(){
     		$("#listNot").html(`<center><span class='bg-warning text-yellow' style='padding:2px;'>
@@ -23,8 +30,9 @@ function loadNotifikasi(){
     			  }
 
                   if(value.jenis_notif == '1'){
-                    var link_notif = "detail_transaksi?transaksi_id="+value.judul_id;
-                    var label = "<label class='label label-warning'>Transaksi</label>";
+                    var link_notif = url+"transaksi/"+value.judul_id;
+                    // var label = "<label class='label label-warning'>Transaksi</label>";
+                    var label = "";
                   }else if(value.jenis_notif == '2'){
                     var link_notif = 'konfir_bayar';
                     var label = "";
@@ -38,7 +46,7 @@ function loadNotifikasi(){
                   
 				  listNotif += `<li style="background-color : `+bg+`" >
                                     <a href="`+link_notif+`" target='blank()' style="font-size: 13px; ">
-                                        <i class="fa fa-bell-o" style="color:#FBB901;"></i> `+value.created_at+` - `+label+` <br/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `+value.judul+` lorem ipsm  
+                                        <i class="fa fa-bell-o" style="color:#FBB901;"></i> `+value.created_at+`  `+label+` <br/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `+value.judul+` lorem ipsm  
                                     </a>
                                 </li>`;
                  
@@ -79,7 +87,7 @@ function refreshNotif(){
 
 function getJumPesanan(){
     $.ajax({
-        url : "get_jum_pesanan",
+        url : url+"get_jum_pesanan",
         success:function(msg){
             $(".jumPesanan").html(msg);
         }
@@ -89,7 +97,7 @@ function getJumPesanan(){
 function getJumPengiriman()
 {
     $.ajax({
-        url : "get_jum_pengiriman",
+        url : url+"get_jum_pengiriman",
         success :function(msg){
             $(".jumPengiriman").html(msg);
         }

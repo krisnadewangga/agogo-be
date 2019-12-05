@@ -36,7 +36,7 @@
 						@foreach($transaksi as $key)
 							<tr>
 								<td align="center"></td>
-								<td>{{ $key->created_at->format('d M Y H:i a') }}</td>
+								<td>{{ $key->created_at->format('d M Y H:i A') }}</td>
 								<td>{{ $key->no_transaksi }}</td>
 								<td>{{ $key->User->name }}</td>
 								<td align="center">{{ $key->ItemTransaksi()->count() }} Pesanan</td>

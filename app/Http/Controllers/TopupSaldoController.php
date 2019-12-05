@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Notifikasi;
 use App\HistoriTopup;
+use App\Helpers\SendNotif;
 use Auth;
 
 class TopupSaldoController extends Controller
@@ -21,7 +22,7 @@ class TopupSaldoController extends Controller
     }
     public function index()
     {
-        $menu_active = "transaksi|topup";
+        $menu_active = "transaksi|topup|0";
         return view('topup_saldo.index',compact('menu_active'));
     }
 
@@ -39,7 +40,7 @@ class TopupSaldoController extends Controller
         $search = User::join('detail_konsumen as a', 'users.id', '=', 'a.user_id')
                         ->where('users.status_aktif','=','1')
                         ->where('name','like','%'.$param.'%')
-                        ->orWhere('a.no_hp','=',$param)
+                        ->orWhere('no_hp','=',$param)
 
                         ->get();
         $jumCount = $search->count();
@@ -78,7 +79,7 @@ class TopupSaldoController extends Controller
         $new_saldo = $find->DetailKonsumen->saldo + $req['saldo'];
 
         if($req['status_member'] == '0'){
-            $dataUpdate = ['satatus_member' => '1','saldo' => $new_saldo];
+            $dataUpdate = ['status_member' => '1','saldo' => $new_saldo];
         }else if($req['status_member'] == '1'){
             $dataUpdate = ['saldo' => $new_saldo];
         }else{
@@ -104,6 +105,10 @@ class TopupSaldoController extends Controller
         ];
         
         $notif = Notifikasi::create($dnotif);
+
+        //NotifGCM
+        SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'histori_topup', $notif->judul_id);
+
         return redirect()->back()->with('success','Berhasil Topup Saldo');
     }
 

@@ -21,7 +21,7 @@ class AdministratorController extends Controller
     public function index()
     {
        $administrator = User::where('level_id','2')->get();
-       $menu_active = "user|admin";
+       $menu_active = "user|admin|0";
        return view('user.administrator', compact('administrator','menu_active'));
     }
 
