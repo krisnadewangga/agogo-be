@@ -53,4 +53,26 @@ class NotifikasiController extends Controller
        $pengiriman = Pengiriman::where('status','0')->count();
        return $pengiriman;
     }
+
+    public function index()
+    {
+        $notifikasi = Notifikasi::join('users as a','a.id','=','notifikasi.pengirim_id')
+                                  ->select('notifikasi.*','a.name')
+                                  ->where('notifikasi.penerima_id', Auth::User()->id )
+                                  ->orderBy('id','desc')->get();
+        $jumNotBelumDibaca = Notifikasi::where([ 
+                                                 ['dibaca','=','0'],
+                                                 ['penerima_id','=', Auth::User()->id]
+
+                                               ])->count();
+        if($jumNotBelumDibaca > 0){
+            Notifikasi::where([ 
+                                 ['dibaca','=','0'],
+                                 ['penerima_id','=', Auth::User()->id]
+                               ])->update(['dibaca' => '1']);
+        }
+        
+        $menu_active = "||0";
+        return view('list_notifikasi',compact('menu_active','notifikasi'));
+    }
 }

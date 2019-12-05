@@ -25,7 +25,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $menu_active = "dashboard|";
+        $menu_active = "dashboard||0";
+
         return view('home',compact('menu_active'));
     }
 }

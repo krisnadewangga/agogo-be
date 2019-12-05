@@ -24,7 +24,7 @@ class ItemController extends Controller
     public function index()
     {
         $item = Item::where('status_aktif','1')->orderBy('id','DESC')->get();
-        $menu_active = "item|item";
+        $menu_active = "item|item|0";
         return view('item.item', compact('item','menu_active') );
     }
 
@@ -36,7 +36,7 @@ class ItemController extends Controller
     public function create()
     {
        $kategori = Kategori::where('status_aktif','1')->get();
-       $menu_active = "item|item";
+       $menu_active = "item|item|1";
        return view('item.create_item', compact('kategori','menu_active'));
     }
 
@@ -133,7 +133,7 @@ class ItemController extends Controller
         $stocker = Stocker::where('item_id',$id)->orderBy('created_at','DESC')->get();
         $listGambarItem = GambarItem::where(['item_id' => $id])->orderBy('utama','DESC')->get();
         
-        $menu_active = "item|item";
+        $menu_active = "item|item|1";
         return view('item.show_item',compact('item','gambarUtama', 'listGambarItem','stocker','menu_active'));
     }
 

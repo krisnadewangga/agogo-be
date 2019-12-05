@@ -18,7 +18,6 @@ class CreateTableDetailKonsumen extends Migration
             $table->unsignedBigInteger('user_id');
             $table->date('tgl_lahir')->nullable();
             $table->enum('jenis_kelamin',['0','1'])->nullable();//0 = Laki-Laki, 1 = Perempuan
-            $table->string('no_hp');
             $table->text('alamat')->nullable();
             $table->text('lat')->nullable();
             $table->text('long')->nullable();

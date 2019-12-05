@@ -22,7 +22,7 @@ class KategoriController extends Controller
     public function index()
     {
         $kategori = Kategori::all();
-        $menu_active = "item|kategori";
+        $menu_active = "item|kategori|0";
         return view('item.kategori', compact('kategori','menu_active'));
     }
 

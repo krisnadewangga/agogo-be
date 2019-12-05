@@ -16,7 +16,9 @@ class LaporanController extends Controller
     
     public function LapPendapatan()
     {
-    	$transaksi = Transaksi::where([ 
+    	$transaksi = Transaksi::selectRaw('transaksi.*, 
+                                          (SELECT sum(jumlah * margin) from item_transaksi Where transaksi_id =transaksi.id) as sub_total_bersih_item ')
+                            ->where([ 
     									['metode_pembayaran','=','1'],
     									['status','>=','1']
     								  ])
@@ -24,13 +26,18 @@ class LaporanController extends Controller
     									['metode_pembayaran','>','1'],
     									['status','=','5']
     								  ])->orderBy('tgl_bayar','DESC')->get();
+        
+        // return $transaksi;
 
         $kop = "Laporan Pendapatan Sampai Hari Ini / ".Carbon::now()->format('d M Y');
 
         $input = ['mt' => "", 'st' => "" ];
     	$total_pendapatan = $transaksi->sum('total_bayar');
-        $menu_active = "laporan|pendapatan";
-    	return view("laporan.lap_pendapatan",compact('transaksi','total_pendapatan','menu_active','kop','input'));
+        $total_bersih_item = $transaksi->sum('sub_total_bersih_item');
+        $total_pengiriman = $transaksi->sum('total_biaya_pengiriman');
+
+        $menu_active = "laporan|pendapatan|0";
+    	return view("laporan.lap_pendapatan",compact('transaksi','total_pendapatan','menu_active','kop','input','total_bersih_item','total_pengiriman'));
     }
 
     public function FilterLaporan(Request $request)
@@ -49,25 +56,37 @@ class LaporanController extends Controller
         }
         
         if( !empty($req['mt']) && empty($req['st']) ){
-            $transaksi = Transaksi::whereDate('tgl_bayar','=',$mt)
-                            ->orderBy('tgl_bayar','DESC')->get();
+            $transaksi = Transaksi::selectRaw('transaksi.*, 
+                                               (SELECT sum(jumlah * margin) from item_transaksi Where transaksi_id =transaksi.id) as sub_total_bersih_item 
+                                             ')
+                                    ->whereDate('tgl_bayar','=',$mt)
+                                    ->orderBy('tgl_bayar','DESC')->get();
+            
             $kop = "Laporan Pendapatan Di Tanggal $kop_mt";
         }else if( empty($req['mt']) && !empty($req['st']) ){
-            $transaksi = Transaksi::whereDate('tgl_bayar','<=',$st)
-                            ->orderBy('tgl_bayar','DESC')->get();
+            $transaksi = Transaksi::selectRaw('transaksi.*, 
+                                               (SELECT sum(jumlah * margin) from item_transaksi Where transaksi_id =transaksi.id) as sub_total_bersih_item 
+                                             ')
+                                    ->whereDate('tgl_bayar','<=',$st)
+                                    ->orderBy('tgl_bayar','DESC')->get();
             $kop = "Laporan Pendapatan Sampai Tanggal $kop_st";
         }else if( !empty($req['mt']) && !empty($req['st']) ){
-             $transaksi = Transaksi::whereBetween('tgl_bayar',[$mt,$st])
-                            ->orderBy('tgl_bayar','DESC')->get();
+             $transaksi = Transaksi::selectRaw('transaksi.*, 
+                                               (SELECT sum(jumlah * margin) from item_transaksi Where transaksi_id =transaksi.id) as sub_total_bersih_item 
+                                             ')
+                                    ->whereBetween('tgl_bayar',[$mt,$st])
+                                    ->orderBy('tgl_bayar','DESC')->get();
              $kop = "Laporan Pendapatan Mulai Tanggal $kop_mt S/D $kop_st";
         }else{
             return redirect()->route('lap_pendapatan');
         }
         
         $total_pendapatan = $transaksi->sum('total_bayar');
-        $menu_active = "laporan|pendapatan";
+        $total_bersih_item = $transaksi->sum('sub_total_bersih_item');
+        $total_pengiriman = $transaksi->sum('total_biaya_pengiriman');
+        $menu_active = "laporan|pendapatan|0";
 
-        return view("laporan.lap_pendapatan",compact('transaksi','total_pendapatan','menu_active','kop','input'));
+        return view("laporan.lap_pendapatan",compact('transaksi','total_pendapatan','menu_active','kop','input','total_bersih_item','total_pengiriman'));
     }
 
     public function LapUser()
@@ -82,7 +101,7 @@ class LaporanController extends Controller
                              ->where('a.status_member','=','0')
                              ->where('users.status_aktif','=','1')->count();
 
-        $menu_active = "laporan|user";
+        $menu_active = "laporan|user|0";
         return view("laporan.lap_user",compact('menu_active','user', 'total_member','total_not_member','total_user'));
     }
 }
