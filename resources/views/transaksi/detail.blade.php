@@ -357,6 +357,11 @@
 				@if(Session::get('gagal') == 'simpan_ambil_pesanan')
 					$("#modal_ambil_pesanan").modal('show');
 				@endif
+
+
+				@if(Session::get('gagal') == 'kurir')
+					$("#modal_input").modal('show');
+				@endif
 	 		});
 	 	
 
@@ -489,7 +494,11 @@
                 	</label>    
 		        @enderror 
 			</div>
-
+			@if (session('error'))
+			 	@component("components.alert_error", ["type" => "danger"])
+					{{ session('error') }}
+				@endcomponent
+			@endif
 
 			<button class="btn btn-primary">Simpan</button>
 		</form>
