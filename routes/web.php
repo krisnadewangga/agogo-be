@@ -16,6 +16,9 @@ use App\Events\PusherEvent;
 Auth::routes();
 
 Route::get('/', 'HomeController@index')->name('home');
+Route::get('/get_bulan','HomeController@getBulan')->name('get_bulan');
+Route::get('/get_top_ten','HomeController@getTopTen')->name('get_top_ten');
+Route::get('/set_grafik','HomeController@setGrafik')->name('set_grafik');
 Route::get('/load_notif','NotifikasiController@loadNotif')->name('load_notif');
 Route::get('/get_jum_pesanan','NotifikasiController@GetJumPesanan')->name('get_jum_pesanan');
 Route::get('/get_jum_pengiriman','NotifikasiController@GetJumPengiriman')->name('get_jum_pengiriman');
@@ -24,6 +27,8 @@ Route::get('/baca_notif','NotifikasiController@bacaNotif')->name('baca_notif');
 Route::get('/in_ganti_password','ProfilController@inGantiPassword')->name('in_ganti_password');
 Route::POST('/submit_ganti_password','ProfilController@gantiPassword')->name('submitGantiPassword');
 Route::POST('/submit_ganti_fp','ProfilController@gantiFotoProfil')->name('submit_ganti_fp');
+
+
 
 Route::get('/aktifasi/{id}','AktifasiAkunController@Aktifasi')->name('aktifasi');
 Route::resource('level','LevelController');
