@@ -28,7 +28,7 @@ class Transaksi extends Model
                  'waktu_kirim',
                  'tgl_bayar',
     					   'status'];
-    protected $dates = ['waktu_kirim','tgl_bayar'];
+    protected $dates = ['waktu_kirim','tgl_bayar','tgl_bayar'];
 
   	protected $appends = array('ket_metodepembayaran','ket_status_transaksi');
 

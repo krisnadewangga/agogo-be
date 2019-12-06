@@ -7,6 +7,7 @@ use App\Helpers\SendNotif;
 use App\Pengiriman;
 use App\Transaksi;
 use App\Notifikasi;
+use App\Kurir;
 use Carbon\Carbon;
 use Auth;
 
@@ -53,6 +54,13 @@ class PengirimanController extends Controller
 
         if($validator->fails()){
             return redirect()->back()->withErrors($validator)->with('gagal','simpan');
+        }
+
+        $cek_kurir = Pengiriman::where('kurir_id','=',$req['kurir_id'])->where('status','=','0')
+                               ->count();
+
+        if($cek_kurir > 0){
+            return redirect()->back()->with('gagal','kurir')->with("error","Kurir Yang Anda Pilih Sementara Melakukan Pengiriman");
         }
 
         $input = ['transaksi_id' => $req['transaksi_id'],

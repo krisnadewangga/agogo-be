@@ -61,7 +61,7 @@ class UserController extends Controller
 	                        AgoogoBakery.com </span>  <br/>
 	                        Nikmati belanja online dari produk AgogoBakery yang aman dan dapat dipercaya .. <br/>
 	                        <p></p>
-	                        Silahkan klik link dibawah ini untuk aktifasi akun anda <br/>http://".$_SERVER['HTTP_HOST']."/agogobakery.com/aktifasi/$no_aktifasi
+	                        Silahkan klik link dibawah ini untuk aktifasi akun anda <br/>http://".$_SERVER['HTTP_HOST']."/aktifasi/$no_aktifasi
 	                        <p></p>
 	                        Pingin Ngemil ? Atau.. Buat Acara ? Atau... Buat Orang Terspesial ? <br/> Pesan Aja Di <span style='color:#FBB901;'>AgogoBakery.com</span>"
 	                   ];
