@@ -52,7 +52,7 @@ class AdministratorController extends Controller
         }
 
         $req['level_id'] = '2';
-        $req['password'] = bcrypt($req['pasword']);
+        $req['password'] = bcrypt($request->password);
         $insert = User::create($req);
 
         return redirect()->back()->with("success","Berhasil Buat Administrator");
