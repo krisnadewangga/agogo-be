@@ -152,7 +152,7 @@
 	        </div>
 		</form>
 	 @endcomponent
-
+	 
 	 @component("components.modal", ["id" => "modal_edit" ,"kop_modal" => "Form Edit Promo"])
 		<form method="POST" action="setup_promo/edit" enctype="multipart/form-data">
 			@csrf

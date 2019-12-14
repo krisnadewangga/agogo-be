@@ -50,7 +50,7 @@ class ItemController extends Controller
     {
         $req = $request->all();
         $validator = \Validator::make($req,[ 'nama_item' => 'required|unique:item',
-                                             'kategori_id' => 'required',
+                                             'kategori' => 'required',
                                              'harga' => 'required|numeric',
                                              'margin' => 'required|numeric',
                                              'gambar' => 'required|image|mimes:jpeg,png,jpg,JPG,PNG,JPEG',
@@ -63,6 +63,7 @@ class ItemController extends Controller
         
         $req = $request->except('gambar');
         $req['diinput_by'] = Auth::User()->name;
+        $req['kategori_id'] = $req['kategori'];
         $insertItem = Item::create($req);
 
         $gambarUtama = $request->gambar;
