@@ -28,8 +28,6 @@ Route::get('/in_ganti_password','ProfilController@inGantiPassword')->name('in_ga
 Route::POST('/submit_ganti_password','ProfilController@gantiPassword')->name('submitGantiPassword');
 Route::POST('/submit_ganti_fp','ProfilController@gantiFotoProfil')->name('submit_ganti_fp');
 
-
-
 Route::get('/aktifasi/{id}','AktifasiAkunController@Aktifasi')->name('aktifasi');
 Route::resource('level','LevelController');
 Route::resource('administrator','AdministratorController');
@@ -51,16 +49,22 @@ Route::post('/ambil_pesanan','TransaksiController@AmbilPesanan')->name('ambil_pe
 Route::resource('topup_saldo','TopupSaldoController');
 Route::get('/list_topup_saldo','TopupSaldoController@ListTopupSaldo')->name('list_topup_saldo');
 Route::get('/cari_user','TopupSaldoController@CariUser')->name('cari_user');
-
-
 Route::resource('pengiriman','PengirimanController');
-
 Route::get('pesanan_diterima/{id}','TransaksiController@pesananDiterima')->name('pesanan_diterima');
 
 Route::get('/lap_pendapatan','LaporanController@LapPendapatan')->name('lap_pendapatan');
 Route::post('/filter_laporan','LaporanController@FilterLaporan')->name('filter_laporan');
 Route::get('/lap_user','LaporanController@LapUser')->name('lap_user');
+Route::get('/detail_user/{id}','LaporanController@DetailUser')->name('detail_user');
+Route::get('/blokir_user/{id}','LaporanController@BlokirUser')->name('blokir_user');
 
+Route::get('/penjualan','LaporanController@ShowPenjualan')->name('penjualan');
+Route::get('/set_grafik_penjualan','LaporanController@setGrafikPenjualan')->name('set_grafik_penjualan');
+Route::get('/dataPenjualan','LaporanController@showDataPenjualan')->name('data_penjualan');
+Route::get('/set_data_penjualan','LaporanController@setDataPenjualan')->name('set_data_penjualan');
+
+Route::get('/list_promo_selesai', 'PromoController@listPromoSelesai')->name('list_promo_selesai');
+Route::resource('/setup_promo','PromoController');
 
 Route::get('coba',function(){
 	event(new PusherEvent('coba pusher'));

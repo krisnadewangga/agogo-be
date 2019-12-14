@@ -117,6 +117,11 @@
     <script src="{{ asset('assets/dist/js/notifikasi.js') }}"></script>
     <!-- page script -->
     
+   <!--  <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script> -->
+   
+
     <script>
       
       $(function () {
@@ -139,9 +144,7 @@
          });
 
           //Date picker
-        $('.datepicker').datepicker({
-          autoclose: true
-        })
+       
         
         var pusher = new Pusher('{{ env('MIX_PUSHER_APP_KEY') }}', {
                               cluster: '{{ env('MIX_PUSHER_APP_CLUSTER') }}',
