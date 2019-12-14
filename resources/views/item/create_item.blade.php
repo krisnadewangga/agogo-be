@@ -27,10 +27,10 @@
 								        @enderror 
 									</div>
 
-									<div class="form-group @error('kategori_id') has-error @enderror">
+									<div class="form-group @error('kategori') has-error @enderror">
 										<label>Kategori</label>
-						                <select class="form-control select2" style="width: 100%;" name="kategori_id">
-						                  <option value="">Pilih Kategori</option>
+						                <select id="select2Kat" class="form-control " style="width: 100%;" name="kategori" >
+						                  <option></option>
 						                  @foreach($kategori as $key)
 						                  	<option value="{{ $key->id }}">{{ $key->kategori }}</option>
 						                  @endforeach
@@ -42,10 +42,12 @@
 								        @enderror 
 									</div>
 									<div class="row">
-										<div class="col-md-6">
+										<div class="col-md-12">
 											<div class="form-group @error('harga') has-error @enderror">
 												<label>Harga</label>
 												<input type="text" name="harga" value="{{ old('harga') }}" class="form-control" placeholder="Masukan Harga Jual">
+												<input type="hidden" name="margin" value="0" class="form-control" placeholder="Masukan Margin Keuntunga Dari Harga Jual" readonly >
+
 												@error('harga')
 										            <label class="control-label" for="inputError">
 								                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
@@ -53,7 +55,7 @@
 										        @enderror 
 											</div>
 										</div>
-										<div class="col-md-6">
+										<!-- <div class="col-md-6">
 											<div class="form-group @error('margin') has-error @enderror">
 												<label>Margin</label>
 												<input type="text" name="margin" value="{{ old('margin') }}" class="form-control" placeholder="Masukan Margin Keuntunga Dari Harga Jual">
@@ -63,7 +65,7 @@
 								                	</label>    
 										        @enderror 
 											</div>
-										</div>
+										</div> -->
 									</div>
 
 									<label>Stock Awal</label>
@@ -176,6 +178,8 @@
 		<script type="text/javascript">
 			$(function (){
 				CKEDITOR.replace('deskripsi');
+				$('#select2Kat').select2({allowClear:true, placeholder: "Pilih Kategori"});
+
 			});
 			
 		</script>
