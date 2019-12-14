@@ -41,7 +41,7 @@
 			       					@elseif($key->Transaksi->metode_pembayaran == 2)
 			       						<span class="label label-info">COD</span>
 			       					@elseif($key->Transaksi->metode_pembayaran == 3)
-			       						<span class="label label-success">Bayar Ditempat</span>
+			       						<span class="label label-success">Bayar Di Toko</span>
 			       					@endif
 								</td>
 								<td align="center">

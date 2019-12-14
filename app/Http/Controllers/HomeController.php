@@ -18,7 +18,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        // $this->middleware('auth');
     }
 
 
@@ -94,13 +94,15 @@ class HomeController extends Controller
         }else{
             $sq = "";
         }
+      
+
         $top_ten = Item::selectRaw("item.*,
                                    (select sum(a.jumlah) from item_transaksi as a,transaksi as b
                                     where  a.transaksi_id=b.id and a.item_id=item.id and YEAR(b.tgl_bayar) = ".$req['tahun']." $sq  ) as total_belanja
                            ")
-                        ->where([
-                                  ['item.status_aktif','=','1']
-                                ])
+                        // ->where([
+                        //           ['item.status_aktif','=','1']
+                        //         ])
                         ->orderBy('total_belanja','DESC')
                         ->limit('10')
                         ->get();
@@ -115,14 +117,18 @@ class HomeController extends Controller
     {
         $tahun = Transaksi::selectRaw("MIN(YEAR(tgl_bayar)) as min_tahun,
                                             MAX(YEAR(tgl_bayar)) as max_tahun ")->first();
+        
         $tahunNow = date('Y');
+        if(!isset($tahun->min_tahun) ){
+            $tahun = ['min_tahun' => $tahunNow, 'max_tahun' => $tahunNow];
+        }
         $top_ten = Item::selectRaw("item.*,
                                    (select sum(a.jumlah) from item_transaksi as a,transaksi as b
-                                    where  a.transaksi_id=b.id and a.item_id=item.id and YEAR(b.tgl_bayar) = $tahunNow ) as total_belanja
+                                    where  a.transaksi_id=b.id and a.item_id=item.id and YEAR(b.tgl_bayar) = $tahunNow and MONTH(b.tgl_bayar) = ".date('m')." ) as total_belanja
                            ")
-                        ->where([
-                                  ['item.status_aktif','=','1']
-                                ])
+                        // ->where([
+                        //           ['item.status_aktif','=','1']
+                        //         ])
                         ->orderBy('total_belanja','DESC')
                         ->limit('10')
                         ->get();

@@ -99,7 +99,7 @@
 							<div class="col-md-8">
 								<h4 style="margin-top: 5px; margin-bottom: 5px;"><b>Pengiriman</b></h4>
 								<div>
-									Klik <u>Lihat Detail</u> Untuk Melihat Deskripsi Pengiriman
+									Klik <u onclick="$('#bodi_pengiriman').toggle('slow')" style="cursor:pointer;">Lihat Detail</u> Untuk Melihat Deskripsi Pengiriman
 								</div>
 							</div>
 							<div class="col-md-4 text-right">

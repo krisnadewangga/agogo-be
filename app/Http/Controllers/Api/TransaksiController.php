@@ -41,6 +41,8 @@ class TransaksiController extends Controller
 	
 		
 		$itemTransaksi = [];
+		$countItemError = 0;
+		$ItemError = [];
 		for($i=1; $i<=$req['banyak_item']; $i++){
 			
 			$rules['item_id'.$i] = 'required';
@@ -48,97 +50,111 @@ class TransaksiController extends Controller
 			$rules['harga'.$i] = 'required|numeric';
 			$rules['margin'.$i] = 'required|numeric';
 			
-
-			$itemTransaksi[$i-1] = ['item_id' => $req['item_id'.$i], 
+			$selItem = Item::findOrFail($req['item_id'.$i]);
+			if($selItem->stock >= $req['jumlah'.$i]){
+				$itemTransaksi[$i-1] = ['item_id' => $req['item_id'.$i], 
 								'jumlah' => $req['jumlah'.$i],
 								'harga' => $req['harga'.$i],
 								'margin' => $req['margin'.$i],
 							   ];
-			if(isset($req['diskon'.$i])){
-				$itemTransaksi[$i-1]['diskon'] = $req['diskon'.$i];
-				$itemTransaksi[$i-1]['harga_diskon'] = $req['harga_diskon'.$i];
-				$itemTransaksi[$i-1]['total'] = $req['jumlah'.$i] * $req['harga_diskon'.$i];
+				if(isset($req['diskon'.$i])){
+					$itemTransaksi[$i-1]['diskon'] = $req['diskon'.$i];
+					$itemTransaksi[$i-1]['harga_diskon'] = $req['harga_diskon'.$i];
+					$itemTransaksi[$i-1]['total'] = $req['jumlah'.$i] * $req['harga_diskon'.$i];
+				}else{
+					$itemTransaksi[$i-1]['total'] = $req['jumlah'.$i] * $req['harga'.$i];
+				}
 			}else{
-				$itemTransaksi[$i-1]['total'] = $req['jumlah'.$i] * $req['harga'.$i];
+				$countItemError += 1;	
+				$ItemError[] = $selItem->nama_item;
 			}
+		}
 
-
+		if($countItemError > 0){
+			$tempMsgItem = "";
+			for($a=1; $a<=$countItemError; $a++ ){
+				if($a < $countItemError && $a != $countItemError-1){
+					$sambungan = ", ";
+				}else if($a == $countItemError-1 ){
+					$sambungan = " dan ";
+				}else{
+					$sambungan = ".";
+				}
+				$tempMsgItem .= $ItemError[$a-1].$sambungan;
+			}
+			$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Melebihi Jumlah Stock ";
 		}
 		
-		
-	   	$validator = Validator::make($req, $rules);
+		$validator = Validator::make($req, $rules);
 	    if($validator->fails()){
 	        $success = 0;
 	        $msg = $validator->messages()->all();
 	        $response = $msg;
 	    }else{
-	    	$req_transaksi = $request->only('user_id',
-    									'total_transaksi',
-    									'biaya_pengiriman',
-    									'jarak_tempuh',
-    									'total_biaya_pengiriman',
-    									'kode_voucher',
-    									'potongan',
-    									'total_bayar',
-    									'alamat_lain',
-    									'lat',
-    									'long',
-    									'detail_alamat',
-    									'metode_pembayaran',
-    									'banyak_item',
-    									'catatan',
-    									'waktu_kirim');	
+			$req_transaksi = $request->only('user_id',
+											'total_transaksi',
+											'biaya_pengiriman',
+											'jarak_tempuh',
+											'total_biaya_pengiriman',
+											'kode_voucher',
+											'potongan',
+											'total_bayar',
+											'alamat_lain',
+											'lat',
+											'long',
+											'detail_alamat',
+											'metode_pembayaran',
+											'banyak_item',
+											'catatan',
+											'waktu_kirim');	
 
-	    	$sel_user = User::findOrFail($req['user_id']);
-	    	$saldo = $sel_user->DetailKonsumen->saldo;
-	    	$status_member = $sel_user->DetailKonsumen->status_member;
+			$sel_user = User::findOrFail($req['user_id']);
+			$saldo = $sel_user->DetailKonsumen->saldo;
+			$status_member = $sel_user->DetailKonsumen->status_member;
 
-	    	$min_stock_item = $this->UpdateStock($itemTransaksi);
-	    	if($req['metode_pembayaran'] == '1' && $status_member == '1'){
-	    		if($saldo > $req['total_bayar'] ){
-			    	$req_transaksi['tgl_bayar'] = Carbon::now();
-			    	// return $req_transaksi;
-	    			$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
-	    			
-	    			$new_saldo = $saldo - $req['total_bayar'];
-	    			$this->UpdateSaldo($req['user_id'],$new_saldo);
+			if( ($req['metode_pembayaran'] == '1' || $req['metode_pembayaran'] == '2' )  && $status_member == '1'){
+				if($req['metode_pembayaran'] == '1' && $countItemError == 0){
+					if($saldo > $req['total_bayar'] ){
+						$req_transaksi['tgl_bayar'] = Carbon::now();
+						// return $req_transaksi;
+						$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
+						$min_stock_item = $this->UpdateStock($itemTransaksi);
 
-	    			// if($req['durasi_kirim'] == 0){
-	    			// 	$this->UpdateStock($itemTransaksi);
-	    			// }
+						$new_saldo = $saldo - $req['total_bayar'];
+						$this->UpdateSaldo($req['user_id'],$new_saldo);
 
-	    			$success = 1;
-	    			$msg = "Berhasil Simpan Transaksi";
-	    		}else{
-	    			$success = 0;
-	    			$msg = "Saldo Anda Tidak Cukup";
-	    		}
-	    	}else if($req['metode_pembayaran'] == '1' && $status_member != "1"){
-	    		$success = 0;
-	    		$msg = "Maaf! Silahkan Daftarkan Akun Anda Menjadi Member";
-	    	}else if( $req['metode_pembayaran'] == '2' && ($status_member == "1" || $status_member == "0" ) ){
-	    		
-	    		$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
-	    		
-	    		// if($req['durasi_kirim'] == 0){
-	    		// 	$this->UpdateStock($itemTransaksi);
-	    		// }
+						$success = 1;
+						$msg = "Berhasil Simpan Transaksi";
+					}else{
+						$success = 0;
+						$msg = "Saldo Anda Tidak Cukup";
+					}
+				}else if($req['metode_pembayaran'] == '2' && $countItemError == 0){
+					$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
+					$min_stock_item = $this->UpdateStock($itemTransaksi);
+				
+					$success = 1;
+					$msg = "Berhasil Simpan Transaksi";
+				}else{
+					$success = 0;
+					$msg = $msgItem;
+				}
+			}else if( ($req['metode_pembayaran'] == '1' || $req['metode_pembayaran'] == '2' ) && $status_member != "1"){
+				$success = 0;
+				$msg = "Maaf! Silahkan Daftarkan Akun Anda Menjadi Member";
+			}else if($req['metode_pembayaran'] == '3' && ($status_member == "1" || $status_member == "0")){
+				if($countItemError == 0){
+					$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
+					$min_stock_item = $this->UpdateStock($itemTransaksi);
 
-	    		$success = 1;
-	    		$msg = "Berhasil Simpan Transaksi";
-	    		
-
-	    	}else if($req['metode_pembayaran'] == '3' && ($status_member == "1" || $status_member == "0")){
-	    		// $req_transaksi['durasi_kirim'] = 0;
-	    	
-	    		// return $req_transaksi;
-	    		$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
-	    		
-	    		$success = 1;
-	    		$msg = "Berhasil Simpan Transaksi";
-
-	    	}
-	    	
+					$success = 1;
+					$msg = "Berhasil Simpan Transaksi";
+				}else{
+					$success = 0;
+					$msg = $msgItem;
+				}
+			}
+			
 	    	if($success == "1"){
 	    		$admin = User::where('level_id','2')->first();
             	SendNotif::SendNotifPus($sel_user->id,$sel_user->name,$admin->id,$ins_transaksi->id,$sel_user->name.' Baru Saja Melakukan Transaksi','1');
