@@ -47,6 +47,7 @@
               <li id="sm_transaksi"><a href="{{ route('transaksi.index') }}"><i class="fa fa-circle-o"></i> <span>Pesanan</span></a></li>
                <li id="sm_pengiriman"><a href="{{ route('pengiriman.index') }}"><i class="fa fa-circle-o"></i> <span>Pengiriman</span></a></li>
                <li id="sm_topup"><a href="{{ route('topup_saldo.index') }}"><i class="fa fa-circle-o"></i> <span>TopUp Saldo</span></a></li>
+               <li id="sm_promo"><a href="{{ route('setup_promo.index') }}"><i class="fa fa-circle-o"></i> <span>SetUp Promo</span></a></li>
             </ul>
           </li>
 
@@ -58,8 +59,9 @@
             </a>
             <ul class="treeview-menu">
               <li id="sm_user" ><a href="{{ route('lap_user') }}"><i class="fa fa-circle-o"></i> <span>User</span></a></li>
+              <li id="sm_penjualan"><a href="{{ route('penjualan') }}"><i class="fa fa-circle-o"></i> <span>Penjualan</span></a></li>
               <li id="sm_pendapatan"><a href="{{ route('lap_pendapatan') }}"><i class="fa fa-circle-o"></i> <span>Pendapatan</span></a></li>
-               
+              
             </ul>
           </li>
 

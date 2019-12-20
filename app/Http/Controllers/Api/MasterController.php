@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Kategori;
 use App\Item;
+use App\Promo;
 use Validator;
 
 class MasterController extends Controller
@@ -247,4 +248,50 @@ class MasterController extends Controller
     return response()->json(['success' => 1,'msg' => $item], 200);
   }
 
+  public function listPromo(Request $request)
+  {
+        $req = $request->all();
+        $messsages = ['dataPerpage.required' => 'dataPerpage Tidak Bisa Kosong',
+                      'page.required' => 'page Tidak Bisa Kosong'];
+        $rules = ['page' => 'required', 'dataPerpage' => 'required'];
+
+        $validator = Validator::make($req, $rules,$messsages);
+        if($validator->fails()){
+              $success = 0;
+              $msg = $validator->messages()->all();
+              $kr = 400;
+              $pageSaatIni = 0;
+              $tampilPS = 0;
+         }else{
+          $page = $req['page'];
+            $dataPerpage = $req['dataPerpage'];
+            $offset = ($page - 1) * $dataPerpage;
+
+            $promo = Promo::where('status','1')
+                    ->orderBy('id','DESC')
+                    ->limit($dataPerpage)
+                    ->offset($offset)->get();
+            $promo->map(function($promo){
+              return $promo['batas_promo'] = $promo->berlaku_sampai->format('Y-m-d');
+              
+            });
+
+          $jumdat = Promo::where('status','1')->count();
+
+          $jumHal = ceil($jumdat / $dataPerpage);
+          $pageSaatIni = (int) $page;
+          $pageSelanjutnya = $page+1;
+          if( ($pageSaatIni == $jumHal) || ($jumHal == 0) ){
+             $tampilPS = 0;
+          }else{
+             $tampilPS = $pageSelanjutnya;
+          }
+
+          $success = 1;
+          $msg = $promo;
+          $kr = 200;
+
+    }
+        return response()->json(['success' => $success,'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'msg' => $msg], $kr);
+  }
 }

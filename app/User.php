@@ -75,4 +75,9 @@ class User extends Authenticatable
         return $this->hasMany(HistoriTopup::class);
     }
     
+    public function LogBan()
+    {
+        return $this->hasMany(LogBan::class);
+    }
+    
 }

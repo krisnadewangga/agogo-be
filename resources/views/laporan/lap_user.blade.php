@@ -10,7 +10,7 @@
 
       	<!-- Small boxes (Stat box) -->
 	    <div class="row">
-	        <div class="col-lg-4 col-xs-12">
+	        <div class="col-lg-3 col-xs-12">
 	          <!-- small box -->
 	          <div class="small-box bg-aqua" style="padding:10px;">
 	            <div class="inner">
@@ -25,7 +25,7 @@
 	          </div>
 	        </div>
 	        <!-- ./col -->
-	        <div class="col-lg-4 col-xs-12">
+	        <div class="col-lg-3 col-xs-12">
 	          <!-- small box -->
 	          <div class="small-box bg-green" style="padding:10px;">
 	            <div class="inner">
@@ -40,7 +40,7 @@
 	          </div>
 	        </div>
 	        <!-- ./col -->
-	        <div class="col-lg-4 col-xs-12">
+	        <div class="col-lg-3 col-xs-12">
 	          <!-- small box -->
 	          <div class="small-box bg-yellow" style="padding:10px;">
 	            <div class="inner">
@@ -53,6 +53,21 @@
 	           
 	          </div>
 	        </div>
+
+			 <!-- ./col -->
+			 <div class="col-lg-3 col-xs-12">
+	          <!-- small box -->
+	          <div class="small-box bg-red" style="padding:10px;">
+	            <div class="inner">
+	              <h3>{{ $total_blokir }}</h3>
+	              <p>Di blokir</p>
+	            </div>
+	            <div class="icon">
+	              <i class="fa fa-user"></i>
+	            </div>
+	           
+	          </div>
+			 </div>
 	    </div>
       	<!-- /.row -->
 
@@ -63,44 +78,43 @@
 					<thead style=" font-size:14px;">
 						<tr>
 							<th style="width: 5px;">No</th>
-							<th>Waktu Regis</th>
+							<th style="width:130px;"> Waktu Regis</th>
 							<th>Nama User</th>
-							<th>Jenis Kelamain</th>
-							<th>TGL Lahir</th>
-							<th>No Hp</th>
-							
-							<th><center>Jenis User</center></th>
+							<th style="width:90px;"><center>Saldo</center></th>
+							<th style="width:80px;"><center>Total <br/> Belanja</center></th>
+							<th style="width:80px;"><center>Batal <br/> Belanja</center></th>
+							<th style="width:80px;"><center>Jenis <br/> User</center></th>
+							<th style="width:50px;"><center>Status</center></th>
+							<th style="width:80px;"><center>Aksi</center></th>
 						</tr>
 					</thead>
 					<tbody style=" font-size:14px;">
 						@foreach($user as $key)
 							<tr>
 								<td align="center"></td>
-								<td>{{ $key->email_verified_at->format('d M Y H:i A') }}</td>
+								<td >{{ $key->email_verified_at->format('d M Y H:i A') }}</td>
 								<td>{{$key->name}}</td>
-								<td>
-									@if($key->DetailKonsumen->jenis_kelamin == '0')
-										Laki-Laki
-									@elseif($key->DetailKonsumen->jenis_kelamin == '1')
-										Perempuan
-									@else
-										<label class="label label-warning">Belum Ditentukan</label>
-									@endif
-								</td>
-								<td>
-									@if(!empty($key->DetailKonsumen->tgl_lahir))
-									{{ $key->DetailKonsumen->tgl_lahir->format('d M Y') }}
-									@else
-										<label class="label label-warning">Belum Ditentukan</label>
-									@endif
-								</td>
-								<td>{{ $key->no_hp }}</td>
+								<td align="right">Rp {{ number_format($key->DetailKonsumen->saldo,'0','','.') }}</td>
+								<td align="center">{{ $key->total_belanja }}</td>
+								<td align="center">{{ $key->batal_belanja }}</td>
 								<td align="center">
 									@if($key->DetailKonsumen->status_member == '1')
 										<label class="label label-success">Member</label>
 									@else
 										<label class="label label-warning">Not Member</label>
 									@endif
+								</td>
+								<td align="center">
+									@if($key->status_aktif == '1')
+										<label class="label label-success">Aktif</label>
+									@else
+										<label class="label label-danger">Diblokir</label>
+									@endif
+								</td>
+								<td align="center">
+									<a href="{{ route('detail_user', $key->id) }}">
+										<button class="btn btn-warning btn-sm"><i class="fa fa-search"></i></button>
+									</a>
 								</td>
 							</tr>
 						@endforeach
