@@ -112,12 +112,10 @@ class UserController extends Controller
         }else{
             if(Auth::attempt(['no_hp' => $req['no_hp'], 'password' => $req['password'] ])){
                 $user = Auth::user()->where('no_hp',$req['no_hp'])->first();
-                
                 $find = User::findOrFail($user->id);
-              
 
                 if($user->level_id == 3){
-                  if(!empty($user->email_verified_at)){
+                  if(!empty($user->email_verified_at) && $user->status_aktif == '1' ){
                     if($find->DetailKonsumen->alamat == ""){
                       $user['lengkapi_alamat'] = "0";
                     }else{
@@ -126,7 +124,10 @@ class UserController extends Controller
                     
                     $success = 1;
                     $msg = $user;
-                  }else{
+                  }else if(!empty($user->email_verified_at) && $user->status_aktif == '0'){
+                    $success = 0;
+                    $msg = "Maaf! Untuk Saat Ini Akun Anda Diblokir";
+                  }else if(empty($user->email_verified_at) && $user->status_aktif == '0' ) {
                     $success = 0;
                     $msg = "Silahkan Aktifasi Akun Anda";
                   }

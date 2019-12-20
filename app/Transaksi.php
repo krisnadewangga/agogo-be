@@ -41,7 +41,7 @@ class Transaksi extends Model
       }else if($attr == "2"){
          $ket = "COD";
       }else if($attr == "3"){
-         $ket = "Bayar Ditempat";
+         $ket = "Bayar Di Toko";
       }
 
       return $ket;

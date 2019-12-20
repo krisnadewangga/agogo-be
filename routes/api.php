@@ -24,7 +24,7 @@ Route::post('update_profil','Api\UserController@updateProfil');
 Route::post('reset_password','Api\UserController@resetPassword');
 Route::post('login','Api\UserController@login');
 
-
+Route::get('list_promo','Api\MasterController@listPromo');
 Route::get('list_kategori','Api\MasterController@ListKategori');
 Route::get('list_item_all','Api\MasterController@ListItemAll');
 Route::get('list_item_perkat','Api\MasterController@ListItemPerKat');

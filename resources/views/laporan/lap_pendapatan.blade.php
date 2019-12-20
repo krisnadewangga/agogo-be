@@ -18,7 +18,7 @@
 			                  <div class="input-group-addon">
 			                    <i class="fa fa-calendar"></i>
 			                  </div>
-			                  <input type="text" class="form-control pull-right datepicker" name="mt" autocomplete="off" value="{{ $input['mt'] }}">
+			                  <input type="text" id="mt" class="form-control pull-right datepicker" name="mt" autocomplete="off" value="{{ $input['mt'] }}">
 			                </div>
 			                <!-- /.input group -->
 	              		</div>
@@ -31,7 +31,7 @@
 			                  <div class="input-group-addon">
 			                    <i class="fa fa-calendar"></i>
 			                  </div>
-			                  <input type="text" class="form-control pull-right datepicker" name="st" autocomplete="off" value="{{ $input['st'] }}" >
+			                  <input type="text" class="form-control pull-right datepicker" id="st" name="st" autocomplete="off" value="{{ $input['st'] }}" >
 			                </div>
 			                <!-- /.input group -->
 	              		</div>
@@ -91,21 +91,19 @@
 				</table>
 			</div>
 			<hr style="margin-top: 5px; margin-bottom: 5px;"></hr>
-			<div class="row">
-				<div class="col-md-4 text-center">
-					<h5 style="margin-bottom: 3px;"><u>Total Pendapatan</u></h5>
-					<h1 style="margin-top: 0px;">Rp {{ number_format($total_pendapatan,'0','','.') }}</h1>
-				</div>
-				<div class="col-md-4 text-center">
-					<h5 style="margin-bottom: 3px;"><u>Total Pendapatan Bersih/Item</u></h5>
-					<h1 style="margin-top: 0px;">Rp {{ number_format($total_bersih_item,'0','','.') }}</h1>
-				</div>
-				<div class="col-md-4 text-center">
-					<h5 style="margin-bottom: 3px;"><u>Total Pendapatan Dari Pengiriman</u></h5>
-					<h1 style="margin-top: 0px;">Rp {{ number_format($total_pengiriman,'0','','.') }}</h1>
-				</div>
-			</div>
+			<h5 style="margin-bottom: 3px;"><u>Total Pendapatan</u></h5>
+			<h1 style="margin-top: 0px;">Rp {{ number_format($total_pendapatan,'0','','.') }}</h1>
+		
 			
         </div>
+
+        <script type="text/javascript">
+        	$(function(){
+        		 $('.datepicker').datepicker({
+		           format: 'dd/mm/yyyy',
+		           autoclose: true
+		        });
+        	});
+        </script>
     @endcomponent
 @endsection
