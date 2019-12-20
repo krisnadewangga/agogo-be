@@ -83,10 +83,11 @@
 									</div>
 
 									<div class="row">
-										<div class="col-md-6">
+										<div class="col-md-12">
 											<div class="form-group @error('harga') has-error @enderror">
 												<label>Harga</label>
 												<input type="text" name="harga" value="{{ $item->harga }}" class="form-control" placeholder="Masukan Harga Jual">
+												<input type="hidden" name="margin" value="0" class="form-control" placeholder="Masukan Margin Keuntunga Dari Harga Jual" readonly >
 												@error('harga')
 										            <label class="control-label" for="inputError">
 								                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
@@ -94,17 +95,7 @@
 										        @enderror 
 											</div>
 										</div>
-										<div class="col-md-6">
-											<div class="form-group @error('margin') has-error @enderror">
-												<label>Margin</label>
-												<input type="text" name="margin" value="{{ $item->margin }}" class="form-control" placeholder="Masukan Margin Keuntunga Dari Harga Jual">
-												@error('margin')
-										            <label class="control-label" for="inputError">
-								                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
-								                	</label>    
-										        @enderror 
-											</div>
-										</div>
+										
 									</div>
 <!-- 
 									<div style="border:1px solid #CCC; padding:20px 20px 10px 20px; margin-bottom:10px; margin-top: 10px;" >
