@@ -53,21 +53,21 @@
 <body>
 	<div class="bungkus">
 		<div class="header">
-			<img src="{{ asset('assets/dist/img/logo_kuning.png') }}">
+			<img src="{{ asset('assets/dist/img/fixLogo.png') }}" style="height: 60px;">
 		</div>
 		<div class="bodi">
 			<h4>Hi, <u>{{ $name }}</u></h4>
-			<span class="label_bodi">
-				{!! $email_body !!}
-
-				<p></p>
-				<div class="footer">
-					copyright &copy;2019, </br>
-					CV. Azkha Indo Pratama All Rights Reserved <br/>
-					Kel. Kakenturan satu Kec. Maesa Kota. Bitung <br/>
-					Prov. Sulawesi Utara
-				</div>
-			</span>
+            <span class="label_bodi">
+                {!! $email_body !!}
+                
+                <p></p>
+                <div class="footer">
+                    copyright &copy;2019, </br>
+                    CV. Azkha Indo Pratama All Rights Reserved <br/>
+                    Kel. Kakenturan satu Kec. Maesa Kota. Bitung <br/>
+                    Prov. Sulawesi Utara
+                </div>
+            </span>
 		
 		</div>
 		
