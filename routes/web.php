@@ -1,6 +1,6 @@
 <?php
 
-use App\Events\PusherEvent;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -66,8 +66,3 @@ Route::get('/set_data_penjualan','LaporanController@setDataPenjualan')->name('se
 Route::get('/list_promo_selesai', 'PromoController@listPromoSelesai')->name('list_promo_selesai');
 Route::resource('/setup_promo','PromoController');
 
-Route::get('coba',function(){
-	event(new PusherEvent('coba pusher'));
-});
-
-// Route::put('/level_update/{id}','LevelController@update')->name('level_update');
