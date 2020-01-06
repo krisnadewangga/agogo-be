@@ -65,7 +65,7 @@
                             <div class="col-md-6">
                                   <div class="form-group">
                                     <label >Tahun</label>
-                                    <select class="form-control" id="tahun_grafik" onchange="setGrafik()">
+                                    <select class="form-control" id="tahun_grafik" onchange="setGrafik(2)">
                                         @for($a=$tahun->min_tahun; $a<=$tahun->max_tahun; $a++)
                                           <option value="{{ $a }}"  @if($a == $tahunNow) selected @endif >{{ $a }}</option>
                                         @endfor
@@ -101,7 +101,7 @@
             <div class="row" style="margin-top: 10px;">
               <div class="col-md-6">
                 <div class="form-group">
-                    <select class="form-control" id="top_ten_tahun" onchange="getTopTen()">
+                    <select class="form-control" id="top_ten_tahun" onchange="getTopTen(2)">
                         @for($i=$tahun->min_tahun; $i<=$tahun->max_tahun; $i++)
                           <option value="{{ $i }}"  @if($i == $tahunNow) selected @endif >{{ $i }}</option>
                         @endfor
@@ -156,21 +156,63 @@
     <script src="https://code.highcharts.com/stock/highstock.js"></script>
     <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
     <script type="text/javascript">
-      var bulan_sekarang = "<?= date('m') ?>";
+      var bulan_sekarang = parseInt("<?= date('m') ?>");
+      var tahun_sekarang = parseInt("<?= date('Y') ?>")
       $(function(){
+
           setBulan("1");
           setBulan1("1");
           setGrafik("1");
       });
 
+      function setBulan1(set){
+        var tahun_select = $("#tahun_grafik").val();
+        if(tahun_select == tahun_sekarang){
+          set = "1";
+        }
+
+        $.ajax({
+          url : "get_bulan",
+          data : "tahun="+tahun_select,
+          beforeSend:function(){
+            $("#loading_bulan_grafik").prop("class","label label-warning")
+                                      .html(`<i class='fa fa-spinner fa-pulse fa-fw' ></i> Loading...`);
+          },
+          success :function(msg){
+            html = '<option value="">All Bulan  </option>';
+            $.each(msg, function( key,value ){
+              if( set=="1"){
+                if(key == bulan_sekarang){
+                  selected = "selected";
+                }else{
+                  selected = "";
+                }
+              }else{
+                 selected = "";
+              }
+              html +=`<option value=`+key+` `+selected+`>`+value+`</option>`;
+            });
+            $("#bulan_grafik").html(html);
+            $("#loading_bulan_grafik").prop('class','').html("");
+            // console.log(html);
+          }
+        });
+      }
+
+
       function setGrafik(set){
          var tahun = $("#tahun_grafik").val();
+        
+        
          if(set == "1"){
-           bulan = bulan_sekarang
+          bulan = bulan_sekarang;
+         }else if(set == "2"){
+            setBulan1('');
+            var bulan = "";
          }else{
-           var bulan = $("#bulan_grafik").val();
+            var bulan = $("#bulan_grafik").val();
          }
-         
+
          if(bulan == null){
             bulan = "";
          }
@@ -303,8 +345,12 @@
       }
 
 
+      
       function setBulan(set){
         var tahun_select = $("#top_ten_tahun").val();
+        if(tahun_select == tahun_sekarang){
+          set = "1";
+        }
         $.ajax({
           url : "get_bulan",
           data : "tahun="+tahun_select,
@@ -334,40 +380,14 @@
         });
       }
 
-      function setBulan1(set){
-        var tahun_select = $("#tahun_grafik").val();
-        $.ajax({
-          url : "get_bulan",
-          data : "tahun="+tahun_select,
-          beforeSend:function(){
-            $("#loading_bulan_grafik").prop("class","label label-warning")
-                                      .html(`<i class='fa fa-spinner fa-pulse fa-fw' ></i> Loading...`);
-          },
-          success :function(msg){
-            html = '<option value="">All Bulan  </option>';
-            $.each(msg, function( key,value ){
-              if( set=="1"){
-                if(key == bulan_sekarang){
-                  selected = "selected";
-                }else{
-                  selected = "";
-                }
-              }else{
-                 selected = "";
-              }
-              html +=`<option value=`+key+` `+selected+`>`+value+`</option>`;
-            });
-            $("#bulan_grafik").html(html);
-            $("#loading_bulan_grafik").prop('class','').html("");
-            // console.log(html);
-          }
-        });
-      }
-
       function getTopTen(set){
+
         var tahun = $("#top_ten_tahun").val();
         if(set == "1"){
           bulan = bulan_sekarang;
+        }else if(set == "2"){
+          setBulan('');
+          var bulan = $("#top_ten_bulan").val();
         }else{
           var bulan = $("#top_ten_bulan").val();
         }
@@ -405,6 +425,7 @@
               no++;
             });
             $("#tbl_top_ten").html(html);
+
           }
         });
       }
