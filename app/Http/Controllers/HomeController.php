@@ -119,6 +119,7 @@ class HomeController extends Controller
                                             MAX(YEAR(tgl_bayar)) as max_tahun ")->first();
         
         $tahunNow = date('Y');
+        $tahun['max_tahun'] = $tahunNow;
         if(!isset($tahun->min_tahun) ){
             $tahun = ['min_tahun' => $tahunNow, 'max_tahun' => $tahunNow];
         }
