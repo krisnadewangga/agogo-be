@@ -25,7 +25,7 @@
                                     <div class="form-group">
                                         <label  class="col-sm-2 control-label">Tahun</label>
                                         <div class="col-sm-10">
-                                            <select class="form-control" id="top_ten_tahun" onchange="getTopTen()" style="width: 100%;">
+                                            <select class="form-control" id="top_ten_tahun" onchange="getTopTen(2)" style="width: 100%;">
                                                 @for($a=$tahun->min_tahun; $a<=$tahun->max_tahun; $a++)
                                                     <option value="{{ $a }}"  @if($a == $tahunNow) selected @endif >{{ $a }}</option>
                                                 @endfor
@@ -115,12 +115,17 @@
                 
             }
 
-            function getTopTen(){
+            function getTopTen(stat){
                 var tahun = $("#top_ten_tahun").val();
                 var bulan = $("#top_ten_bulan").val();
                 var item = $("#top_ten_item").val();
                 var page = $("#page").val();
 
+                if(stat == "2"){
+                    setBulan();
+                    var bulan = "";
+                }
+                
                 if(item == null){
                     item = "";
                 }
@@ -400,6 +405,7 @@
 
             function setBulan(){
                 var tahun_select = $("#top_ten_tahun").val();
+             
                 $.ajax({
                 url : "get_bulan",
                 data : "tahun="+tahun_select,
