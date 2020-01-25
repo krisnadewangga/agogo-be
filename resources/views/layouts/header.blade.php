@@ -1,10 +1,13 @@
 <header class="main-header">
       <!-- Logo -->
-      <a href="../../index2.html" class="logo">
+      <a href="#" class="logo" >
         <!-- mini logo for sidebar mini 50x50 pixels -->
         <span class="logo-mini"><b>AGG</b></span>
         <!-- logo for regular state and mobile devices -->
-        <span class="logo-lg"><b>AGOGO</b>MIN</span>
+        <!-- <span class="logo-lg"><b>AGOGO</b>MIN</span> -->
+         <center >
+            <img src="{{ asset('assets/dist/img/fixLogo.png') }}" height="40px" class="logo-lg" style="margin-top:5px; background: #FFFFFF; padding:5px; border-radius: 5px; width: 80px;">
+          </center>
       </a>
       <!-- Header Navbar: style can be found in header.less -->
       <nav class="navbar navbar-static-top">
@@ -20,6 +23,16 @@
           <ul class="nav navbar-nav">
             
             <!-- Notifications: style can be found in dropdown.less -->
+            @if(Auth::user()->level_id == "2")
+              <li class="notifications-menu">
+                 <a href="#" data-toggle="control-sidebar" id="notPesan">
+                  <i class="fa fa-envelope"></i>
+                  <span class="label label-warning jumPesanNot"></span>
+                </a>
+              </li>
+            @endif
+
+            
             <li class="notifications-menu">
                <a href="{{ route('transaksi.index') }}">
                 <i class="fa fa-shopping-cart"></i>
