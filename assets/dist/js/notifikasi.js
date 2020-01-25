@@ -6,6 +6,7 @@ if(pisah_not[2] == "1"){
     url = "";
 }
 
+
 function loadNotifikasi(){
 
     $.ajax({
@@ -17,7 +18,7 @@ function loadNotifikasi(){
 								</center>`);
     	},
     	success:function(msg){
-            console.log(msg);
+            // console.log(msg);
     		if(msg.status == '1'){
     			$(".jumNotif").html(msg.jumNot);
     			
@@ -100,6 +101,17 @@ function getJumPengiriman()
         url : url+"get_jum_pengiriman",
         success :function(msg){
             $(".jumPengiriman").html(msg);
+        }
+    });
+}
+
+function getJumPesan()
+{
+    $.ajax({
+        url : url+"get_jum_pesan",
+        success :function(msg){
+            // console.log(msg);
+            $(".jumPesanNot").html(msg);
         }
     });
 }

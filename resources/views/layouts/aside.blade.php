@@ -16,6 +16,9 @@
             <a href="#">
               <i class="fa  fa-users"></i>
               <span>Master User</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
             </a>
             <ul class="treeview-menu">
               <li id="sm_level"><a href="{{ route('level.index') }}"><i class="fa fa-circle-o"></i>Level</a></li>
@@ -29,6 +32,9 @@
             <a href="#">
               <i class="fa fa-suitcase"></i>
               <span>Master Item</span>
+              <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
               
             </a>
             <ul class="treeview-menu">
@@ -41,7 +47,9 @@
             <a href="#">
               <i class="fa fa-exchange"></i>
               <span>Transaksi</span>
-              
+              <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
             </a>
             <ul class="treeview-menu">
               <li id="sm_transaksi"><a href="{{ route('transaksi.index') }}"><i class="fa fa-circle-o"></i> <span>Pesanan</span></a></li>
@@ -55,7 +63,9 @@
             <a href="#">
               <i class="fa fa-files-o"></i>
               <span>Laporan</span>
-              
+              <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
             </a>
             <ul class="treeview-menu">
               <li id="sm_user" ><a href="{{ route('lap_user') }}"><i class="fa fa-circle-o"></i> <span>User</span></a></li>

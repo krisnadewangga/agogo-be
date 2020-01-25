@@ -79,5 +79,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(LogBan::class);
     }
+
+    public function Pesan()
+    {
+        return $this->hasMany(Pesan::class);
+    }
     
 }

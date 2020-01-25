@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Transaksi;
 use App\Kurir;
 use App\Item;
+use App\User;
 use App\Notifikasi;
 use Carbon\Carbon;
 use App\Helpers\SendNotif;
@@ -19,6 +20,19 @@ class TransaksiController extends Controller
         $this->middleware('auth');
     }
     
+    public function setKunciTransaksi($user_id)
+    {
+        $sel_user = User::findOrFail($user_id);
+        $transaksi_berlangsung = $sel_user->Transaksi->whereNotIn('status',['5','3'] )->count();
+        $kunci_transaksi = $sel_user->DetailKonsumen->kunci_transaksi;
+        if($transaksi_berlangsung == '0' && $kunci_transaksi == '1'){
+            $sel_user->DetailKonsumen()->update(['kunci_transaksi' => '0']);
+        }
+        
+        $success = 1;
+        return $success;
+    }
+
     public function index()
     {
     	$transaksi = Transaksi::where('status','1')->orderBy('created_at','desc')->get();
@@ -71,9 +85,11 @@ class TransaksiController extends Controller
         
         $notif = Notifikasi::create($dnotif);
 
+
         //NotifGCM
         SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'pengiriman', $notif->judul_id);
         
+        $this->setKunciTransaksi($transaksi->user_id);
         return redirect()->back()->with("success","Berhasil Menyelesaikan Transaksi");
     }
 
@@ -101,8 +117,11 @@ class TransaksiController extends Controller
             'jenis_notif' => 1,
             'dibaca' => '0'
         ];
-    
+        
         $notif = Notifikasi::create($dnotif);
+        
+        $this->setKunciTransaksi($penerima_id);
+        
         return redirect()->back()->with("success","Berhasil Membatalkan Transaksi");
     }
 
@@ -134,6 +153,9 @@ class TransaksiController extends Controller
         ];
     
         $notif = Notifikasi::create($dnotif);
+
+        $this->setKunciTransaksi($penerima_id);
+
         return redirect()->back()->with("success","Berhasil Menyelesaikan Transaksi");
     }
 }

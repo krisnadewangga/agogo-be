@@ -162,8 +162,12 @@ class SendNotif{
                                       'jenis_notif' => $jenis_notif,
                                       'dibaca' => '0'
                                     ]);
-        event(new PusherEvent($pengirim_nama." , ".$judul, [$penerima_id]));
+        event(new PusherEvent('1',$pengirim_nama." , ".$judul, [$penerima_id]));
 
+    }
+
+    public static function SendNotPesan($type,$message){
+        event(new PusherEvent($type,$message));
     }
 
     public  function simpanNotif()

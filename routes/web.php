@@ -11,7 +11,8 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+use App\Events\PusherEvent;
+use App\Helpers\SendNotif;
 
 Auth::routes();
 
@@ -66,3 +67,17 @@ Route::get('/set_data_penjualan','LaporanController@setDataPenjualan')->name('se
 Route::get('/list_promo_selesai', 'PromoController@listPromoSelesai')->name('list_promo_selesai');
 Route::resource('/setup_promo','PromoController');
 
+Route::get('/msessages','MessageController@Index');
+Route::get('/dashboard_pesan','PesanController@dashboardPesan');
+Route::get('/list_pesan','PesanController@listPesan');
+Route::post('/kirim_pesan','PesanController@kirimPesan')->name('kirim_pesan');
+Route::get('/hapus_pesan/{id}','PesanController@hapusPesan')->name('hapus_pesan');
+Route::get('/get_jum_pesan','PesanController@getJumPesan')->name('get_jum_pesan');
+Route::get('/baca_pesan/{id}','PesanController@bacaPesan')->name('baca_pesan');
+Route::get('/cari_user','PesanController@cariUser')->name('cari_user');
+
+Route::get('/tes_event',function(){
+	$message = ['user_id' => 21, 'name' => 'Fajrin Ismail', 'waktu' => '2020-01-01', 'jumPesan' => 0];
+	SendNotif::SendNotPesan('2',$message);
+
+});

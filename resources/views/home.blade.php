@@ -226,7 +226,7 @@
                                 <h5>Sedang Meload Grafik Pendapatan</h5>
                             </div>`);
               },success:function(msg){
-                  console.log(msg);
+                  // console.log(msg);
                    
                   if(msg.grafik == '1'){
                      $('#chartid').highcharts({
@@ -406,7 +406,7 @@
                           `);
           },
           success :function(msg){
-            console.log(msg);
+            // console.log(msg);
             no = 1;
             html = "";
             $.each(msg, function( key,value ){

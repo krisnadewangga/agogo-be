@@ -10,7 +10,7 @@
 			<!-- <button class="btn btn-primary" data-toggle="modal" data-target="#modal_input">Create</button>
 			<button class="btn btn-warning" data-toggle="modal" data-target="#modal_input">SetOngkir</button>
 			<hr></hr> -->
-
+			
 			@if (session('success'))
 			 	@component("components.alert", ["type" => "success"])
 					{{ session('success') }}

@@ -24,6 +24,14 @@ Route::post('update_profil','Api\UserController@updateProfil');
 Route::post('reset_password','Api\UserController@resetPassword');
 Route::post('login','Api\UserController@login');
 
+
+Route::post('kirim_pesan','Api\PesanController@kirimPesan');
+Route::get('list_pesan', 'Api\PesanController@listPesan');
+Route::get('pesan_by_id', 'Api\PesanController@pesanById');
+Route::post('baca_pesan_tiap_user','Api\PesanController@bacaPesanTiapUser');
+Route::post('baca_pesan_tiap_id','Api\PesanController@bacaPesanTiapId');
+Route::post('hapus_pesan','Api\PesanController@hapusPesan');
+
 Route::get('list_promo','Api\MasterController@listPromo');
 Route::get('list_kategori','Api\MasterController@ListKategori');
 Route::get('list_item_all','Api\MasterController@ListItemAll');
@@ -36,6 +44,7 @@ Route::post('transaksi','Api\TransaksiController@Store');
 Route::get('list_transaksi','Api\TransaksiController@ListTransaksi');
 Route::get('detail_transaksi','Api\TransaksiController@DetailTransaksi');
 Route::get('get_ongkir','Api\TransaksiController@GetOngkir');
+Route::get('ajukan_batal_transaksi','Api\TransaksiController@AjukanBatalTransaksi');
 
 //notifikasi
 Route::get('list_notifikasi', 'Api\NotifikasiController@tampilNotifikasi');
