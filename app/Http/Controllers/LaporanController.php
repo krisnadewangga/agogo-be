@@ -23,7 +23,9 @@ class LaporanController extends Controller
                                           (SELECT sum(jumlah * margin) from item_transaksi Where transaksi_id =transaksi.id) as sub_total_bersih_item ')
                             ->where([ 
     									['metode_pembayaran','=','1'],
-    									['status','>=','1']
+    									['status','>=','1'],
+                      ['status','!=','3']
+
     								  ])
     						->orWhere([ 
     									['metode_pembayaran','>','1'],
@@ -66,17 +68,22 @@ class LaporanController extends Controller
         
         if( !empty($req['mt']) && empty($req['st']) ){
             $transaksi = Transaksi::whereDate('tgl_bayar','=',$mt)
+                                    ->where('status','!=', '3')
                                     ->orderBy('tgl_bayar','DESC')->get();
             
             $kop = "Laporan Pendapatan Di Tanggal $kop_mt";
         }else if( empty($req['mt']) && !empty($req['st']) ){
             $transaksi = Transaksi::whereDate('tgl_bayar','<=',$st)
+                                    
+                                    ->where('status','!=', '3')
                                     ->orderBy('tgl_bayar','DESC')->get();
             $kop = "Laporan Pendapatan Sampai Tanggal $kop_st";
         }else if( !empty($req['mt']) && !empty($req['st']) ){
              $arr_bettwen = ["$mt","$st"];
              $transaksi = Transaksi::whereDate('tgl_bayar','>=',$mt)
                                     ->whereDate('tgl_bayar','<=',$st)
+                                    
+                                    ->where('status','!=', '3')
                                     ->orderBy('tgl_bayar','DESC')->get();
              $kop = "Laporan Pendapatan Mulai Tanggal $kop_mt S/D $kop_st";
         }else{
@@ -222,6 +229,7 @@ class LaporanController extends Controller
                           ->leftJoin('transaksi as b','b.id','=','a.transaksi_id')
                           ->selectRaw('item.id,item.nama_item,sum(a.jumlah) as jumlah,date(b.tgl_bayar) as aa')
                           ->where('item.id','=',$value->id)
+                           ->where('b.status','!=','3')
                           ->whereYear('b.tgl_bayar','=',$tahun)
                           ->groupBy('item.id','item.nama_item','b.tgl_bayar')
                           ->get()
@@ -253,6 +261,7 @@ class LaporanController extends Controller
                           ->leftJoin('transaksi as b','b.id','=','a.transaksi_id')
                           ->selectRaw('item.id,item.nama_item,sum(a.jumlah) as jumlah,date(b.tgl_bayar) as aa')
                           ->where('item.id','=',$value->id)
+                           ->where('b.status','!=','3')
                           ->whereYear('b.tgl_bayar','=',$tahun)
                           ->whereMonth('b.tgl_bayar','=',$bulan)
                           ->groupBy('item.id','item.nama_item','b.tgl_bayar')
@@ -297,6 +306,7 @@ class LaporanController extends Controller
                                 ->join('transaksi as b','a.transaksi_id','=','b.id')
                                 ->selectRaw("item.id,item.nama_item,b.tgl_bayar,a.jumlah")
                                 ->where('b.tgl_bayar','!=','')
+                                 ->where('b.status','!=','3')
                                 ->whereYear('tgl_bayar','=',$tahun)
                                 ->where('item.id', $key->id)
                                 ->get()
@@ -329,6 +339,7 @@ class LaporanController extends Controller
                           ->leftJoin('transaksi as b','b.id','=','a.transaksi_id')
                           ->selectRaw('item.id,item.nama_item,sum(a.jumlah) as jumlah,date(b.tgl_bayar) as aa')
                           ->where('item.id','=',$value->id)
+                           ->where('b.status','!=','3')
                           ->whereYear('b.tgl_bayar','=',$tahun)
                           ->whereMonth('b.tgl_bayar','=',$bulan)
                           ->groupBy('item.id','item.nama_item','b.tgl_bayar')
@@ -438,6 +449,7 @@ class LaporanController extends Controller
                           ->leftJoin('transaksi as b','b.id','=','a.transaksi_id')
                           ->selectRaw('item.id,item.nama_item,sum(a.jumlah) as jumlah,date(b.tgl_bayar) as aa')
                           ->where('item.id','=',$value->id)
+                          ->where('b.status','!=','3')
                           ->whereYear('b.tgl_bayar','=',$tahun)
                           ->groupBy('item.id','item.nama_item','b.tgl_bayar')
                           ->get()
@@ -469,6 +481,7 @@ class LaporanController extends Controller
                             ->leftJoin('transaksi as b','b.id','=','a.transaksi_id')
                             ->selectRaw('item.id,item.nama_item,sum(a.jumlah) as jumlah,date(b.tgl_bayar) as aa')
                             ->where('item.id','=',$value->id)
+                             ->where('b.status','!=','3')
                             ->whereYear('b.tgl_bayar','=',$tahun)
                             ->groupBy('item.id','item.nama_item','b.tgl_bayar')
                             ->get()
@@ -505,6 +518,7 @@ class LaporanController extends Controller
                           ->leftJoin('transaksi as b','b.id','=','a.transaksi_id')
                           ->selectRaw('item.id,item.nama_item,sum(a.jumlah) as jumlah,date(b.tgl_bayar) as aa')
                           ->where('item.id','=',$value->id)
+                           ->where('b.status','!=','3')
                           ->whereYear('b.tgl_bayar','=',$tahun)
                           ->whereMonth('b.tgl_bayar','=',$bulan)
                           ->groupBy('item.id','item.nama_item','b.tgl_bayar')
@@ -548,6 +562,7 @@ class LaporanController extends Controller
                           ->leftJoin('transaksi as b','b.id','=','a.transaksi_id')
                           ->selectRaw('item.id,item.nama_item,sum(a.jumlah) as jumlah,date(b.tgl_bayar) as aa')
                           ->where('item.id','=',$value->id)
+                           ->where('b.status','!=','3')
                           ->whereYear('b.tgl_bayar','=',$tahun)
                           ->whereMonth('b.tgl_bayar','=',$bulan)
                           ->groupBy('item.id','item.nama_item','b.tgl_bayar')

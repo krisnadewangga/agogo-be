@@ -26,6 +26,10 @@ class CreateTableNotifikasi extends Migration
             //3 = terima pengiriman
             //4 = topup
             //5 = pesan
+            //6 = Batal pesanan
+            //7 = konfir bayar
+            //8 = ambil pesanan
+
             $table->enum('dibaca',['0','1'])->default(0);
             $table->timestamps();
         });

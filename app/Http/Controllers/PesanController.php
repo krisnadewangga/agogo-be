@@ -12,6 +12,11 @@ use Auth;
 
 class PesanController extends Controller
 {
+	public function __construct()
+	{
+		$this->middleware('auth');
+	}
+	
 	public function dashboardPesan()
 	{
 		$pesan = Pesan::distinct('user_id')

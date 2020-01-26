@@ -98,7 +98,7 @@ class HomeController extends Controller
 
         $top_ten = Item::selectRaw("item.*,
                                    (select sum(a.jumlah) from item_transaksi as a,transaksi as b
-                                    where  a.transaksi_id=b.id and a.item_id=item.id and YEAR(b.tgl_bayar) = ".$req['tahun']." $sq  ) as total_belanja
+                                    where  a.transaksi_id=b.id and a.item_id=item.id and YEAR(b.tgl_bayar) = ".$req['tahun']." and b.status != '3' $sq  ) as total_belanja
                            ")
                         // ->where([
                         //           ['item.status_aktif','=','1']
@@ -125,7 +125,7 @@ class HomeController extends Controller
         }
         $top_ten = Item::selectRaw("item.*,
                                    (select sum(a.jumlah) from item_transaksi as a,transaksi as b
-                                    where  a.transaksi_id=b.id and a.item_id=item.id and YEAR(b.tgl_bayar) = $tahunNow and MONTH(b.tgl_bayar) = ".date('m')." ) as total_belanja
+                                    where  a.transaksi_id=b.id and a.item_id=item.id and YEAR(b.tgl_bayar) = $tahunNow and MONTH(b.tgl_bayar) = ".date('m')." and b.status != '3' ) as total_belanja
                            ")
                         // ->where([
                         //           ['item.status_aktif','=','1']
