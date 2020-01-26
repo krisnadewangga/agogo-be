@@ -34,8 +34,8 @@ function loadNotifikasi(){
                     var link_notif = url+"transaksi/"+value.judul_id;
                     // var label = "<label class='label label-warning'>Transaksi</label>";
                     var label = "";
-                  }else if(value.jenis_notif == '2'){
-                    var link_notif = 'konfir_bayar';
+                  }else if(value.jenis_notif == '6'){
+                    var link_notif = url+"transaksi/"+value.judul_id;
                     var label = "";
                   }else if(value.jenis_notif == '7'){
                     var link_notif = '';

@@ -134,7 +134,7 @@
                             </div>
                             <div class="col-md-6 text-right">
                                 <label class="label label-success">{{ $user->Transaksi->where('metode_pembayaran','=','1')->count() }} x</label> <small>TopUp</small> &nbsp;
-                                <label class="label label-info">{{ $user->Transaksi->where('metode_pembayaran','=','2')->count() }} x</label> <small>COD</small> &nbsp;
+                                <label class="label label-info">{{ $user->Transaksi->where('metode_pembayaran','=','2')->count() }} x</label> <small>Bank Transfer</small> &nbsp;
                                 <label class="label label-warning">{{ $user->Transaksi->where('metode_pembayaran','=','3')->count() }} x</label> <small>Bayar Di Toko</small>
                             </div>
                         </div>
@@ -164,7 +164,7 @@
                                                 @if($key['metode_pembayaran'] == 1)
                                                     <span class="label label-success ">TopUp</span>
                                                 @elseif($key['metode_pembayaran'] == 2)
-                                                    <span class="label label-info">COD</span>
+                                                    <span class="label label-info">Bank Transfer</span>
                                                 @elseif($key['metode_pembayaran'] == 3)
                                                     <span class="label label-warning">Bayar Di Toko</span>
                                                 @endif

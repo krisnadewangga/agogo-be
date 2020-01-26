@@ -52,6 +52,7 @@ Route::get('/list_topup_saldo','TopupSaldoController@ListTopupSaldo')->name('lis
 Route::get('/cari_user','TopupSaldoController@CariUser')->name('cari_user');
 Route::resource('pengiriman','PengirimanController');
 Route::get('pesanan_diterima/{id}','TransaksiController@pesananDiterima')->name('pesanan_diterima');
+Route::get('konfir_pembayaran/{id}','TransaksiController@konfirBayar')->name('konfir_pembayaran');
 
 Route::get('/lap_pendapatan','LaporanController@LapPendapatan')->name('lap_pendapatan');
 Route::post('/filter_laporan','LaporanController@FilterLaporan')->name('filter_laporan');
@@ -74,7 +75,8 @@ Route::post('/kirim_pesan','PesanController@kirimPesan')->name('kirim_pesan');
 Route::get('/hapus_pesan/{id}','PesanController@hapusPesan')->name('hapus_pesan');
 Route::get('/get_jum_pesan','PesanController@getJumPesan')->name('get_jum_pesan');
 Route::get('/baca_pesan/{id}','PesanController@bacaPesan')->name('baca_pesan');
-Route::get('/cari_user','PesanController@cariUser')->name('cari_user');
+
+
 
 Route::get('/tes_event',function(){
 	$message = ['user_id' => 21, 'name' => 'Fajrin Ismail', 'waktu' => '2020-01-01', 'jumPesan' => 0];

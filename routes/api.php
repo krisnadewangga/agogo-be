@@ -23,7 +23,7 @@ Route::get('profil_user','Api\UserController@ProfilUser');
 Route::post('update_profil','Api\UserController@updateProfil');
 Route::post('reset_password','Api\UserController@resetPassword');
 Route::post('login','Api\UserController@login');
-
+Route::get('get_saldo','Api\UserController@getSaldo');
 
 Route::post('kirim_pesan','Api\PesanController@kirimPesan');
 Route::get('list_pesan', 'Api\PesanController@listPesan');
@@ -44,7 +44,7 @@ Route::post('transaksi','Api\TransaksiController@Store');
 Route::get('list_transaksi','Api\TransaksiController@ListTransaksi');
 Route::get('detail_transaksi','Api\TransaksiController@DetailTransaksi');
 Route::get('get_ongkir','Api\TransaksiController@GetOngkir');
-Route::get('ajukan_batal_transaksi','Api\TransaksiController@AjukanBatalTransaksi');
+Route::post('ajukan_batal_pesanan','Api\TransaksiController@AjukanBatalPesanan');
 
 //notifikasi
 Route::get('list_notifikasi', 'Api\NotifikasiController@tampilNotifikasi');

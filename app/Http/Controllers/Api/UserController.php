@@ -287,10 +287,15 @@ class UserController extends Controller
             $kr = 400;
         }else{
         	$find = User::findOrFail($req['user_id']);
-        	$find->DetailKonsumen;
-        	
+        	$detail_konsmen = $find->DetailKonsumen;
+
+        	if($detail_konsmen['saldo'] == ""){
+              $detail_konsmen['saldo'] = 0;
+          }
+
         	$success = 1;
         	$msg = $find;
+         
         	$kr = 200;
         }
         return response()->json(['success' => $success,'msg' => $msg], $kr);
@@ -340,6 +345,39 @@ class UserController extends Controller
         
     }
     return response()->json(['success' => $success, 'msg' => $msg],200);
+  }
+
+  public function getSaldo(Request $request)
+  {
+     $req = $request->all();
+     $rules = ['user_id' => 'required'];
+     $messages = ['user_id.required' => 'user_id Tidak Bisa Kosong'];
+
+     $validator = Validator::make($req, $rules, $messages);
+     if($validator->fails()){
+       $success = 0;
+       $msg = $validator->messages()->all();
+       $kr = 400;
+     }else{
+        $find = User::join('detail_konsumen','users.id','=','detail_konsumen.user_id')->select('users.id','saldo')->where('users.id',$req['user_id'])->first();
+
+        if(isset($find->id)){
+          if($find->saldo == ""){
+             $saldo = 0;
+          }else{
+             $saldo = $find->saldo;
+          }
+
+        }else{
+          $saldo = "User Tidak Ditemukan";
+        }
+        
+          
+        $success = 1;
+        $msg = $saldo;
+        $kr = 200;
+     }
+     return response()->json(['success' => $success, 'msg' => $msg], $kr);
   }
   
 }
