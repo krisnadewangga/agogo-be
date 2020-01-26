@@ -232,7 +232,7 @@ class TransaksiController extends Controller
 										</div>
 
 										<div style='margin-top:20px; margin-bottom:20px; text-align:center'>
-											<a href='https://api.whatsapp.com/send?phone=6282343965747&text=Halo Admin, Saya Mau Konfirmasi Pembayaran Dengan No Transaksi '><button class='myButton'>Konfirmasi Pembayaran</button></a>
+											<a href='https://api.whatsapp.com/send?phone=6282343965747&text=Halo Admin, Saya Mau Konfirmasi Pembayaran, Untuk Pesanan Nomor Transaksi ".$ins_transaksi->no_transaksi."'><button class='myButton'>Konfirmasi Pembayaran</button></a>
 										</div>
 
 										<hr />
