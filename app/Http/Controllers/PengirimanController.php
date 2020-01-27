@@ -78,7 +78,7 @@ class PengirimanController extends Controller
         'pengirim_id' => Auth::User()->id,
         'penerima_id' => $find->user_id,
         'judul_id' => $find->id,
-        'judul' => 'Transaksi '.$find->no_transaksi,
+        'judul' => 'Pengiriman Pesanan Nomor Transaksi '.$find->no_transaksi,
         'isi' => 'Pesanan Dengan Nomor Transaksi '.$find->no_transaksi.' Telah Dikirimkan Kerumah Anda',
         'jenis_notif' => 2,
         'dibaca' => '0'

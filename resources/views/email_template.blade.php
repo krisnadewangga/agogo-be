@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="{{ asset('assets/bower_components/font-awesome/css/font-awesome.min.css') }}">      <!-- Ionicons -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/Ionicons/css/ionicons.min.css') }}">
       <!-- Theme style -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.2.1/css/bootstrap-reboot.min.css">
+   <!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.2.1/css/bootstrap-reboot.min.css"> -->
+
     <style type="text/css">
     	.bungkus{
     		 width: 100%;  padding:10px;
@@ -46,6 +47,63 @@
     		font-size: 9pt;
     		color : #aeaca8;
     	}
+
+        .myButton {
+            background-color:#44c767;
+            border-radius:7px;
+            display:inline-block;
+            cursor:pointer;
+            color:#ffffff;
+            font-family:Arial;
+            font-size:17px;
+            padding:10px;
+            border:0px;
+        }
+        .myButton:hover {
+            background-color:#5cbf2a;
+        }
+        .myButton:active {
+            position:relative;
+            top:1px;
+        }
+
+
+       table.blueTable {
+          width: 100%;
+          text-align: left;
+          border-collapse: collapse;
+        }
+        table.blueTable td, table.blueTable th {
+          border: 1px solid #AAAAAA;
+          padding: 3px 2px;
+        }
+        table.blueTable tbody td {
+          font-size: 14px;
+          color: #000000;
+        }
+        table.blueTable thead {
+          background: #ededed;
+        }
+        table.blueTable thead th {
+          font-size: 17px;
+          font-weight: bold;
+          color: #000000;
+          padding: 10px;
+        }
+        table.blueTable tfoot td {
+          font-size: 14px;
+        }
+        table.blueTable tfoot .links {
+          text-align: right;
+        }
+        table.blueTable tfoot .links a{
+          display: inline-block;
+          background: #1C6EA4;
+          color: #FFFFFF;
+          padding: 2px 8px;
+          border-radius: 5px;
+        }
+        
     </style>
 	<title></title>
 
@@ -62,7 +120,7 @@
                 
                 <p></p>
                 <div class="footer">
-                    copyright &copy;2019, </br>
+                    copyright &copy;@php date('Y') @endphp, </br>
                     CV. Azkha Indo Pratama All Rights Reserved <br/>
                     Kel. Kakenturan satu Kec. Maesa Kota. Bitung <br/>
                     Prov. Sulawesi Utara

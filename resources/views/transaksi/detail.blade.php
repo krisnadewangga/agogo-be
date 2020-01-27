@@ -14,6 +14,12 @@
 			@endcomponent
 		@endif
 
+		@php
+			if(isset($transaksi->AjukanBatalPesanan->id)){
+			 	$cek_batal_ajukan = $transaksi->AjukanBatalPesanan->id;
+			}
+			
+		@endphp
         <div class="row" style="margin-bottom: 20px; margin-top: 0px;">
 			
 			<div class="col-md-12">
@@ -107,20 +113,36 @@
 									$waktu_skrang = strtotime(date('Y-m-d H:i:s'));
 									$batas_ambe = strtotime($transaksi->waktu_kirim);
 								@endphp
-								@if( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '1') )
-									<label class="label label-danger">Pesanan Expired</label>
-								@elseif( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '3') )
-									<label class="label label-danger">Pesanan Dibatalkan</label>
+
+								@if($transaksi->metode_pembayaran == '1')
+									@if( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '1') )
+										<label class="label label-danger">Pesanan Expired</label>
+									@elseif( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '3') )
+										<label class="label label-danger">Pesanan Dibatalkan</label>
+									@elseif( ($waktu_skrang < $batas_ambe) && ($transaksi->status == '3') )
+										<label class="label label-danger">Pesanan Dibatalkan</label>
+									@else
+										
+										@if($transaksi->status == '1')
+											<label class="label label-warning">Menunggu Pengiriman</label>
+										@elseif($transaksi->status == '2')
+											<label class="label label-info">Sedang Pengiriman</label>
+										@elseif($transaksi->status == '5')
+											<label class="label label-success">Pesanan Diterima</label>
+										@endif
+									@endif
 								@else
-									
-									@if($transaksi->status == '1')
-										<label class="label label-warning">Menunggu Pengiriman</label>
-									@elseif($transaksi->status == '2')
+									@if($transaksi->status == '2')
 										<label class="label label-info">Sedang Pengiriman</label>
+									@elseif($transaksi->status == '1')
+										<label class="label label-warning">Menunggu Pengiriman</label>
+									@elseif( $transaksi->status == '3' )
+										<label class="label label-danger">Pesanan Dibatalkan</label>
 									@elseif($transaksi->status == '5')
 										<label class="label label-success">Pesanan Diterima</label>
 									@endif
 								@endif
+								
 
 								<h6 style="margin-bottom: 0px; margin-top: 5px; cursor:pointer;" onclick="$('#bodi_pengiriman').toggle('slow')"><u>Lihat Detail</u></h6>
 								
@@ -137,7 +159,7 @@
 												<th>No Hp</th>
 												<th>Akan Dikirimkan</th>
 												<th><center>Alamat</center></th>
-												@if($transaksi->status >= '2' && $transaksi->status != '3')
+												@if($transaksi->status >= '2' && $transaksi->status != '3'  && $transaksi->status != '6' )
 													<th><center>Waktu Pengiriman</center></th>
 												@endif
 
@@ -145,9 +167,18 @@
 													<th><center>Waktu Diterima</center></th>
 												@endif
 
-												@if($transaksi->status == '3')
-													<th><center>Dibatalkan Oleh</center></th>
+												
+												@if($transaksi->status == '3' )
+													@if(!isset($cek_batal_ajukan))
+														<th><center>Dibatalkan Oleh</center></th>
+														
+													@else
+														<th><center>Diajukan Pembatalan</center></th>
+														<th><center>Disetujui Pembatalan</center></th>
+													@endif
 												@endif
+												
+												
 
 											</thead>
 											<tbody>
@@ -163,7 +194,7 @@
 														<small>Jarak Tempuh : <label class="label  label-default text-yellow ">{{ $transaksi->jarak_tempuh }} KM </small>
 													</td>
 													
-													@if( $transaksi->status >= '2' && $transaksi->status != '3' )
+													@if( $transaksi->status >= '2' && $transaksi->status != '3' && $transaksi->status != '6'  )
 														<td align="center">
 															{{$transaksi->Pengiriman->created_at->format('d M Y H:i A')}}
 															<hr style="margin:3px;"></hr>
@@ -183,11 +214,33 @@
 													@endif
 
 													@if($transaksi->status == '3')
-														<td align="center">
-															<label class="label label-danger">{{ $transaksi->BatalPesanan->input_by}}</label>
-															<hr style="margin:3px;"></hr>
-															{{ $transaksi->BatalPesanan->created_at->format('d M Y H:i A') }}
-														</td>
+														@if(!isset($cek_batal_ajukan))
+															<td align="center">
+																<label class="label label-danger">
+																	{{ $transaksi->BatalPesanan->input_by}}
+																</label>
+																<hr style="margin:3px;"></hr>
+																{{ $transaksi->BatalPesanan->created_at->format('d M Y H:i A') }}
+															</td>
+														
+														@else
+															<td align="center"	>
+																<label class="label label-danger">
+																	{{ $transaksi->AjukanBatalPesanan->diajukan_oleh }}
+																</label>
+																<hr style="margin:3px;"></hr>
+																{{ $transaksi->AjukanBatalPesanan->created_at->format('d M Y H:i A') }}
+															</td>
+															<td align="center">
+																<label class="label label-success">
+																	{{ $transaksi->AjukanBatalPesanan->disetujui_oleh }}
+																</label>
+																<hr style="margin:3px;"></hr>
+																{{ $transaksi->AjukanBatalPesanan->updated_at->format('d M Y H:i A') }}
+															</td>
+														@endif
+
+														
 													@endif
 												</tr>
 											</tbody>
@@ -214,6 +267,7 @@
 									$waktu_skrang = strtotime(date('Y-m-d H:i:s'));
 									$batas_ambe = strtotime($transaksi->waktu_kirim);
 								@endphp
+
 								@if( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '1') )
 									<label class="label label-danger">Pesanan Expired</label>
 								@elseif( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '3') )
@@ -246,9 +300,16 @@
 													<th><center>Waktu Ambil</center></th>
 												@endif
 
-												@if($transaksi->status == '3')
-													<th><center>Dibatalkan Oleh</center></th>
+												@if($transaksi->status == '3' )
+													@if(!isset($cek_batal_ajukan))
+														<th><center>Dibatalkan Oleh</center></th>
+														
+													@else
+														<th><center>Diajukan Pembatalan</center></th>
+														<th><center>Disetujui Pembatalan</center></th>
+													@endif
 												@endif
+												
 											</thead>
 											<tbody>
 												<tr>
@@ -269,12 +330,30 @@
 														</td>
 													@endif
 
-													@if($transaksi->status == '3')
-														<td align="center">
-															<label class="label label-danger">{{ $transaksi->BatalPesanan->input_by}}</label>
-															<hr style="margin:3px;"></hr>
-															{{ $transaksi->BatalPesanan->created_at->format('d M Y H:i A') }}
-														</td>
+													@if($transaksi->status == '3' )
+														@if(!isset($cek_batal_ajukan))
+															<td align="center">
+																<label class="label label-danger">{{ $transaksi->BatalPesanan->input_by}}</label>
+																<hr style="margin:3px;"></hr>
+																{{ $transaksi->BatalPesanan->created_at->format('d M Y H:i A') }}
+															</td>
+															
+														@else
+															<td align="center"	>
+																<label class="label label-danger">
+																	{{ $transaksi->AjukanBatalPesanan->diajukan_oleh }}
+																</label>
+																<hr style="margin:3px;"></hr>
+																{{ $transaksi->AjukanBatalPesanan->created_at->format('d M Y H:i A') }}
+															</td>
+															<td align="center">
+																<label class="label label-success">
+																	{{ $transaksi->AjukanBatalPesanan->disetujui_oleh }}
+																</label>
+																<hr style="margin:3px;"></hr>
+																{{ $transaksi->AjukanBatalPesanan->updated_at->format('d M Y H:i A') }}
+															</td>
+														@endif
 													@endif
 												</tr>
 											</tbody>
@@ -290,13 +369,38 @@
 					
 					
 				@endif
+				
 
+				<!-- PEMBAYARAN -->
 				<div class="bg-white" style="margin-top: 10px; background-color: #FFFFFF; padding:10px;">
 					<div class="row">
 						<div class="col-md-8">
 							<h4 style="margin-top: 5px; margin-bottom: 5px;"><b>Pembayaran</b></h4>
 							<div>
 								Metode Pembayaran Yang Digunakan Via <label class="label label-warning text-white">{{$transaksi->ket_metodepembayaran}}</label> 
+
+								@if($transaksi->metode_pembayaran == '2')
+									@php
+										$waktu_skrang1 = strtotime(date('Y-m-d H:i:s'));
+										$batas_bayar = strtotime($transaksi->waktu_kirim);
+									@endphp
+
+									@if( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '6') )
+										<label class="label label-danger">Pembayaran Expired</label>&nbsp;<label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim->format('d/m/Y h:i A') }} </label>
+									@elseif( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '3') )
+										<label class="label label-danger">Pesanan Dibatalkan</label>
+									@elseif( ($waktu_skrang < $batas_ambe) && ($transaksi->status == '3') )
+										<label class="label label-danger">Pesanan Dibatalkan</label>
+									@else
+										@if($transaksi->status == '6')
+											&nbsp <label class="label label-info">Menunggu Transfer</label> &nbsp; <label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim->format('d/m/Y h:i A') }} </label>
+										@else 
+											&nbsp <label class="label label-success">Terbayar</label> &nbsp; <label class="label label-default">TGL BAYAR : {{ $transaksi->tgl_bayar->format('d/m/Y h:i A') }} </label>
+										@endif
+
+									@endif
+
+								@endif
 							</div>
 						</div>
 						<div class="col-md-4 text-right">
@@ -304,7 +408,9 @@
 							@if($transaksi->metode_pembayaran != '3')
 								<h3 style="margin:0px;"> Rp. {{number_format($transaksi->total_bayar,'0','','.') }} </h3>
 
-								<h6 style="margin-bottom: 0px; margin-top: 5px; cursor:pointer;" data-toggle="modal" data-target="#modal_rincian" ><u>Lihat Rincian</u></h6>
+								<h6 style="margin-bottom: 0px; margin-top: 5px; cursor:pointer;" >
+									<u  data-toggle="modal" data-target="#modal_rincian">Lihat Rincian</u>
+								</h6>
 							@else
 								<h3 style="margin:0px;"> Rp. {{number_format($transaksi->total_bayar,'0','','.') }} </h3>
 								<h6 style="margin-bottom: 0px; margin-top: 5px; cursor:pointer;" ><u>Total Bayar</u></h6>
@@ -312,14 +418,29 @@
 						</div>
 					</div>
 				</div>
+				@if(isset($transaksi->AjukanBatalPesanan->id) && $transaksi->AjukanBatalPesanan->status == '0' )
+					<div class="bg-danger text-red" style="margin-top: 10px; padding:10px">
+						<div><i class="fa fa-info-circle fa-2x"> <u>INFO</u></i>  </div>
+						<p style="margin-top: 5px;">Pesanan Ini Telah Diajukan Oleh <b>{{ $transaksi->AjukanBatalPesanan->diajukan_oleh }}</b> Untuk Pembatalan Pesanan Pada Tanggal : <b>{{ $transaksi->AjukanBatalPesanan->created_at->format('d/m/Y h:i A') }}</b>  </p>
+					</div>
+				@endif
 
+				<!-- Tombol -->
 				@if($transaksi->status == '1' && $transaksi->metode_pembayaran != '3')
 					<div style="margin-top: 10px;">
 						<button class="btn btn-primary" data-target="#modal_input" data-toggle="modal">Mulai Pengiriman</button>
 
-						@if( ($waktu_skrang > $batas_ambe) && ($transaksi->metode_pembayaran == '2') )
+						@if($transaksi->status < '2' && $transaksi->status != '6')
 							<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
 						@endif
+					</div>
+				@elseif($transaksi->status == '6' && $transaksi->metode_pembayaran == '2')
+					<div style="margin-top: 10px;"> 
+						<a href="{{ route('konfir_pembayaran',$transaksi->id) }}" onclick="return confirm('Apakah Anda Yakin Mengkonfirmasi Pembayaran ?')">
+							<button class="btn btn-success">Konfir Pembayaran</button>
+						</a>
+
+						<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
 					</div>
 				@elseif($transaksi->status == '1' && $transaksi->metode_pembayaran == '3')
 					<div style="margin-top: 10px;">
@@ -331,12 +452,11 @@
 					</div>
 				@endif
 
-
-				@if($transaksi->status == '2')
+				@if($transaksi->status == '2' )
 					<div style="margin-top: 10px;">
 						<a href="{{ route('pesanan_diterima', $transaksi->id ) }}" onclick="return(confirm('Apakah Anda Yakin ?'))"><button class="btn btn-success">Pesanan Diterima</button></a>
 						@if($transaksi->metode_pembayaran != '1')
-							<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
+							<!-- <a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a> -->
 						@endif
 					</div>
 				@endif
@@ -374,7 +494,8 @@
 	     	}
      	</script>
 
-     	@if( ($transaksi->metode_pembayaran == '1' && $transaksi->status > '1') || ($transaksi->metode_pembayaran == '2' && $transaksi->status >= '2' && $transaksi->status != '3' ) )
+     	@if( ($transaksi->metode_pembayaran == '1' && $transaksi->status > '1' && $transaksi->status != '3') || ($transaksi->metode_pembayaran == '2' && $transaksi->status >= '2' && $transaksi->status != '3'  && $transaksi->status != '6' ) )
+	     	
 	     	<div class="modal fade"  id="modal_profil">
 				<!-- Add the bg color to the header using any of the bg-* classes -->
 		        <div class="modal-dialog">
