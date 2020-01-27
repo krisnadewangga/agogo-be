@@ -61,6 +61,8 @@ class Transaksi extends Model
            $ket = "Pesanan Diterima";
          }else if($attr == "3"){
            $ket = "Pesanan Dibatalkan";
+         }else if($attr == "6"){
+           $ket = "Menunggu Pembayaran";
          }
       }else{
          if($attr == "1"){
