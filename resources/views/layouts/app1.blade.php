@@ -30,6 +30,7 @@
          folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="{{ asset('assets/dist/css/skins/_all-skins.min.css') }}">
 
+    <link rel="stylesheet" href="{{ asset('assets/dist/css/style_message.css') }}"
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -105,14 +106,20 @@
     <!-- bootstrap datepicker -->
     <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
     
-    <script type="text/javascript"> 
-      @if (Auth::check()) var user_id =  {{ Auth::user()->id }} @else var user_id = '' @endif 
-    </script>
+   
 
     <!-- Pusher -->
     <script src="https://js.pusher.com/3.1/pusher.min.js"></script>
 
-    <script type="text/javascript">var menu_active = "{{ $menu_active }}";</script>
+    <script type="text/javascript"></script>
+    <script type="text/javascript"> 
+       @if (Auth::check()) 
+          var user_id =  {{ Auth::user()->id }}  
+          var level_id = {{ Auth::user()->level_id }}
+      @else var user_id = '' @endif 
+      var menu_active = "{{ $menu_active }}";
+    </script>
+
     <!-- NOTIFIKASI -->
     <script src="{{ asset('assets/dist/js/notifikasi.js') }}"></script>
     <!-- page script -->
@@ -122,9 +129,12 @@
     <script src="https://code.highcharts.com/modules/export-data.js"></script> -->
    
 
+
+
     <script>
       
       $(function () {
+         getJumPesan();
          loadNotifikasi();
          activeMenu();
          getJumPesanan();
@@ -153,21 +163,67 @@
 
 
         @if (Auth::check())
+         
+          if(level_id == "2"){
+            var channelPesan = pusher.subscribe('agogoPesan');
+            channelPesan.bind('App\\Events\\PusherEvent', function(data) {
+               // console.log(data);
+              // console.log(data);
+              var cek_buka_pesan_us = $("input[name='user_id_k']").val();
+              if(data.type == "2"){
+                  if ( $('#kontak'+data.message.user_id).length ){
+                      $("#kontak"+data.message.user_id).remove();
+                      // console.log("hilang");
+                      setDashboardPesan(data.message);
+                  }else{
+                    setDashboardPesan(data.message);
+                  }
+
+                  if( (cek_buka_pesan_us != "") && (cek_buka_pesan_us == data.message.user_id) ){
+                    setPesan(data.message);
+                    bacaPesan(data.message.user_id);
+                    $("#jumPesanDash"+data.message.user_id).html("");
+                  }
+
+                  getJumPesan();
+              }else if(data.type == "3"){
+                  getJumPesan();
+                  $("#jumPesanDash"+data.message.user_id).html("");
+              }else if(data.type == "4"){
+                  if ( $('#kontak'+data.message.user_id).length ){
+                      $("#kontak"+data.message.user_id).remove();
+                      // console.log("hilang");
+                      setDashboardPesan(data.message);
+                  }else{
+                    setDashboardPesan(data.message);
+                  }
+
+                  if( (cek_buka_pesan_us != "") && (cek_buka_pesan_us == data.message.user_id) && (user_id != data.message.pengirim_id) ){
+                    setKirimPesan(data.message);
+                  }
+              }
+
+            });
+          }
+          
+
           var channel = pusher.subscribe('agogo.{{ Auth::user()->id }}');
           channel.bind('App\\Events\\PusherEvent', function(data) {
               // this is called when the event notification is received...
               loadNotifikasi();
               getJumPesanan();
-              getJumPengiriman();
-              
+              console.log("ini pesaan");
+              // getJumPengiriman();
+              // // alert(JSON.stringify(data));
+              // alert('ok');
           });
           
         @else
-        var channel = pusher.subscribe('agogo');
-          channel.bind('App\\Events\\PusherEvent', function(data) {
-              // this is called when the event notification is received...
-              console.log('oke');
-          });
+          var channel = pusher.subscribe('agogo');
+            channel.bind('App\\Events\\PusherEvent', function(data) {
+                // this is called when the event notification is received...
+                console.log('oke');
+            });
         @endif
 
       })
@@ -195,7 +251,7 @@
         @yield('content')
       </main>
       
- 
+      
     </div>
     <!-- /.content-wrapper -->
 
@@ -204,7 +260,10 @@
       <strong>copyright © 2019 <a href='http://suaratech.com/'>Cv. Azkha Indo Pratama</a>.  All rights reserved.
       reserved.</strong>
     </footer>
-
+    
+    @if(Auth::user()->level_id == "2")
+      @include('layouts.asideM') 
+    @endif
   </div>
   <script type="text/javascript">
     

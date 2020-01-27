@@ -10,7 +10,7 @@
 			<!-- <button class="btn btn-primary" data-toggle="modal" data-target="#modal_input">Create</button>
 			<button class="btn btn-warning" data-toggle="modal" data-target="#modal_input">SetOngkir</button>
 			<hr></hr> -->
-
+			
 			@if (session('success'))
 			 	@component("components.alert", ["type" => "success"])
 					{{ session('success') }}
@@ -45,7 +45,7 @@
 									@if($key['metode_pembayaran'] == 1)
 		       							<span class="label label-warning ">TopUp</span>
 			       					@elseif($key['metode_pembayaran'] == 2)
-			       						<span class="label label-info">COD</span>
+			       						<span class="label label-info">Bank Transfer</span>
 			       					@elseif($key['metode_pembayaran'] == 3)
 			       						<span class="label label-success">Bayar Di Toko</span>
 			       					@endif
@@ -54,7 +54,9 @@
 									@php
 										$waktu_skrang = strtotime(date('Y-m-d H:i:s'));
 										$batas_ambe = strtotime($key['waktu_kirim']);
+										$waktu_kirim = $key['waktu_kirim'];
 									@endphp
+									
 									@if($waktu_skrang < $batas_ambe )
 										<label class="label label-info">Aktif</label>
 									@else

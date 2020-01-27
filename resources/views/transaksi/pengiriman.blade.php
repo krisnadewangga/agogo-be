@@ -39,7 +39,7 @@
 									@if($key->Transaksi->metode_pembayaran == 1)
 		       							<span class="label label-warning ">TopUp</span>
 			       					@elseif($key->Transaksi->metode_pembayaran == 2)
-			       						<span class="label label-info">COD</span>
+			       						<span class="label label-info">Bank Transfer</span>
 			       					@elseif($key->Transaksi->metode_pembayaran == 3)
 			       						<span class="label label-success">Bayar Di Toko</span>
 			       					@endif

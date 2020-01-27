@@ -3,14 +3,15 @@
 @section('content')
     <div class="login-box" style="margin-bottom: 0px; margin-top: 150px;" >
       <div class="login-logo">
-        <a href="../../index2.html"><b>AGOGO</b>MIN</a>
+        
       </div>
       <!-- /.login-logo -->
       <div class="login-box-body" style="margin-top: -20px;">
         <!-- <p class="login-box-msg">Silahkan Masukan Email Dan Password Anda</p> -->
         <div style="margin-top: 10px;">
             <!-- <h3 style="margin-top: 0px;" class="fg-black"><u><b>LOGIN</b></u></h3> -->
-            <p class="login-box-msg">Silahkan Masukan Email Dan Password Anda</p>
+            <center><img src="{{ asset('assets/dist/img/fixLogo.png') }}" height="70px"></center>
+            <p class="login-box-msg" style="margin-top: 10px;">Silahkan Masukan Email Dan Password Anda</p>
         </div>
         <div style="margin-top: 0px; margin-bottom: 10px;">
           <form method="POST" action="{{ route('login') }}">

@@ -11,7 +11,8 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+use App\Events\PusherEvent;
+use App\Helpers\SendNotif;
 
 Auth::routes();
 
@@ -51,6 +52,7 @@ Route::get('/list_topup_saldo','TopupSaldoController@ListTopupSaldo')->name('lis
 Route::get('/cari_user','TopupSaldoController@CariUser')->name('cari_user');
 Route::resource('pengiriman','PengirimanController');
 Route::get('pesanan_diterima/{id}','TransaksiController@pesananDiterima')->name('pesanan_diterima');
+Route::get('konfir_pembayaran/{id}','TransaksiController@konfirBayar')->name('konfir_pembayaran');
 
 Route::get('/lap_pendapatan','LaporanController@LapPendapatan')->name('lap_pendapatan');
 Route::post('/filter_laporan','LaporanController@FilterLaporan')->name('filter_laporan');
@@ -66,3 +68,18 @@ Route::get('/set_data_penjualan','LaporanController@setDataPenjualan')->name('se
 Route::get('/list_promo_selesai', 'PromoController@listPromoSelesai')->name('list_promo_selesai');
 Route::resource('/setup_promo','PromoController');
 
+Route::get('/msessages','MessageController@Index');
+Route::get('/dashboard_pesan','PesanController@dashboardPesan');
+Route::get('/list_pesan','PesanController@listPesan');
+Route::post('/kirim_pesan','PesanController@kirimPesan')->name('kirim_pesan');
+Route::get('/hapus_pesan/{id}','PesanController@hapusPesan')->name('hapus_pesan');
+Route::get('/get_jum_pesan','PesanController@getJumPesan')->name('get_jum_pesan');
+Route::get('/baca_pesan/{id}','PesanController@bacaPesan')->name('baca_pesan');
+
+
+
+Route::get('/tes_event',function(){
+	$message = ['user_id' => 21, 'name' => 'Fajrin Ismail', 'waktu' => '2020-01-01', 'jumPesan' => 0];
+	SendNotif::SendNotPesan('2',$message);
+
+});

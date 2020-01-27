@@ -98,7 +98,7 @@ class TopupSaldoController extends Controller
         'pengirim_id' => Auth::User()->id,
         'penerima_id' => $find->id,
         'judul_id' => $find->id,
-        'judul' => 'Topup Saldo',
+        'judul' => 'Topup Saldo Agogo',
         'isi' => 'Anda Baru Saja Melakukan Topup Saldo Di Agogo Bakery Sebesar Rp '.number_format($req['saldo'],'0','','.'),
         'jenis_notif' => 4,
         'dibaca' => '0'

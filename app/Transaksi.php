@@ -39,7 +39,7 @@ class Transaksi extends Model
       if($attr == "1"){
          $ket = "TopUp";
       }else if($attr == "2"){
-         $ket = "COD";
+         $ket = "Bank Transfer";
       }else if($attr == "3"){
          $ket = "Bayar Di Toko";
       }
@@ -103,6 +103,16 @@ class Transaksi extends Model
     public function BatalPesanan()
     {
       return $this->hasOne(BatalPesanan::class);
+    }
+
+    public function LogKonfirBayar()
+    {
+      return $this->hasOne(LogKonfirBayar::class);
+    }
+
+    public function AjukanBatalPesanan()
+    {
+      return $this->hasOne(AjukanBatalPesanan::class);
     }
 
 }
