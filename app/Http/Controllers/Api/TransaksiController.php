@@ -416,7 +416,7 @@ class TransaksiController extends Controller
 
         	if($transaksi->metode_pembayaran != "3"){
         		
-        		if( $transaksi->status >= '2' && $transaksi->status != '3'){
+        		if( $transaksi->status >= '2' && $transaksi->status != '3' && $transaksi->status != '6'){
         			$kurir = $transaksi->Pengiriman->Kurir;
         			$transaksi['pengiriman'] = $kurir;
         		}else{
