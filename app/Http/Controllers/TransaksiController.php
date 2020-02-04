@@ -25,7 +25,8 @@ class TransaksiController extends Controller
         $sel_user = User::findOrFail($user_id);
         $transaksi_berlangsung = $sel_user->Transaksi->whereNotIn('status',['5','3'] )->count();
         $kunci_transaksi = $sel_user->DetailKonsumen->kunci_transaksi;
-        if($transaksi_berlangsung == '0' && $kunci_transaksi == '1'){
+
+        if($transaksi_berlangsung < '3' && $kunci_transaksi == '1'){
             $sel_user->DetailKonsumen()->update(['kunci_transaksi' => '0']);
         }
         
