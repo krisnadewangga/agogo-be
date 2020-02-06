@@ -32,20 +32,9 @@
               </li>
             @endif
 
-            
-            <li class="notifications-menu">
-               <a href="{{ route('transaksi.index') }}">
-                <i class="fa fa-shopping-cart"></i>
-                <span class="label label-warning jumPesanan"></span>
-              </a>
-            </li>
+     
 
-            <li class="notifications-menu">
-               <a href="{{ route('pengiriman.index') }}">
-                <i class="fa fa-send"></i>
-                <span class="label label-warning jumPengiriman"></span>
-              </a>
-            </li>
+           
              
 
             <li class="dropdown notifications-menu">

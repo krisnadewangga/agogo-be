@@ -32,14 +32,14 @@ function loadNotifikasi(){
 
                   if(value.jenis_notif == '1'){
                     var link_notif = url+"transaksi/"+value.judul_id;
-                    // var label = "<label class='label label-warning'>Transaksi</label>";
-                    var label = "";
+                    var label = "<label class='label label-warning'>Transaksi</label>";
+                    
                   }else if(value.jenis_notif == '6'){
                     var link_notif = url+"transaksi/"+value.judul_id;
                     var label = "";
                   }else if(value.jenis_notif == '7'){
                     var link_notif = '';
-                    var label = "<label class='label label-success'>BukPay</label>";
+                    var label = "<label class='label label-danger'>Ajukan Batal</label>";
                   }else if(value.jenis_notif == '4'){
                     var link_notif = '';
                     var label = "<label class='label label-info'>Pengiriman</label>";
@@ -101,6 +101,26 @@ function getJumPengiriman()
         url : url+"get_jum_pengiriman",
         success :function(msg){
             $(".jumPengiriman").html(msg);
+        }
+    });
+}
+
+function getJumAP()
+{
+    $.ajax({
+        url : url+"get_jum_ap",
+        success : function(msg){
+            $(".jumAP").html(msg);
+        }
+    });
+}
+
+function getJumKP()
+{
+    $.ajax({
+        url : url+"get_jum_kp",
+        success : function(msg){
+            $(".jumKP").html(msg);
         }
     });
 }
