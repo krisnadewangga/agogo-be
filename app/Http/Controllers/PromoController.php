@@ -19,7 +19,7 @@ class PromoController extends Controller
     {
     	$promo = Promo::where('status','1')->get();
 
-    	$menu_active = "transaksi|promo|0";
+    	$menu_active = "item|promo|0";
     	return view('transaksi.promo', compact('menu_active','promo'));
     }
 

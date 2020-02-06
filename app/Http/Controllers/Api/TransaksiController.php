@@ -314,6 +314,12 @@ class TransaksiController extends Controller
 		        		SendNotif::SendNotifPus($sel_user->id,$sel_user->name,$key->id,$ins_transaksi->id,$sel_user->name.' Baru Saja Melakukan Transaksi','1');
 		        	}
 
+		        	//loadJumNot
+		        	SendNotif::SendNotPesan('5',['jenisNotif' => '1']);
+		        	if($req['metode_pembayaran'] == "2"){
+		        		SendNotif::SendNotPesan('5',['jenisNotif' => '4']);
+		        	}
+		        	
 	            	$transaksi_berlangsung = $sel_user->Transaksi->whereNotIn('status',['5','3'] )->count();
 	            	if($transaksi_berlangsung == '3'){
 	            		$sel_user->DetailKonsumen()->update(['kunci_transaksi' => '1']);
@@ -509,6 +515,7 @@ class TransaksiController extends Controller
         }else{
         	$find = Transaksi::findOrFail($req['transaksi_id']);
         	if($find->status == "1" || $find->status == "6"){
+        		$find->Update(['status' => "4"]);
         		$find->AjukanBatalPesanan()->create(['diajukan_oleh' => $req['nama_user'], 'status' => '0' ]);
 
 	        	// ($pengirim_id,$pengirim_nama,$penerima_id,$judul_id,$judul,$jenis_notif)
@@ -516,9 +523,9 @@ class TransaksiController extends Controller
 	        	$admin = User::where('level_id','2')->get();
 	        	
 	        	foreach($admin as $key){
-	        		SendNotif::SendNotifPus($find->user_id,$req['nama_user'],$key->id,$req['transaksi_id'],$req['nama_user'].' Mengajukan Untuk Pembatalan Pesanan','6');
+	        		SendNotif::SendNotifPus($find->user_id,$req['nama_user'],$key->id,$req['transaksi_id'],$req['nama_user'].' Mengajukan Untuk Pembatalan Pesanan','7');
 	        	}
-	        	
+	        	SendNotif::SendNotPesan('5',['jenisNotif' => '3']);
 
 	        	$success = 1;
 	          	$msg = "Berhasil Ajukan Pembatalan Transaksi";

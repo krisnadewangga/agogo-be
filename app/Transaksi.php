@@ -42,6 +42,8 @@ class Transaksi extends Model
          $ket = "Bank Transfer";
       }else if($attr == "3"){
          $ket = "Bayar Di Toko";
+      }else{
+        $ket = "";
       }
 
       return $ket;
@@ -63,6 +65,8 @@ class Transaksi extends Model
            $ket = "Pesanan Dibatalkan";
          }else if($attr == "6"){
            $ket = "Menunggu Pembayaran";
+         }else if($attr == "4"){
+           $ket = "Ajukan Pembatalan";
          }
       }else{
          if($attr == "1"){
@@ -71,6 +75,8 @@ class Transaksi extends Model
            $ket = "Pesanan Telah Diambil";
          }else if($attr == "3"){
            $ket = "Pesanan Dibatalkan";
+         }else if($attr == "4"){
+           $ket = "Ajukan Pembatalan";
          }
       }
 

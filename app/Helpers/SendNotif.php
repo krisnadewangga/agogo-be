@@ -169,7 +169,7 @@ class SendNotif{
     public static function SendNotPesan($type,$message){
         event(new PusherEvent($type,$message));
     }
-
+    
     public  function simpanNotif()
     {
         return "insert Notif Db";
