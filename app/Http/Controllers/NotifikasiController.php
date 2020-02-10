@@ -44,7 +44,7 @@ class NotifikasiController extends Controller
 
     public function GetJumPesanan()
     {
-       $transaksi = Transaksi::where('status','1')->count();
+       $transaksi = Transaksi::whereNotIn('status',['5','3'])->count();
        return $transaksi;
     }
     
@@ -54,6 +54,18 @@ class NotifikasiController extends Controller
        return $pengiriman;
     }
 
+    public function GetJumAP()
+    {
+       $transaksi = Transaksi::where('status','4')->count();
+       return $transaksi;
+    }
+
+    public function GetJumKP()
+    {
+      $transaksi = Transaksi::where('status','6')->count();
+      return $transaksi;
+    }
+    
     public function index()
     {
         $notifikasi = Notifikasi::join('users as a','a.id','=','notifikasi.pengirim_id')

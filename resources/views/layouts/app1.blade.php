@@ -139,7 +139,9 @@
          activeMenu();
          getJumPesanan();
          getJumPengiriman();
-
+         getJumAP();
+         getJumKP();
+         
          var t = $('.dataTables').DataTable();
          t.on( 'order.dt search.dt', function () {
             t.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
@@ -201,8 +203,17 @@
                   if( (cek_buka_pesan_us != "") && (cek_buka_pesan_us == data.message.user_id) && (user_id != data.message.pengirim_id) ){
                     setKirimPesan(data.message);
                   }
+              }else if(data.type == "5"){
+                  if(data.message.jenisNotif == "1"){
+                    getJumPesanan();
+                  }else if(data.message.jenisNotif == "2"){
+                    getJumPengiriman();
+                  }else if(data.message.jenisNotif == "3"){
+                    getJumAP();
+                  }else if(data.message.jenisNotif == "4"){
+                    getJumKP();
+                  }
               }
-
             });
           }
           
@@ -211,11 +222,7 @@
           channel.bind('App\\Events\\PusherEvent', function(data) {
               // this is called when the event notification is received...
               loadNotifikasi();
-              getJumPesanan();
-              console.log("ini pesaan");
-              // getJumPengiriman();
-              // // alert(JSON.stringify(data));
-              // alert('ok');
+              // alert(JSON.stringify(data));
           });
           
         @else

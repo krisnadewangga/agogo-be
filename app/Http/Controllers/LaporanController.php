@@ -127,7 +127,7 @@ class LaporanController extends Controller
                                         ['status_aktif','=','0']
                                     ])->count();
       
-        $menu_active = "laporan|user|0";
+        $menu_active = "user|user|0";
         return view("laporan.lap_user",compact('menu_active','user', 'total_member','total_not_member','total_user','total_blokir'));
     }
 

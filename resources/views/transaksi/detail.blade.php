@@ -194,7 +194,7 @@
 														<small>Jarak Tempuh : <label class="label  label-default text-yellow ">{{ $transaksi->jarak_tempuh }} KM </small>
 													</td>
 													
-													@if( $transaksi->status >= '2' && $transaksi->status != '3' && $transaksi->status != '6'  )
+													@if( $transaksi->status >= '2' && $transaksi->status != '3' && $transaksi->status != '6' && $transaksi->status != '4' )
 														<td align="center">
 															{{$transaksi->Pengiriman->created_at->format('d M Y H:i A')}}
 															<hr style="margin:3px;"></hr>
@@ -450,6 +450,26 @@
 							<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
 						@endif
 					</div>
+				@elseif($transaksi->status == '4' && $transaksi->metode_pembayaran == '2')
+					<div style="margin-top: 10px;"> 
+						<a href="{{ route('konfir_pembayaran',$transaksi->id) }}" onclick="return confirm('Apakah Anda Yakin Mengkonfirmasi Pembayaran ?')">
+							<button class="btn btn-success">Konfir Pembayaran</button>
+						</a>
+
+						<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
+					</div>
+				@elseif($transaksi->status == '4' && $transaksi->metode_pembayaran == '1')
+					<div style="margin-top: 10px;"> 
+						<button class="btn btn-primary" data-target="#modal_input" data-toggle="modal">Mulai Pengiriman</button>
+
+						<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
+					</div>
+				@elseif($transaksi->status == '4' && $transaksi->metode_pembayaran == '3')
+					<div style="margin-top: 10px;"> 
+						<button class="btn btn-success" data-target="#modal_ambil_pesanan" data-toggle="modal">Pesanan Diambil</button>
+						
+						<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
+					</div>
 				@endif
 
 				@if($transaksi->status == '2' )
@@ -494,7 +514,9 @@
 	     	}
      	</script>
 
-     	@if( ($transaksi->metode_pembayaran == '1' && $transaksi->status > '1' && $transaksi->status != '3') || ($transaksi->metode_pembayaran == '2' && $transaksi->status >= '2' && $transaksi->status != '3'  && $transaksi->status != '6' ) )
+     	@if( 
+     			($transaksi->metode_pembayaran == '1' && $transaksi->status > '1' && $transaksi->status != '3' && $transaksi->status != '4') 
+     			|| ($transaksi->metode_pembayaran == '2' && $transaksi->status >= '2' && $transaksi->status != '3'  && $transaksi->status != '6'  && $transaksi->status != '6' && $transaksi->status != '4' ) )
 	     	
 	     	<div class="modal fade"  id="modal_profil">
 				<!-- Add the bg color to the header using any of the bg-* classes -->
