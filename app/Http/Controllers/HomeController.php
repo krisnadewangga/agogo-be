@@ -134,7 +134,7 @@ class HomeController extends Controller
                         ->limit('10')
                         ->get();
 
-        $pesanan = Transaksi::where('status','1')->count();
+        $pesanan = Transaksi::where('status','1')->orWhere('status','2')->orWhere('status','6')->count();
         $pengiriman = Pengiriman::where('status','0')->count();
         $total_p = Transaksi::where('status','5')->count();
         $dashboard_k = ['pesanan' => $pesanan, 'pengiriman' => $pengiriman, 'total_p' => $total_p];

@@ -75,7 +75,7 @@
 									@if($key['metode_pembayaran'] == 1)
 		       							<span class="label label-warning ">TopUp</span>
 			       					@elseif($key['metode_pembayaran'] == 2)
-			       						<span class="label label-info">COD</span>
+			       						<span class="label label-info">Bank Transfer</span>
 			       					@elseif($key['metode_pembayaran'] == 3)
 			       						<span class="label label-success">Bayar Ditempat</span>
 			       					@endif

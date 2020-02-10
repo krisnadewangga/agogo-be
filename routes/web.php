@@ -23,6 +23,8 @@ Route::get('/set_grafik','HomeController@setGrafik')->name('set_grafik');
 Route::get('/load_notif','NotifikasiController@loadNotif')->name('load_notif');
 Route::get('/get_jum_pesanan','NotifikasiController@GetJumPesanan')->name('get_jum_pesanan');
 Route::get('/get_jum_pengiriman','NotifikasiController@GetJumPengiriman')->name('get_jum_pengiriman');
+Route::get('/get_jum_ap','NotifikasiController@GetJumAP')->name('get_jum_ap');
+Route::get('/get_jum_kp','NotifikasiController@GetJumKP')->name('get_jum_kp');
 Route::get('/list_notifikasi','NotifikasiController@index')->name('list_notifikasi');
 Route::get('/baca_notif','NotifikasiController@bacaNotif')->name('baca_notif');
 Route::get('/in_ganti_password','ProfilController@inGantiPassword')->name('in_ganti_password');
@@ -45,6 +47,9 @@ Route::resource('kurir','KurirController');
 Route::post('/set_ongkir','KurirController@SetOngkir')->name('set_ongkir');
 
 Route::resource('transaksi','TransaksiController');
+Route::get('/pengajuan_batal_pesanan','TransaksiController@PengajuanBatalPesanan')->name('pengajuan_batal_pesanan');
+Route::get('/konfirmasi_pembayaran','TransaksiController@KonfirmasiPembayaran')->name('konfirmasi_pembayaran');
+
 Route::get('/batal_transaksi','TransaksiController@BatalTransaksi')->name('batal_transaksi');
 Route::post('/ambil_pesanan','TransaksiController@AmbilPesanan')->name('ambil_pesanan');
 Route::resource('topup_saldo','TopupSaldoController');
@@ -76,10 +81,11 @@ Route::get('/hapus_pesan/{id}','PesanController@hapusPesan')->name('hapus_pesan'
 Route::get('/get_jum_pesan','PesanController@getJumPesan')->name('get_jum_pesan');
 Route::get('/baca_pesan/{id}','PesanController@bacaPesan')->name('baca_pesan');
 
-
+Route::post('/get_pesanan','TransaksiController@filterTransaksi')->name('get_pesanan');
 
 Route::get('/tes_event',function(){
 	$message = ['user_id' => 21, 'name' => 'Fajrin Ismail', 'waktu' => '2020-01-01', 'jumPesan' => 0];
 	SendNotif::SendNotPesan('2',$message);
 
 });
+
