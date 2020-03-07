@@ -51,16 +51,10 @@ Route::get('list_notifikasi', 'Api\NotifikasiController@tampilNotifikasi');
 Route::POST('read_notifiikasi', 'Api\NotifikasiController@readNotifikasi');
 
 
-
-
 //get user
 Route::get('users','Api\UserController@getUser');
-
 //cek kas
 Route::get('cekKas','Api\MasterController@cekKas');
-
-
-
 
 // react
 Route::get('categories', 'Api\react\ProductController@categories');
