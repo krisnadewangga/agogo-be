@@ -298,5 +298,15 @@ class MasterController extends Controller
         return response()->json(['success' => $success,'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'msg' => $msg], $kr);
   }
 
+
+
+  // cek kas
+
+  public function cekKas(){
+    return response()->json(["status" => "1"]);
+  }
+
+
+
   
 }
