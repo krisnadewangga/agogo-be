@@ -353,6 +353,7 @@ class TransaksiController extends Controller
         SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'transaksi', $notif->judul_id);
 
         $this->setKunciTransaksi($penerima_id);
+        
         return redirect()->back()->with("success","Berhasil Menyelesaikan Transaksi");
     }
 

@@ -9,7 +9,7 @@ class Item extends Model
 {
   protected $table = "item";
   protected $fillable = ['kategori_id','nama_item','harga','margin','stock','v_rasa','deskripsi','diinput_by',
-    					   'status_aktif'];
+    					   'status_aktif','code'];
 
   protected $appends = array('GambarUtama');
 
