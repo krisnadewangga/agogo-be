@@ -50,6 +50,20 @@ Route::post('ajukan_batal_pesanan','Api\TransaksiController@AjukanBatalPesanan')
 Route::get('list_notifikasi', 'Api\NotifikasiController@tampilNotifikasi');
 Route::POST('read_notifiikasi', 'Api\NotifikasiController@readNotifikasi');
 
+// react
+Route::get('categories', 'Api\react\ProductController@categories');
+Route::get('products', 'Api\react\ProductController@products');
+Route::post('orders','Api\react\OrderController@postOrder');
+Route::get('cekInvoice', 'Api\react\OrderController@checkLastInvoice');
+Route::get('get_transaksi/{no_transaksi}','Api\react\OrderController@getTransaksi');
+Route::post('bayar_transaksi','Api\react\OrderController@bayarTransaksiM');
+
+//simpan transaksi 
+Route::post('/keepOrders', 'Api\react\OrderController@keepOrder');
+Route::get('/orders','Api\react\OrderController@getUnpaidOrders');
+Route::get('/order/{id}', 'Api\react\OrderController@getOrderDetail');
+Route::delete('/order/{id}', 'Api\react\OrderController@deleteOrder');
+
 Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
     return "Cache is cleared";
