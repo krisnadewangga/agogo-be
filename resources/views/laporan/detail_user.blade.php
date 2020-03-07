@@ -33,52 +33,52 @@
                         <h5 class="widget-user-desc">Konsumen</h5>
                         </div>
                         <div class="box-footer no-padding">
-                        <ul class="nav nav-stacked">
-                            <li>
-                                <a href="#" title="Jenis Kelamin">
-                                    @if($user->DetailKonsumen->jenis_kelamin == '0')
-                                        Laki-Laki
-                                    @elseif($user->DetailKonsumen->jenis_kelamin == '1')
-                                        Perempuan
-                                    @else 
-                                        <label class="label label-warning">Belum Diupdate</label>
-                                    @endif
-                                        
-                                    <span class="pull-right  text-red" >
-                                        <i class="fa  fa-intersex"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" title="Tgl Lahir">
-                                
+                            <ul class="nav nav-stacked">
+                                <li>
+                                    <a href="#" title="Jenis Kelamin">
+                                        @if($user->DetailKonsumen->jenis_kelamin == '0')
+                                            Laki-Laki
+                                        @elseif($user->DetailKonsumen->jenis_kelamin == '1')
+                                            Perempuan
+                                        @else 
+                                            <label class="label label-warning">Belum Diupdate</label>
+                                        @endif
+                                            
+                                        <span class="pull-right  text-red" >
+                                            <i class="fa  fa-intersex"></i>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" title="Tgl Lahir">
                                     
-                                    @if(!empty($user->DetailKonsumen->tgl_lahir) )
-                                        {{ $user->DetailKonsumen->tgl_lahir->format('d M Y') }}
-                                    @else 
-                                        <label class="label label-warning">Belum Diupdate</label>
-                                    @endif
-                                    <span class="pull-right  text-green" >
-                                        <i class="fa fa-calendar"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" title="No HP" >{{ $user->no_hp }}
-                                    <span class="pull-right  text-blue" >
-                                        <i class='fa fa-phone text-blue'></i>
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" title="Email">{{ $user->email }}
-                                    <span class="pull-right  text-aqua" >
-                                        <i class="fa fa-envelope"></i>
-                                    </span>
-                                </a>
-                            </li>
-                          
-                        </ul>
+                                        
+                                        @if(!empty($user->DetailKonsumen->tgl_lahir) )
+                                            {{ $user->DetailKonsumen->tgl_lahir->format('d M Y') }}
+                                        @else 
+                                            <label class="label label-warning">Belum Diupdate</label>
+                                        @endif
+                                        <span class="pull-right  text-green" >
+                                            <i class="fa fa-calendar"></i>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" title="No HP" >{{ $user->no_hp }}
+                                        <span class="pull-right  text-blue" >
+                                            <i class='fa fa-phone text-blue'></i>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" title="Email">{{ $user->email }}
+                                        <span class="pull-right  text-aqua" >
+                                            <i class="fa fa-envelope"></i>
+                                        </span>
+                                    </a>
+                                </li>
+                              
+                            </ul>
                         </div>
                     </div>
 

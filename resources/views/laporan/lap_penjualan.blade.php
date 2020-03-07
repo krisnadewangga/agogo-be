@@ -388,6 +388,7 @@
 
                             $("#forTable").empty();
                             $("#forTable").append(html);
+                            
                             $("#dataTables1").dataTable({
                                                             scrollY:        "400px",
                                                             scrollX:        true,
