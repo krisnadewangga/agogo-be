@@ -7,7 +7,9 @@ use Carbon\Carbon;
 class Transaksi extends Model
 {
     protected $table = "transaksi";
-    protected $fillable = ['user_id',
+    protected $fillable = [
+                 'id',
+                 'user_id',
     					   'no_transaksi',
     					   'total_transaksi',
     					   'biaya_pengiriman',
@@ -27,7 +29,8 @@ class Transaksi extends Model
                  'durasi_kirim',
                  'waktu_kirim',
                  'tgl_bayar',
-    					   'status'];
+    					   'status',
+                 'jalur'];
     protected $dates = ['waktu_kirim','tgl_bayar','tgl_bayar'];
 
   	protected $appends = array('ket_metodepembayaran','ket_status_transaksi');
@@ -67,6 +70,8 @@ class Transaksi extends Model
            $ket = "Menunggu Pembayaran";
          }else if($attr == "4"){
            $ket = "Ajukan Pembatalan";
+         }else{
+           $ket = "";
          }
       }else{
          if($attr == "1"){
@@ -77,6 +82,8 @@ class Transaksi extends Model
            $ket = "Pesanan Dibatalkan";
          }else if($attr == "4"){
            $ket = "Ajukan Pembatalan";
+         }else {
+           $ket = "";
          }
       }
 
@@ -121,6 +128,11 @@ class Transaksi extends Model
     public function AjukanBatalPesanan()
     {
       return $this->hasOne(AjukanBatalPesanan::class);
+    }
+
+    public function R_Order()
+    {
+      return $this->hasOne(R_Order::class);
     }
 
 }
