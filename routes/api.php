@@ -50,6 +50,17 @@ Route::post('ajukan_batal_pesanan','Api\TransaksiController@AjukanBatalPesanan')
 Route::get('list_notifikasi', 'Api\NotifikasiController@tampilNotifikasi');
 Route::POST('read_notifiikasi', 'Api\NotifikasiController@readNotifikasi');
 
+
+
+//get user
+Route::get('users','Api\UserController@getUser');
+
+//cek kas
+Route::get('cekKas','Api\MasterController@cekKas');
+
+
+
+
 Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
     return "Cache is cleared";
