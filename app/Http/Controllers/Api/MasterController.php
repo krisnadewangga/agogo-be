@@ -302,11 +302,7 @@ class MasterController extends Controller
 
   // cek kas
 
-  public function cekKas(){
-    return response()->json(["status" => "1"]);
-  }
-
-
+ 
 
   
 }

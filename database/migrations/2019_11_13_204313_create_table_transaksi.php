@@ -34,7 +34,7 @@ class CreateTableTransaksi extends Migration
             
             $table->enum('metode_pembayaran',['1','2','3']);//1=bukpay, 2=transfer_bank, 3=bayarditempat
             $table->enum('transaksi_member',['0','1'])->default(0); //0 = bukan member, 1=member
-            $table->enum('status',['1','2','3','4','5','6','7','8','9','10']); //1= Mempersiapkan Item, 2=pengiriman, 3=dibatalkan, 4=ajukan pembatalan, 5=selesai, 6=menunggu pembayaran , 7=UNPAID Simpan Transaksi
+            $table->enum('status',['1','2','3','4','5','6','7','8','9','10']); //1= Mempersiapkan Item, 2=pengiriman, 3=dibatalkan, 4=ajukan pembatalan, 5=selesai, 6=menunggu pembayaran , 7=UNPAID Simpan Transaksi 8= refund
 
             $table->datetime('tgl_bayar')->nullable();
             $table->text('catatan')->default('-');
@@ -42,7 +42,7 @@ class CreateTableTransaksi extends Migration
             $table->datetime('waktu_kirim');
             
             $table->timestamps();
-            
+           
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             
         });

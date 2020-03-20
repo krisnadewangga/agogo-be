@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Http\Controllers\Api\react;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\User;
+use App\Role;
+use App\Level;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+
+
+class UserController extends Controller
+{
+    //
+
+    public function getUser(){
+   
+
+
+ 	$sel=  Role::RightJoin('users','users.id','=','roles.user_id')
+ 		  ->select('roles.level_id')	
+ 		  ->get();
+   	
+   	 return response()->json(['success' => 1, 'msg' => $sel], 200); 		
+  }
+
+
+   public function login(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'password' => 'required|string',
+            'remember_me' => 'boolean'
+        ]);
+        $credentials = request(['name', 'password']);
+
+        if(!Auth::attempt($credentials))
+            return response()->json([
+                'message' => 'Unauthorized'
+            ], 401);
+        $user = $request->user();
+        $tokenResult = $user->createToken('Personal Access Token');
+        $token = $tokenResult->token;
+        if ($request->remember_me)
+            $token->expires_at = Carbon::now()->addWeeks(1);
+        $token->save();
+        $role_name = $user->roles()->pluck('level_id');
+        return response()->json([
+            'username'      => $user->name,
+            // 'role'          => $role_name[0],
+            'role'          => $role_name,
+            'access_token'  => $tokenResult->accessToken,
+            'token_type'    => 'Bearer',
+            'expires_at'    => Carbon::parse($tokenResult->token->expires_at)->toDateTimeString()
+        ]);
+    }
+
+}
