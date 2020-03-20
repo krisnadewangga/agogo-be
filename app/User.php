@@ -6,10 +6,13 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\DetailKonsumen;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+
+    use Notifiable, HasApiTokens;
+
 
     /**
      * The attributes that are mass assignable.
@@ -60,6 +63,12 @@ class User extends Authenticatable
     }
 
 
+   public function Roles()
+    {
+      return $this->hasMany(Role::class);
+    }
+
+
     public function DetailKonsumen()
     {
         return $this->hasOne(DetailKonsumen::class);
@@ -69,6 +78,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Transaksi::class);
     }
+
 
     public function HistoriTopup()
     {

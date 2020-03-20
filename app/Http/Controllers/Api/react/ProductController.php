@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Helpers\PathImageReact;
 use App\Kategori;
 use App\Item;
+use App\Http\Resources\Item as ItemResource;
 
 class ProductController extends Controller
 {
@@ -17,6 +18,7 @@ class ProductController extends Controller
 		$this->path_image = PathImageReact::getPath(400);;
 
 	}
+
 
     public function categories()
     {
@@ -50,5 +52,11 @@ class ProductController extends Controller
 		});
 
 		return response()->json($item);
+    }
+
+    public function show($id){
+    	$item = Item::findOrFail($id);
+
+    	return response()->json($item);
     }
 }

@@ -11,6 +11,10 @@ use App\User;
 use App\Item;
 use App\Notifikasi;
 use App\Helpers\SendNotif;
+use App\Role;
+use Illuminate\Support\Facades\Auth;
+use DB;
+use App\Refund;
 
 class OrderController extends Controller
 {
@@ -33,11 +37,31 @@ class OrderController extends Controller
 		return $invoice;
 	}
 
+   public function generateInvoiceRefunds()
+    {
+        $refund = Refund::orderBy('id', 'DESC');
+        if ($refund->count() > 0) {
+            $refund = $refund->first();
+            $explode = explode('-', $refund->invoice);
+            $count = $explode[1] + 1;
+            return 'RF-' . $count;
+        }
+        return 'RF-1';
+    }
+
+
+
+
+
+
+
     public function checkLastInvoice()
     {
     	$res = $this->generateInvoice('1');
     	return response()->json(['current_invoice' => $res],200);
     }
+
+
 
     public function postOrder(Request $request)
     {
@@ -87,6 +111,18 @@ class OrderController extends Controller
           $array['total'] = $key['qty'] * $key['price'];
 
           $insItem[] = $array;
+
+
+               $getCount = Item::where(['id' => $key['product_id']])->get();
+                
+                if ($getCount[0]['stock'] >= $key['qty']) {
+                  DB::table('item')->where('id', $key['product_id'])->decrement('stock', $key['qty']);  
+                }
+                else {
+                    throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
+                }
+
+
       }
 
   		$find->ItemTransaksi()->createMany($insItem);
@@ -294,6 +330,15 @@ class OrderController extends Controller
     
     }
 
+
+
+   public function getPaidOrders()
+    {
+        $orders = Transaksi::where(['status' => '5','jenis'=>'1'])->get();
+        return response()->json($orders, 200);
+    }
+
+
     public function getUnpaidOrders()
     {
        $sel = Transaksi::join('r_order as a','transaksi.id','=','a.transaksi_id')
@@ -312,6 +357,9 @@ class OrderController extends Controller
         return response()->json($sel,200);
     }
 
+
+
+
     public function getOrderDetail($id)
     {
        $detail_transaksi = ItemTransaksi::select('id',
@@ -320,6 +368,7 @@ class OrderController extends Controller
                                                    'jumlah as qty',
                                                    'harga as price',
                                                    'item_id')
+                                        ->where('item_transaksi.status','1')
                                         ->where('transaksi_id',$id)->get();
 
        $index = 0;
@@ -342,5 +391,166 @@ class OrderController extends Controller
             'message' => $order->no_transaksi,
         ], 200);
     }
+
+
+
+
+
+
+
+
+
+    public function postRefunds(Request $request){
+ // return response()->json([
+ //                'status' => 'failed',
+ //                'message' => $request[0]['product_id']
+ //            ], 400);
+      
+        if(!Auth::attempt(['name' => $request[0]['username_approval'], 'password' => $request[0]['pin_approval'] ]))
+             return response()->json([
+                'status' => 'failed',
+                'message' => 'Invalid Username / PIN'
+            ], 400);
+        $user = $request->user();
+        $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+
+
+        if($role > 0){
+    
+        DB::beginTransaction();
+        try {
+
+
+            $total = 0;
+
+            $result = collect($request)->map(function ($value) {
+                return [
+                    'transaksi_id'    => $value['transaksi_id'],
+                    'item_id'  => $value['product_id'],
+                    'qty'         => $value['qty'],
+                    'harga'       => $value['price'],
+                    'total'       => $value['total'],
+                ];
+            })->all();
+            
+
+
+
+
+            foreach ($result as $key => $row) {  
+                // Kurangin Total Amount di Summary Order
+               
+
+                
+                DB::table('item_transaksi')
+                    ->where('transaksi_id', $row['transaksi_id'])
+                    ->where('item_id', $row['item_id'])
+                    ->update(['status' => '0']);
+
+                    DB::table('item')->where('id', $row['item_id'])
+                ->increment('stock', $row['qty']);        
+
+                $total = $total + $row['total'];
+                                  
+            }
+
+
+              $refund = Refund::create(array(
+                'invoice'       => $this->generateInvoiceRefunds(),
+                'transaksi_id'      => $request[0]['transaksi_id'],
+                'user_id'   => $request[0]['user_id'],
+                'total'         => $total,
+            ));
+
+
+            if($request[0]['jum'] <=0 ){
+              DB::table('transaksi')->where('id', $row['transaksi_id'])
+              ->update(['status'=> '8']);
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' =>  $request[0]['price'],
+            ], 200);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => $e->getMessage()
+                ], 400);
+            }
+        }
+        else {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Invalid PIN'
+            ], 400);
+        }
+    }
+
+
+
+
+
+    // public function postRefunds(Request $request){
+
+
+    //     if(!Auth::attempt(['name' => $request[0]['username_approval'], 'password' => $request[0]['pin_approval'] ]))
+    //          return response()->json([
+    //             'status' => 'failed',
+    //             'message' => 'Invalid Username / PIN'
+    //         ], 400);
+    //     $user = $request->user();
+    //     $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+  
+
+
+
+
+    //     if($role > 0){
+    //              $db = Transaksi::find((string)$request[0]['order_id']);
+    //              $db->update(['status' => '8']);
+
+
+
+
+    //             $result = collect($request)->map(function ($value) {
+    //             return [
+    //                 'order_id'    => $value['order_id'],
+    //                 'preorder_id' => $value['preorder_id'],
+    //                 'product_id'  => $value['product_id'],
+    //                 'qty'         => $value['qty'],
+    //                 'price'       => $value['price'],
+    //                 'total'       => $value['total'],
+    //             ];
+    //         })->all();
+    //         // return response($result);
+
+    //         foreach ($result as $key => $row) {  
+
+    //             DB::table('item')->where('id', $row['product_id'])
+    //             ->increment('stock', $row['qty']);    
+
+    //         }
+    //         DB::commit();
+    //         return response()->json([
+    //             'status' => 'success',
+    //             'message' => $db->no_transaksi,
+    //         ], 200);
+
+    //     }else {
+
+    //         return response()->json([
+    //             'status' => 'gagal',
+    //             'message' => "Anda Bukan Approval"
+    //         ], 400);
+
+    //     }
+
+
+
+        
+    // }
 
 }
