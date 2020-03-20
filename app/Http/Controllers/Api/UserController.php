@@ -381,10 +381,6 @@ class UserController extends Controller
   }
 
 
-  public function getUser(){
-    $success = 1;
-    $msg = User::all();
-    return response()->json(['success' => $success, 'msg' => $msg], 200);
-  }
+  
   
 }

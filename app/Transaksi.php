@@ -30,6 +30,7 @@ class Transaksi extends Model
                  'waktu_kirim',
                  'tgl_bayar',
     					   'status',
+                 'jenis',
                  'jalur'];
     protected $dates = ['waktu_kirim','tgl_bayar','tgl_bayar'];
 
@@ -133,6 +134,11 @@ class Transaksi extends Model
     public function R_Order()
     {
       return $this->hasOne(R_Order::class);
+    }
+
+    public function Preorder()
+    {
+      return $this->hasOne(Preorders::class);
     }
 
 }

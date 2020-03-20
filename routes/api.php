@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Http\Request;
-
+use App\Http\Resources\UserCollection;
+use App\User;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -51,10 +52,51 @@ Route::get('list_notifikasi', 'Api\NotifikasiController@tampilNotifikasi');
 Route::POST('read_notifiikasi', 'Api\NotifikasiController@readNotifikasi');
 
 
+
 //get user
-Route::get('users','Api\UserController@getUser');
-//cek kas
-Route::get('cekKas','Api\MasterController@cekKas');
+//Route::get('users','Api\react\UserController@getUser');
+Route::get('/users', function () {
+
+    return new UserCollection(
+        User::whereHas('roles', function ($query) {
+            $query->where('name', '!=', 'admin')->where('name', '!=', 'manager');
+        })->get()
+    );
+
+});
+
+
+
+//Auth API
+Route::group([
+    'prefix' => 'auth'
+], function () {
+    Route::post('login', 'Api\react\UserController@login');
+    Route::post('signup', 'AuthController@signup');
+    Route::get('logout', 'AuthController@logout');
+    Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
+    Route::group([
+      'middleware' => 'auth:api'
+    ], function() {
+        
+       // Route::get('user', 'AuthController@user');
+    });
+});
+
+
+//produk
+Route::get('product/{id}', 'Api\react\ProductController@show');
+
+//Kas API
+Route::post('/postKas', 'Api\react\KasController@postKas');
+Route::get('cekKas/{id}','Api\react\KasController@cekKas');
+Route::get('/getTrx/{id}', 'Api\react\KasController@getTrx');
+Route::get('getTrxTest','Api\react\KasController@getTrxTest');
+Route::post('/CheckApproval', 'Api\react\KasController@CheckApproval');
+Route::put('/updateKas/{id}', 'Api\react\KasController@updateKas');
+
+
+
 
 // react
 Route::get('categories', 'Api\react\ProductController@categories');
@@ -69,6 +111,26 @@ Route::post('/keepOrders', 'Api\react\OrderController@keepOrder');
 Route::get('/orders','Api\react\OrderController@getUnpaidOrders');
 Route::get('/order/{id}', 'Api\react\OrderController@getOrderDetail');
 Route::delete('/order/{id}', 'Api\react\OrderController@deleteOrder');
+
+
+//Refund API
+Route::post('/refunds', 'Api\react\OrderController@postRefunds');
+
+//paid
+Route::get('/PaidOrders', 'Api\react\OrderController@getPaidOrders');
+Route::get('/paid_preorders', 'Api\react\PreorderController@paid_preorder');
+
+
+// cek invoice 
+Route::get('/cekPOInvoice', 'Api\react\PreorderController@checkLastInvoicePesanan');
+
+// preoders
+Route::get('/preorders', 'Api\react\PreorderController@index');
+Route::post('preorders','Api\react\PreorderController@store');
+Route::get('/preorder/{id}', 'Api\react\PreorderController@show');
+Route::post('/bayarPreorder', 'Api\react\PreorderController@bayarPreorder');
+
+
 
 
 Route::get('/clear-cache', function() {
