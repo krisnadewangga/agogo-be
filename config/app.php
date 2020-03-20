@@ -170,6 +170,7 @@ return [
          */
         Intervention\Image\ImageServiceProvider::class,
         LaravelFCM\FCMServiceProvider::class,
+        Laravel\Passport\PassportServiceProvider::class,
         /*
          * Application Service Providers...
          */
