@@ -21,10 +21,10 @@ class UserController extends Controller
                  ->where('roles.level_id',3)
                  ->orWhere('roles.level_id',4)
                  ->orWhere('roles.level_id',5)
-                 ->select('users.id','name','email','foto as photo')->distinct('id')->get();
+                 ->select('users.id','name','email','foto as photo')->distinct('users.id')->get();
 
     $user->map(function($user){ 
-        $sel_role = Role::where(['user_id' => $user->id])->pluck('id');
+        $sel_role = Role::where(['user_id' => $user->id])->pluck('level_id');
         //$roles = explode(",", $sel_role->roles);
         $user['username'] = $user->name;
         $user['role'] = $sel_role;
