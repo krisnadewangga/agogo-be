@@ -17,12 +17,14 @@ class UserController extends Controller
 
     public function getUser(){
    
-    $user = User::where(['status_aktif' => '1'])->select('id','name','email','foto as photo')->get();
+    $user = User::join('roles','roles.user_id','=','users.id')
+                 ->where('roles.level_id',3)
+                 ->orWhere('roles.level_id',4)
+                 ->orWhere('roles.level_id',5)
+                 ->select('users.id','name','email','foto as photo')->distinct('id')->get();
+
     $user->map(function($user){ 
-        $sel_role = Role::where(['user_id' => $user->id,
-                                 'level_id' => '3',
-                                 'level_id' => '4',
-                                 'level_id' => '5'])->pluck('id');
+        $sel_role = Role::where(['user_id' => $user->id])->pluck('id');
         //$roles = explode(",", $sel_role->roles);
         $user['username'] = $user->name;
         $user['role'] = $sel_role;
