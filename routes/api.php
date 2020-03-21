@@ -57,12 +57,21 @@ Route::POST('read_notifiikasi', 'Api\NotifikasiController@readNotifikasi');
 //Route::get('users','Api\react\UserController@getUser');
 Route::get('/users', function () {
 
-    return new UserCollection(
-        User::whereHas('roles', function ($query) {
-            $query->where('name', '!=', 'admin')->where('name', '!=', 'manager');
-        })->get()
-    );
-
+    // return new UserCollection(
+    //     User::whereHas('roles', function ($query) {
+    //         $query->where('name', '!=', 'admin')->where('name', '!=', 'manager');
+    //     })->get()
+    // );
+    
+    $user = User::where('status_aktif','1')->select('id','name','email','foto as photo')->get();
+    $user->map(function($user){ 
+        $sel_role = App\Role::where('user_id',$user->id)->selectRaw('group_concat(level_id) as roles')->first();
+        $roles = explode(",", $sel_role->roles);
+        $user['username'] = $user->name;
+        $user['role'] = $roles ;
+        return $user;
+    });
+    return response()->json(['data' => $user]);
 });
 
 

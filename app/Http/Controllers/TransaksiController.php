@@ -199,6 +199,8 @@ class TransaksiController extends Controller
                 $status = "<label class='label label-warning'>Ajukan Pembatalan</label>";
             }else if($transaksi['status'] == "5"){
                 $status = "<label class='label label-success'>Pesanan Diterima</label>";
+            }else if($transaksi['status'] == "7"){
+                $status = "<label class='label label-warning'>Pesanan Disimpan</label>";
             }
 
             $transaksi['tampil_jt'] = $tampil_jt;

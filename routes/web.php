@@ -86,6 +86,5 @@ Route::post('/get_pesanan','TransaksiController@filterTransaksi')->name('get_pes
 Route::get('/tes_event',function(){
 	$message = ['user_id' => 21, 'name' => 'Fajrin Ismail', 'waktu' => '2020-01-01', 'jumPesan' => 0];
 	SendNotif::SendNotPesan('2',$message);
-
 });
 
