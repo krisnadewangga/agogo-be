@@ -92,7 +92,8 @@
 
         <script src="https://cdn.datatables.net/fixedcolumns/3.3.0/js/dataTables.fixedColumns.min.js"></script>
         <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/3.3.0/css/fixedColumns.bootstrap.min.css"></style>
-        <script type="text/javascript">
+       
+       <script type="text/javascript">
             $(function(){
                 setBulan();
                 getTopTen();
