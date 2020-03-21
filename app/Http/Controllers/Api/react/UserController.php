@@ -17,13 +17,19 @@ class UserController extends Controller
 
     public function getUser(){
    
-
-
- 	$sel=  Role::RightJoin('users','users.id','=','roles.user_id')
- 		  ->select('roles.level_id')	
- 		  ->get();
-   	
-   	 return response()->json(['success' => 1, 'msg' => $sel], 200); 		
+    $user = User::where(['status_aktif' => '1'])->select('id','name','email','foto as photo')->get();
+    $user->map(function($user){ 
+        $sel_role = Role::where(['user_id' => $user->id,
+                                 'level_id' => '3',
+                                 'level_id' => '4',
+                                 'level_id' => '5'])->pluck('id');
+        //$roles = explode(",", $sel_role->roles);
+        $user['username'] = $user->name;
+        $user['role'] = $sel_role;
+        return $user;
+    });
+    return response()->json(['data' => $user]);
+   
   }
 
 
