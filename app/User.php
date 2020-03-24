@@ -6,6 +6,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\DetailKonsumen;
+use App\Role;
 use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
@@ -45,6 +46,8 @@ class User extends Authenticatable
   
     protected $appends = array('ket_tgl_lahir');
 
+
+
     public function getKetTglLahirAttribute()
     {
       $sel_tglLahir = DetailKonsumen::where('id',$this->id)->select('tgl_lahir')->first();
@@ -56,6 +59,13 @@ class User extends Authenticatable
 
       return $tgl_lahir;
     }
+
+    // public function getLevelAttribute(){
+    //     $level = Role::where('user_id',$this->id)->select('level_id')->first();
+    //     return $level;
+    // }
+
+
   
     public function Level()
     {
