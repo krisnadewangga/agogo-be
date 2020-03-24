@@ -123,7 +123,17 @@ Route::get('/preorder/{id}', 'Api\react\PreorderController@show');
 Route::post('/bayarPreorder', 'Api\react\PreorderController@bayarPreorder');
 
 
+//produksi 
 
+Route::get('/availProducts', 'Api\react\ProduksiController@getAvailProduct');
+Route::get('/notAvailProducts', 'Api\react\ProduksiController@getNotAvailProduct');
+
+
+Route::get('/TrxByProduct/{id}', 'Api\react\ProduksiController@getTrxByProduct');
+Route::get('/GetLastDate', 'Api\react\ProduksiController@GetLastDate');
+Route::post('/postProduction', 'Api\react\ProduksiController@postProduction');
+Route::post('/ubahTanggal', 'Api\react\ProduksiController@ubahTanggal');
+//Route::put('/updateStock/{id}', 'Api\react\ProduksiController@updateStock');
 
 Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
