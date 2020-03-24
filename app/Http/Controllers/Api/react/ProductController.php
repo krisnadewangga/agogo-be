@@ -39,7 +39,7 @@ class ProductController extends Controller
 
 					->where([
 						['item.status_aktif','=','1'],
-						['item.stock','>','0']
+					
 					])
 					->orderBy('item.kategori_id')
 					->get();
@@ -55,8 +55,17 @@ class ProductController extends Controller
     }
 
     public function show($id){
-    	$item = Item::findOrFail($id);
+    	$item = Item::where('id',$id)->select('id',
+                                             'code',
+                                             'nama_item as name',
+                                             'stock',
+                                             'harga as price',
+                                             'kategori_id as category_id')->first();
 
-    	return response()->json($item);
+        $path_image = $this->path_image;
+        $item['photo'] = $path_image.$item->GambarUtama;
+     
+      
+    	 return response()->json($item);
     }
 }
