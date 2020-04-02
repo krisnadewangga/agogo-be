@@ -38,7 +38,7 @@ class ItemController extends Controller
        $kategori = Kategori::where('status_aktif','1')->get();
        $menu_active = "item|item|1";
        return view('item.create_item', compact('kategori','menu_active'));
-    }
+   }
 
     /**
      * Store a newly created resource in storage.
@@ -50,13 +50,13 @@ class ItemController extends Controller
     {
         $req = $request->all();
         $validator = \Validator::make($req,[ 'nama_item' => 'required|unique:item',
-                                             'kategori' => 'required',
-                                             'harga' => 'required|numeric',
-                                             'margin' => 'required|numeric',
-                                             'gambar' => 'required|image|mimes:jpeg,png,jpg,JPG,PNG,JPEG',
-                                             'stock' => 'required|numeric',
-                                             'deskripsi' => 'required'
-                                           ]);
+         'kategori' => 'required',
+         'harga' => 'required|numeric',
+         'margin' => 'required|numeric',
+         'gambar' => 'required|image|mimes:jpeg,png,jpg,JPG,PNG,JPEG',
+         'stock' => 'required|numeric',
+         'deskripsi' => 'required'
+     ]);
         if($validator->fails()){
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -72,8 +72,8 @@ class ItemController extends Controller
 
         if($req['stock'] > 0){
             $insertStock = Stocker::create(['item_id' => $insertItem->id, 
-                                            'jumlah' => $req['stock'], 
-                                            'input_by' => Auth::User()->name ]);
+                'jumlah' => $req['stock'], 
+                'input_by' => Auth::User()->name ]);
         }
 
         return redirect()->route('item.index')->with('success','Berhasil Input Item');
@@ -84,7 +84,7 @@ class ItemController extends Controller
     {
         $req = $request->all();
         $validator = \Validator::make($req,['gambar' => 'required|image|mimes:jpeg,png,jpg,JPG,PNG,JPEG']);
-       
+        
         if($validator->fails()){
             return redirect()->back()->withErrors($validator)->withInput()->with('gagal','gambar');
         }
@@ -162,10 +162,10 @@ class ItemController extends Controller
     {
         $req = $request->all();
         $validator = \Validator::make($req,['nama_item' => 'required',
-                                            'harga' => 'required|numeric',
-                                            'margin' => 'required|numeric',
-                                            'deskripsi' => 'required'
-                                           ]);
+            'harga' => 'required|numeric',
+            'margin' => 'required|numeric',
+            'deskripsi' => 'required'
+        ]);
         if($validator->fails()){
             return redirect()->back()->withErrors($validator)->withInput();
         }

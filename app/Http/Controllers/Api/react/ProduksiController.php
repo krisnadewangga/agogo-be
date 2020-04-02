@@ -435,7 +435,7 @@ public function ubahTanggal(Request $request)
             // return response($result);
 
         foreach ($result as $key => $row) {                
-            $production = Production::create([
+            $production = Produksi::create([
                 'item_id'            => $row['item_id'],
                 'produksi1'             => $row['produksi1'],
                 'produksi2'             => $row['produksi2'],
