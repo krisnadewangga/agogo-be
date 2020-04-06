@@ -21,7 +21,7 @@ class PreorderController extends Controller
 
  public function generateInvoice()
  {
-  $preorder = Transaksi::orderBy('id', 'DESC');
+  $preorder = Transaksi::where('jenis',2)->orderBy('id', 'DESC');
   if ($preorder->count() > 0) {
     $preorder = $preorder->first();
     $explode = explode('-', $preorder->no_transaksi);
@@ -34,7 +34,7 @@ class PreorderController extends Controller
 
 public function checkLastInvoicePesanan()
 {
-  $preorder = Transaksi::orderBy('id', 'DESC');
+  $preorder = Transaksi::where('jenis',2)->orderBy('id', 'DESC');
   if ($preorder->count() > 0) {
     $preorder = $preorder->first();
     $explode = explode('-', $preorder->no_transaksi);
