@@ -55,7 +55,7 @@
 						<th style="width: 5px;">No</th>
 						<th>Waktu</th>
 						<th>No Transaksi</th>
-						<th>Pemesan</th>
+						<th>Pemesan / Kasir</th>
 						<th ><center>Jumlah Pesanan</center></th>
 						<th ><center>Total Bayar</center></th>
 						<th ><center>Jenis Transaksi</center></th>
@@ -81,9 +81,15 @@
 			       					@endif
 								</td>
 								<td align="center">
-									<a href="{{ route('transaksi.show', $key->id ) }}">
-										<button class="btn btn-warning btn-sm"><i class="fa fa-search"></i></button>
-									</a>
+									@if($key->jalur == "1" && $key->jenis == "1")
+										<a href="{{ route('transaksi.show', $key->id ) }}">
+											<button class="btn btn-warning btn-sm"><i class="fa fa-search"></i></button>
+										</a>
+									@else
+										<a href="{{ route('detail_transaksi', $key->id ) }}">
+											<button class="btn btn-warning btn-sm"><i class="fa fa-search"></i></button>
+										</a>
+									@endif
 								</td>
 							</tr>
 						@endforeach
