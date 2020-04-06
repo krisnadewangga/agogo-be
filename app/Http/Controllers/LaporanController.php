@@ -45,6 +45,16 @@ class LaporanController extends Controller
         return view("laporan.lap_pendapatan",compact('transaksi','total_pendapatan','menu_active','kop','input','total_bersih_item','total_pengiriman'));
     }
 
+    public function DetailTransaksi($id)
+    {
+      $transaksi = Transaksi::findOrFail($id);
+      $transaksi->ItemTransaksi;
+
+      $menu_active = "laporan|pendapatan|1";
+      return view('laporan.detail_transaksi_react',compact('menu_active','transaksi'));
+      
+    }
+
     public function FilterLaporan(Request $request)
     {
         $req = $request->all();
@@ -103,7 +113,7 @@ class LaporanController extends Controller
     // User
     public function LapUser()
     {   
-        $user = User::where('level_id','3')
+        $user = User::where('level_id','6')
                      ->selectRaw("users.*, 
                                  (SELECT count(transaksi.id) from transaksi where transaksi.user_id=users.id and transaksi.status != '3') as total_belanja,
                                  (SELECT count(transaksi.id) from transaksi where transaksi.user_id=users.id and transaksi.status = '3') as batal_belanja

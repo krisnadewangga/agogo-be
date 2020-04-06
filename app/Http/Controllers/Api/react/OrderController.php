@@ -62,6 +62,16 @@ class OrderController extends Controller
     }
 
 
+    public function Coba()
+    {
+      $productid = 7;
+      $qty = 1;
+      $kategori_id = 2;
+
+      // DB::table('item')->where('id', $productid)->decrement('stock', $qty);
+      $aa = DB::table('item')->where('kategori_id',$kategori_id)->orderBy('id','DESC')->take(1)->get();
+      return $aa;            
+    }
 
     public function postOrder(Request $request)
     {
@@ -113,14 +123,22 @@ class OrderController extends Controller
           $insItem[] = $array;
 
 
-               $getCount = Item::where(['id' => $key['product_id']])->get();
+           $getCount = Item::where(['id' => $key['product_id']])->get();
+            
+            if ($getCount[0]['stock'] >= $key['qty']) {
+                DB::table('item')->where('id', $key['product_id'])
+                    ->decrement('stock', $key['qty']);  
+              
+               
+                DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['qty']);
                 
-                if ($getCount[0]['stock'] >= $key['qty']) {
-                  DB::table('item')->where('id', $key['product_id'])->decrement('stock', $key['qty']);  
-                }
-                else {
-                    throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
-                }
+                DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['qty']);
+                
+                DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['qty']);
+
+            }else {
+                throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
+            }
 
 
       }

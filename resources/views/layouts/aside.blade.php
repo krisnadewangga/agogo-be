@@ -24,9 +24,10 @@
               @if(Auth::user()->level_id == "1")
                 <li id="sm_level"><a href="{{ route('level.index') }}"><i class="fa fa-circle-o"></i>Level</a></li>
               @endif
-              <li id="sm_admin"><a href="{{ route('administrator.index') }}"><i class="fa fa-circle-o"></i>Admin</a></li>
-                <li id="sm_user" ><a href="{{ route('lap_user') }}"><i class="fa fa-circle-o"></i> <span>User</span></a></li>
+              <li id="sm_admin"><a href="{{ route('administrator.index') }}"><i class="fa fa-circle-o"></i>User</a></li>
+                
                <li id="sm_kurir"><a href="{{ route('kurir.index') }}"><i class="fa fa-circle-o"></i>Kurir</a></li>
+               <li id="sm_user" ><a href="{{ route('lap_user') }}"><i class="fa fa-circle-o"></i><span>Konsumen</span></a></li>
               
             </ul>
           </li>
