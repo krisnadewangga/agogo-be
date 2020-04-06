@@ -293,7 +293,7 @@ public function show($id)
 {
   $preorder_detail = ItemTransaksi::with(array('item'=>function($query){
     $query->select('nama_item','id','harga');
-  }))->where(['transaksi_id' => $id, 'status' => 1])->get();
+  }))->where(['transaksi_id' => (string)$id, 'status' => '1'])->get();
         // $product = Product::where('id',$order_detail[0]['product_id'])->get();
         // $result = compact('order_detail','product');
         // return response($order_detail[0]['product_id']);
