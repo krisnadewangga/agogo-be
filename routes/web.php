@@ -60,6 +60,7 @@ Route::get('pesanan_diterima/{id}','TransaksiController@pesananDiterima')->name(
 Route::get('konfir_pembayaran/{id}','TransaksiController@konfirBayar')->name('konfir_pembayaran');
 
 Route::get('/lap_pendapatan','LaporanController@LapPendapatan')->name('lap_pendapatan');
+Route::get('/detail_transaksi/{id}','LaporanController@DetailTransaksi')->name('detail_transaksi'); // untuk transaksi dari react
 Route::post('/filter_laporan','LaporanController@FilterLaporan')->name('filter_laporan');
 Route::get('/lap_user','LaporanController@LapUser')->name('lap_user');
 Route::get('/detail_user/{id}','LaporanController@DetailUser')->name('detail_user');

@@ -13,4 +13,9 @@ class Level extends Model
     {
     	return $this->hasMany(User::class);
     }
+
+    public function Roles()
+    {
+        return $this->hasMany(Role::class);
+    }
 }

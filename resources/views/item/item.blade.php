@@ -22,6 +22,7 @@
 						<tr>
 						<th style="width: 5px;">No</th>
 						<th>Kategori</th>
+						<th>Kode Item</th>
 						<th>Item</th>
 						<th>Deskripsi</th>
 						<th>Harga Jual</th>
@@ -34,6 +35,7 @@
 							<tr>
 								<td align="center"></td>
 								<td>{{ $key->Kategori->kategori }}</td>
+								<td>{{ $key->code }}</td>
 								<td>{{ $key->nama_item }}</td>
 								<td>{!! $key->deskripsi !!}</td>
 								<td>Rp. {{ number_format($key->harga,'0','','.') }}</td>

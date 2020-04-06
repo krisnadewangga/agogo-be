@@ -71,41 +71,56 @@ class TransaksiController extends Controller
        
         $waktu_sekarang = Carbon::now()->format('Y-m-d H:i:s');
         if($jenis_transaksi == "0" && $status_transaksi == "0"){
-            $transaksi = Transaksi::whereNotIn('status',['5','3'])->orderBy('updated_at','desc')->get();
+            $transaksi = Transaksi::whereNotIn('status',['5','3'])
+                                    ->where('jenis','1')
+                                    ->where('jalur','1')
+                                    ->orderBy('updated_at','desc')->get();
         }else if($jenis_transaksi == "0" && $status_transaksi == "8"){
             $transaksi = Transaksi::where([
                                               ['metode_pembayaran','=','3'],
                                               ['status','=','1'],
-                                              ['waktu_kirim','>', $waktu_sekarang ]
+                                              ['waktu_kirim','>', $waktu_sekarang ],
+                                              ['jenis','=','1'],
+                                              ['jalur','=','1']
                                             ])
                                     ->orderBy('updated_at','desc')->get();
         }else if($jenis_transaksi == "0" && $status_transaksi == "1"){
             $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2'])
                                     ->where([
                                               ['status','=','1'],
-                                              ['waktu_kirim','>', $waktu_sekarang ]
+                                              ['waktu_kirim','>', $waktu_sekarang ],
+                                              ['jenis','=','1'],
+                                              ['jalur','=','1']
                                             ])
                                     ->orderBy('updated_at','desc')->get();
         }else if($jenis_transaksi == "0" && $status_transaksi == "7"){
                 $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3'])
                                          ->whereNotIn('status',['5','3','2','4'])
                                          ->where('waktu_kirim','<', $waktu_sekarang)
+                                          ->where('jenis','1')
+                                          ->where('jalur','1')
                                          ->orderBy('updated_at','desc')->get();
         }else if($jenis_transaksi == "0" && ($status_transaksi == "5" || $status_transaksi == "3") ){
                 $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3'])
                                          ->where('status',$status_transaksi)
+                                          ->where('jenis','1')
+                                          ->where('jalur','1')
                                          ->orderBy('updated_at','desc')->get();
                                         
         }else if($jenis_transaksi == "0" && $status_transaksi == "4"){
                 $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3'])
                                          ->where([ 
-                                                  ['status','=',$status_transaksi]
+                                                  ['status','=',$status_transaksi],
+                                                  ['jenis','=','1'],
+                                                  ['jalur','=','1']
                                                  ])
                                          ->orderBy('updated_at','desc')->get();
         }else if($jenis_transaksi == "0"  && $status_transaksi == "2" ){
                 $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3'])
                                          ->where([ 
-                                                  ['status','=',$status_transaksi]
+                                                  ['status','=',$status_transaksi],
+                                                  ['jenis','=','1'],
+                                                  ['jalur','=','1']
                                               ])
                                          ->orderBy('updated_at','desc')->get();
 
@@ -113,44 +128,59 @@ class TransaksiController extends Controller
                 $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3'])
                                          ->where([ 
                                                   ['status','=',$status_transaksi],
-                                                  ['waktu_kirim','>', $waktu_sekarang ]
+                                                  ['waktu_kirim','>', $waktu_sekarang ],
+                                                  ['jenis','=','1'],
+                                                  ['jalur','=','1']
                                               ])
                                          ->orderBy('updated_at','desc')->get();
 
         }else if($jenis_transaksi != "0" && $status_transaksi == "0"){
                 $transaksi = Transaksi::whereNotIn('status',['5','3'])
                                     ->where('metode_pembayaran',$jenis_transaksi)
+                                    ->where('jenis','1')
+                                    ->where('jalur','1')
                                     ->orderBy('updated_at','desc')->get();
         }else if($jenis_transaksi != "0" &&  ($status_transaksi == "5" || $status_transaksi == "3") ){
                 $transaksi = Transaksi::where('metode_pembayaran',$jenis_transaksi)
                                    ->where('status',$status_transaksi)
+                                   ->where('jenis','1')
+                                   ->where('jalur','1')
                                    ->orderBy('updated_at','desc')->get();
         }else if( $jenis_transaksi != "0" && $status_transaksi == "4") {
                 $transaksi = Transaksi::where([ 
                                                   ['metode_pembayaran','=',$jenis_transaksi],
-                                                  ['status','=',$status_transaksi]
+                                                  ['status','=',$status_transaksi],
+                                                  ['jenis','=','1'],
+                                                  ['jalur','=','1']
                                               ])
                                          ->orderBy('updated_at','desc')->get();
         }else if( $jenis_transaksi != "0" && ($status_transaksi == "1" || $status_transaksi == "6" ) ){
                 $transaksi = Transaksi::where([ 
                                                   ['metode_pembayaran','=',$jenis_transaksi],
                                                   ['status','=',$status_transaksi],
-                                                  ['waktu_kirim','>', $waktu_sekarang ]
+                                                  ['waktu_kirim','>', $waktu_sekarang ],
+                                                  ['jenis','=','1'],
+                                                  ['jalur','=','1']
                                               ])
                                          ->orderBy('updated_at','desc')->get();
         }else if($jenis_transaksi != "0" && $status_transaksi == "7"){
                 $transaksi = Transaksi::whereNotIn('status',['5','3','2','4'])
                                          ->where('metode_pembayaran',$jenis_transaksi)
                                          ->where('waktu_kirim','<', $waktu_sekarang)
+                                         ->where('jenis','1')
+                                         ->where('jalur','1')
                                          ->orderBy('updated_at','desc')->get();
         }else if($jenis_transaksi != "0" && $status_transaksi == "2"){
                 $transaksi = Transaksi::where([ 
                                                   ['metode_pembayaran','=',$jenis_transaksi],
-                                                  ['status','=',$status_transaksi]
+                                                  ['status','=',$status_transaksi],
+                                                  ['jenis','=','1'],
+                                                  ['jalur','=','1']
                                               ])
                                          ->orderBy('updated_at','desc')->get();
         }
-     
+      
+
         $transaksi->map(function($transaksi){
             $transaksi['nama'] = $transaksi->User->name;
             $transaksi['jum_pesanan'] = $transaksi->ItemTransaksi()->count();

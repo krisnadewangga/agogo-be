@@ -25,7 +25,7 @@ class NotifikasiController extends Controller
             $pageSaatIni = 0;
             $tampilPS = 0;
         }else{
-        	 $id_user = $req['user_id'];
+        	$id_user = $req['user_id'];
             $page = $req['page'];
             $dataPerpage = $req['dataPerpage'];
             $offset = ($page - 1) * $dataPerpage;
