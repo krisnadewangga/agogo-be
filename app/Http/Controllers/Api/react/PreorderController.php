@@ -71,6 +71,7 @@ public function index()
   'preorders.subtotal',
   'preorders.discount',
   'preorders.add_fee',
+  'preorders.nama',
   'preorders.uang_muka',
   'preorders.total',
   'preorders.sisa_harus_bayar',
@@ -188,73 +189,108 @@ public function store(Request $request)
 }
 
 
+public function editPreorder(Request $request)
+{
+  $req = $request->all();
+
+  if(!Auth::attempt(['name' => $req[0]['username_approval'], 'password' => $req[0]['pin_approval'] ]))
+    return response()->json([
+      'status' => 'failed',
+      'message' => 'Invalid Username / PIN'
+    ], 400);
+  $user = $request->user();
+  $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+
+  if($role > 0){
 
 
-    // public function store(Request $request)
-    // {
+    DB::beginTransaction();
+    try {
 
-    //     try {
-    //         // return response($request[0]['user_id']);
+      $delPreorder = Preorders::where('transaksi_id',$request[0]['preorder_id']);
+      $delPreorder->delete();
+      ItemTransaksi::where('transaksi_id',$request[0]['preorder_id'])->delete();
 
-    //         $preorder = Transaksi::create(array(
-    //             'invoice' => $this->generateInvoice(),
-    //             // 'customer_id' => $customer->id,
-    //             'nama'          => $request[0]['nama'],
-    //             'tgl_pesan'     => $request[0]['tgl_pesan'],
-    //             'tgl_selesai'   => $request[0]['tgl_selesai'],
-    //             'waktu_selesai' => $request[0]['waktu_selesai'],
-    //             'alamat'        => $request[0]['alamat'],
-    //             'telepon'       => $request[0]['telepon'],
-    //             'catatan'       => $request[0]['catatan'],
-    //             'user_id'       => $request[0]['user_id'],
-    //             'subtotal'      => $request[0]['subtotal'],
-    //             'discount'      => $request[0]['diskon'],
-    //             'add_fee'       => $request[0]['add_fee'],
-    //             'uang_muka'     => $request[0]['uang_muka'],
-    //             'total'         => $request[0]['total'],
-    //             'sisa_harus_bayar'  => $request[0]['sisa_harus_bayar'],
-    //             'uang_dibayar'  => $request[0]['uang_dibayar'],
-    //             'uang_kembali'  => $request[0]['uang_kembali'],
-    //             'status'        => $request[0]['status']
-    //         ));
+      $preorder = Preorders::create(array(
+        'transaksi_id'  => $request[0]['preorder_id'],
+        'nama'          => $request[0]['nama'],
+        'tgl_pesan'     => $request[0]['tgl_pesan'],
+        'tgl_selesai'   => $request[0]['tgl_selesai'],
+        'waktu_selesai' => $request[0]['waktu_selesai'],
+        'telepon'       => $request[0]['telepon'],
+        'subtotal'      => $request[0]['subtotal'],
+        'discount'      => $request[0]['diskon'],
+        'add_fee'       => $request[0]['add_fee'],
+        'uang_muka'     => $request[0]['uang_muka'],
+        'total'         => $request[0]['total'],
+        'sisa_harus_bayar'  => $request[0]['sisa_harus_bayar'],
+        'uang_dibayar'  => $request[0]['uang_dibayar'],
+        'uang_kembali'  => $request[0]['uang_kembali'],
+        'sisa_bayar' => $request[0]['sisa_harus_bayar']
+      ));
+
+      $update = Transaksi::where('id',$req[0]['preorder_id'])->update(['total_transaksi' =>$req[0]['subtotal'],
+        'total_bayar' => $req[0]['total'],
+        'catatan' => $request[0]['catatan'],
+        'detail_alamat' => $request[0]['alamat']]);
 
 
+      $result = collect($request)->map(function ($value) {
+        return [
+          'product_id'    => $value['product_id'],
+          'qty'           => $value['qty'],
+          'price'         => $value['price'],
+        ];
+      })->all();
+            // return response($result);
 
+      foreach ($result as $key => $row) {
 
-    //         $result = collect($request)->map(function ($value) {
-    //             return [
-    //                 'item_id'    => $value['product_id'],
-    //                 'qty'           => $value['qty'],
-    //                 'harga'         => $value['price'],
-    //             ];
-    //         })->all();
-    //         // return response($result);
+        $getCount = Item::where(['id' => $row['product_id']])->get();
 
-    //         foreach ($result as $key => $row) {
-    //                 $preorder->preorder_detail()->create([
-    //                     'item_id' => $row['item_id'],
-    //                     'qty' => $row['qty'],
-    //                     'harga' => $row['harga']
-    //                 ]);                
-    //             // return response($row['product_id']);
-    //             //return response($getCount[0]['stock']);                               
-    //         }
+        if ($getCount[0]['stock'] >= $row['qty']) {
+          Transaksi::find($req[0]['preorder_id'])->ItemTransaksi()->create([
+            'item_id' => $row['product_id'],
+            'jumlah' => $row['qty'],
+            'harga' => $row['price'],
+            'margin' => 0,
+            'total' => $row['qty'] * $row['qty']
+          ]);                
 
-    //         DB::commit();
+          DB::table('item')->where('id', $row['product_id'])->decrement('stock', $row['qty']); 
+          DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_pemesanan', $row['qty']);
+          DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $row['qty']);
+          DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $row['qty']);
 
-    //         return response()->json([
-    //             'status' => 'success',
-    //             'message' => $preorder->invoice,
-    //         ], 200);
-    //     } catch (Exception $e) {
-    //         DB::rollback();
-    //         return response()->json([
-    //             'status' => 'failed',
-    //             'message' => $e->getMessage()
-    //         ], 400);
-    //     }
-    // }
+        }
+        else {
+          throw new \Exception('Stock ' . $getCount[0]['name'] . ' Tidak Mencukupi');
+        }
+                // return response($row['product_id']);
+                //return response($getCount[0]['stock']);                               
+      }
 
+      DB::commit();
+
+      return response()->json([
+        'status' => 'success',
+        'message' => $preorder->invoice,
+      ], 200);
+    } catch (Exception $e) {
+      DB::rollback();
+      return response()->json([
+        'status' => 'failed',
+        'message' => $e->getMessage()
+      ], 400);
+    }
+  }
+  else {
+    return response()->json([
+      'status' => 'failed',
+      'message' => 'Invalid Username / PIN'
+    ], 400);
+  }
+}
 
 
 public function paid_preorder()
@@ -264,26 +300,26 @@ public function paid_preorder()
   // }))->get();        
   $preorders = Transaksi::join('users','users.id','=','transaksi.user_id')
 
-        ->join('preorders','preorders.transaksi_id','=','transaksi.id')
-        ->select('transaksi.id as id',
-                'transaksi.no_transaksi',
-                'users.id as user_id',
-                'transaksi.total_bayar',
-                'transaksi.catatan',
-                'transaksi.detail_alamat',
-                'preorders.nama',
-                'preorders.tgl_selesai',
-                'preorders.telepon',
-                'preorders.add_fee',
-                'preorders.uang_muka',
-                'preorders.waktu_selesai',
-                'preorders.tgl_pesan',
-                'preorders.subtotal',
-                'preorders.discount',
-                'users.name'
-                )
-        ->where(['status' => '5','jenis'=>'2'])->get();
-    
+  ->join('preorders','preorders.transaksi_id','=','transaksi.id')
+  ->select('transaksi.id as id',
+    'transaksi.no_transaksi',
+    'users.id as user_id',
+    'transaksi.total_bayar',
+    'transaksi.catatan',
+    'transaksi.detail_alamat',
+    'preorders.nama',
+    'preorders.tgl_selesai',
+    'preorders.telepon',
+    'preorders.add_fee',
+    'preorders.uang_muka',
+    'preorders.waktu_selesai',
+    'preorders.tgl_pesan',
+    'preorders.subtotal',
+    'preorders.discount',
+    'users.name'
+  )
+  ->where(['status' => '5','jenis'=>'2'])->get();
+
   return response()->json($preorders, 200);
 }
 
@@ -375,4 +411,31 @@ public function bayarPreorder(Request $request)
 
 
 }
+
+
+   public function cancelPreorder(Request $request,$id)
+    {
+
+     if(!Auth::attempt(['name' => $request[0]['username_approval'], 'password' => $request[0]['pin_approval'] ]))
+       return response()->json([
+        'status' => 'failed',
+        'message' => 'Invalid Username / PIN'
+      ], 400);
+     $user = $request->user();
+     $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+
+     if($role > 0){
+
+        $preorder = Transaksi::where('id', $id)->update(['status' => '3']);
+        // $products->stock = $request->input('sisa_stock');
+        // $products->save();
+        return response()->json(['status' => 'success'], 200);
+        }
+        else {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Invalid Username / PIN'
+            ], 400);
+        }
+    }
 }

@@ -121,7 +121,8 @@ Route::get('/preorders', 'Api\react\PreorderController@index');
 Route::post('preorders','Api\react\PreorderController@store');
 Route::get('/preorder/{id}', 'Api\react\PreorderController@show');
 Route::post('/bayarPreorder', 'Api\react\PreorderController@bayarPreorder');
-
+Route::post('/editPreorders', 'Api\react\PreorderController@editPreorder');
+Route::put('/cancelPreorder/{id}', 'Api\react\PreorderController@cancelPreorder');
 
 //produksi 
 
