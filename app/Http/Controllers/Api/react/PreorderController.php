@@ -125,7 +125,6 @@ public function store(Request $request)
     'catatan' => $request[0]['catatan'],
     'detail_alamat' => $request[0]['alamat'],
     'metode_pembayaran' => '3',
-    'tgl_bayar' => date("Y-m-d H:i:s"),
     'waktu_kirim' => date("Y-m-d H:i:s")
   ];
 
@@ -246,9 +245,8 @@ public function editPreorder(Request $request)
 
       foreach ($result as $key => $row) {
 
-        $getCount = Item::where(['id' => $row['product_id']])->get();
 
-        if ($getCount[0]['stock'] >= $row['qty']) {
+       
           Transaksi::find($req[0]['preorder_id'])->ItemTransaksi()->create([
             'item_id' => $row['product_id'],
             'jumlah' => $row['qty'],
@@ -257,16 +255,9 @@ public function editPreorder(Request $request)
             'total' => $row['qty'] * $row['qty']
           ]);                
 
-          DB::table('item')->where('id', $row['product_id'])->decrement('stock', $row['qty']); 
-          DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_pemesanan', $row['qty']);
-          DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $row['qty']);
-          DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $row['qty']);
+          
 
-        }
-        else {
-          throw new \Exception('Stock ' . $getCount[0]['name'] . ' Tidak Mencukupi');
-        }
-                // return response($row['product_id']);
+        // return response($row['product_id']);
                 //return response($getCount[0]['stock']);                               
       }
 
@@ -353,10 +344,7 @@ public function bayarPreorder(Request $request)
 
  if($role > 0){
 
-
    $db = Transaksi::find((string)$request[0]['preorder_id']);
-   $db->update(['status' => '5']);
-
    $db->Preorder()->update([
     'tgl_selesai'   => $request[0]['tgl_selesai'],
     'waktu_selesai' => $request[0]['waktu_selesai'],
@@ -381,12 +369,20 @@ public function bayarPreorder(Request $request)
     $getCount = Item::where(['id' => $row['product_id']])->get();
 
     if ($getCount[0]['stock'] >= $row['qty']) {
-      DB::table('item')->where('id', $row['product_id'])->decrement('stock', $row['qty']);  
+      DB::table('item')->where('id', $row['product_id'])->decrement('stock', $row['qty']);
+
+      DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_pemesanan', $row['qty']);
+      DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $row['qty']);
+      DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $row['qty']);  
     }
     else {
       throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
+     // DB::rollback();
     }
 
+
+
+    $db->update(['status' => '5','tgl_bayar' => date("Y-m-d H:i:s")]);
 
   }
 
@@ -413,29 +409,29 @@ public function bayarPreorder(Request $request)
 }
 
 
-   public function cancelPreorder(Request $request,$id)
-    {
+public function cancelPreorder(Request $request,$id)
+{
 
-     if(!Auth::attempt(['name' => $request[0]['username_approval'], 'password' => $request[0]['pin_approval'] ]))
-       return response()->json([
-        'status' => 'failed',
-        'message' => 'Invalid Username / PIN'
-      ], 400);
-     $user = $request->user();
-     $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+ if(!Auth::attempt(['name' => $request[0]['username_approval'], 'password' => $request[0]['pin_approval'] ]))
+   return response()->json([
+    'status' => 'failed',
+    'message' => 'Invalid Username / PIN'
+  ], 400);
+ $user = $request->user();
+ $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
 
-     if($role > 0){
+ if($role > 0){
 
-        $preorder = Transaksi::where('id', $id)->update(['status' => '3']);
+  $preorder = Transaksi::where('id', $id)->update(['status' => '3']);
         // $products->stock = $request->input('sisa_stock');
         // $products->save();
-        return response()->json(['status' => 'success'], 200);
-        }
-        else {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Invalid Username / PIN'
-            ], 400);
-        }
-    }
+  return response()->json(['status' => 'success'], 200);
+}
+else {
+  return response()->json([
+    'status' => 'failed',
+    'message' => 'Invalid Username / PIN'
+  ], 400);
+}
+}
 }
