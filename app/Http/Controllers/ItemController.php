@@ -55,7 +55,8 @@ class ItemController extends Controller
          'margin' => 'required|numeric',
          'gambar' => 'required|image|mimes:jpeg,png,jpg,JPG,PNG,JPEG',
          'stock' => 'required|numeric',
-         'deskripsi' => 'required'
+         'deskripsi' => 'required',
+         'kode_item' => 'required'
      ]);
         if($validator->fails()){
             return redirect()->back()->withErrors($validator)->withInput();
@@ -64,6 +65,8 @@ class ItemController extends Controller
         $req = $request->except('gambar');
         $req['diinput_by'] = Auth::User()->name;
         $req['kategori_id'] = $req['kategori'];
+        $req['code'] = $req['kode_item'];
+
         $insertItem = Item::create($req);
 
         $gambarUtama = $request->gambar;
@@ -164,12 +167,15 @@ class ItemController extends Controller
         $validator = \Validator::make($req,['nama_item' => 'required',
             'harga' => 'required|numeric',
             'margin' => 'required|numeric',
-            'deskripsi' => 'required'
+            'deskripsi' => 'required',
+            'kode_item' => 'required'
         ]);
         if($validator->fails()){
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        $req['code'] = $req['kode_item'];
+        
         $find = Item::findOrFail($id);
         $find->update($req);
 

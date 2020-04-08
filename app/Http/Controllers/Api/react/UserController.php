@@ -28,8 +28,16 @@ class UserController extends Controller
         //$roles = explode(",", $sel_role->roles);
         $user['username'] = $user->name;
         $user['role'] = $sel_role;
+
+        if(empty($user['photo'])){
+            $user['photo'] = "http://agogobakery.com/assets/dist/img/user.png";
+        }else{
+            $user['photo'] = "http://agogobakery.com/upload/images-400/".$user['photo'];
+        }
+        
         return $user;
     });
+
     return response()->json(['data' => $user]);
    
   }
@@ -37,23 +45,30 @@ class UserController extends Controller
 
    public function login(Request $request)
     {
+        $req  =$request->all();
+        
+        
         $request->validate([
             'name' => 'required|string',
             'password' => 'required|string',
             'remember_me' => 'boolean'
         ]);
+        
+
         $credentials = request(['name', 'password']);
 
         if(!Auth::attempt($credentials))
             return response()->json([
                 'message' => 'Unauthorized'
             ], 401);
+
         $user = $request->user();
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
         if ($request->remember_me)
             $token->expires_at = Carbon::now()->addWeeks(1);
         $token->save();
+
         $role_name = $user->roles()->pluck('level_id');
         return response()->json([
             'username'      => $user->name,

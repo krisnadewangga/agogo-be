@@ -17,6 +17,17 @@
 								<div style="background-color:#ffffff; padding:10px;">
 								<h4><b>Data Item</b></h4>
 								<div style="padding:20px;">
+									<div class="form-group @error('kode_item') has-error @enderror">
+										<label>Kode Item</label>
+										<input type="text" name="kode_item" value="{{ old('kode_item') }}" class="form-control" placeholder="Masukan Kode Item">
+										@error('kode_item')
+								            <label class="control-label" for="inputError">
+						                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
+						                	</label>    
+								        @enderror 
+									</div>
+
+
 									<div class="form-group @error('nama_item') has-error @enderror">
 										<label>Nama Item</label>
 										<input type="text" name="nama_item" value="{{ old('nama_item') }}" class="form-control" placeholder="Masukan Nama Item">

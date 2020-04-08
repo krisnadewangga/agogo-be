@@ -76,6 +76,7 @@ Route::group([
 });
 
 
+
 //produk
 Route::get('product/{id}', 'Api\react\ProductController@show');
 
@@ -135,6 +136,9 @@ Route::get('/GetLastDate', 'Api\react\ProduksiController@GetLastDate');
 Route::post('/postProduction', 'Api\react\ProduksiController@postProduction');
 Route::post('/ubahTanggal', 'Api\react\ProduksiController@ubahTanggal');
 //Route::put('/updateStock/{id}', 'Api\react\ProduksiController@updateStock');
+
+
+Route::get('coba','Api\react\OrderController@Coba');
 
 Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
