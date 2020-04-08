@@ -15,7 +15,7 @@ class ProductController extends Controller
 
 	public function __construct(){
 
-		$this->path_image = PathImageReact::getPath(400);;
+		$this->path_image = PathImageReact::getPath(400);
 
 	}
 

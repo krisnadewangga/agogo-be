@@ -72,6 +72,16 @@
 										<input type="text" value="{{$item->Kategori->kategori}}" class="form-control" disabled>
 									</div>
 
+									<div class="form-group @error('kode_item') has-error @enderror">
+										<label>Kode Item</label>
+										<input type="text" name="kode_item" value="{{ $item->code }}" class="form-control" placeholder="Masukan Kode Item">
+										@error('kode_item')
+								            <label class="control-label" for="inputError">
+						                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
+						                	</label>    
+								        @enderror 
+									</div>
+					                
 					                <div class="form-group @error('nama_item') has-error @enderror">
 										<label>Nama Item</label>
 										<input type="text" name="nama_item" value="{{ $item->nama_item }}" class="form-control" placeholder="Masukan Nama Item">
