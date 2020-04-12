@@ -310,8 +310,9 @@ class LaporanController extends Controller
 
         $tahunNow = date('Y');
         $tahun['max_tahun'] = $tahunNow;
-        if(!isset($tahun->min_tahun) ){
-            $tahun = ['min_tahun' => $tahunNow, 'max_tahun' => $tahunNow];
+        $cek = $tahun->count();
+        if($cek == 0){
+            $tahun = (object) ['min_tahun' => $tahunNow, 'max_tahun' => $tahunNow];
         }
         
         $item = Item::orderBy('nama_item','ASC')->get();
