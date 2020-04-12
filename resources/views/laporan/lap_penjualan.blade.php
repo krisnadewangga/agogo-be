@@ -343,6 +343,7 @@
                                 $.each(msg.columns, function(i, val){
                                         subHeaders += "<th>" + val + "</th>";
                                 });
+                                
                                 tableHeaders += `<tr>
                                                      <th style="width: 5px;" rowspan='2'>No</th>
                                                      <th rowspan='2' style='width:150px;'>Item</th>
@@ -384,6 +385,9 @@
                                                 `+dataTable+`
                                             </tbody>
                                         </table>
+                                    <div>
+                                        <button class='btn btn-success ' onclick='javascript:export_pdf()'>Export</button>
+                                    </div>
                                  `;
 
 
@@ -424,6 +428,15 @@
                     // console.log(html);
                 }
                 });
+            }
+
+            function export_pdf()
+            {
+                var tahun = $("#top_ten_tahun").val();
+                var bulan = $("#top_ten_bulan").val();
+                var item = $("#top_ten_item").val();
+
+                window.open('export_penjualan?tahun='+tahun+'&bulan='+bulan+'&item='+item,'_blank');
             }
         </script>            
   

@@ -171,6 +171,7 @@ return [
         Intervention\Image\ImageServiceProvider::class,
         LaravelFCM\FCMServiceProvider::class,
         Laravel\Passport\PassportServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
         /*
          * Application Service Providers...
          */
@@ -233,7 +234,8 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Image' => Intervention\Image\Facades\Image::class,
         'FCM'      => LaravelFCM\Facades\FCM::class,
-        'FCMGroup' => LaravelFCM\Facades\FCMGroup::class // Optional
+        'FCMGroup' => LaravelFCM\Facades\FCMGroup::class, // Optional
+        'PDF' => Barryvdh\DomPDF\Facade::class
 
     ],
 
