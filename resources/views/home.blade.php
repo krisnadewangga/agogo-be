@@ -66,7 +66,9 @@
                                   <div class="form-group">
                                     <label >Tahun</label>
                                     <select class="form-control" id="tahun_grafik" onchange="setGrafik(2)">
-                                       
+                                       @for($a=$tahun->min_tahun; $a<=$tahun->max_tahun; $a++)
+                                          <option value="{{ $a }}"  @if($a == $tahunNow) selected @endif >{{ $a }}</option>
+                                        @endfor
                                     </select>
                                   </div>
                             </div>
@@ -100,7 +102,9 @@
               <div class="col-md-6">
                 <div class="form-group">
                     <select class="form-control" id="top_ten_tahun" onchange="getTopTen(2)">
-                       
+                        @for($i=$tahun->min_tahun; $i<=$tahun->max_tahun; $i++)
+                          <option value="{{ $i }}"  @if($i == $tahunNow) selected @endif >{{ $i }}</option>
+                        @endfor
                     </select>
                   </div>
               </div>

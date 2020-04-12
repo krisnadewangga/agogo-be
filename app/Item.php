@@ -38,4 +38,9 @@ class Item extends Model
    {
       return $this->hasMany(ItemTransaksi::class);
    }
+
+   public function Produksi()
+   {
+     return $this->hasMany(Produks::class);
+   }
 }
