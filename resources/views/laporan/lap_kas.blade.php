@@ -32,7 +32,7 @@
 	        	<div style="margin-top: 5px;">
 	        			<button class="btn btn-primary">Cari</button>
 	        			<a href="{{ route('lap_kas') }}"><label class="btn btn-warning" >Reset</label></a>
-	        			<a href="{{ route('lap_pendapatan') }}"><label class="btn btn-success" >Export</label></a>
+	        			<a href="javascript:export_pdf()"><label class="btn btn-success" >Export</label></a>
 	        	</div>
         	</form>
         </div>
@@ -80,6 +80,15 @@
 		           autoclose: true
 		        });
         	});
+
+        	function export_pdf()
+        	{
+        		var tanggal = $("#mt").val();
+        		var pisah = tanggal.split('/');
+        		var kt = pisah[2]+"-"+pisah[1]+"-"+pisah[0];
+        		// document.location.href('export_kas');
+        		window.open('export_kas?tanggal='+kt, '_blank');
+        	}
         </script>
     @endcomponent
 @endsection
