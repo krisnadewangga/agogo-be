@@ -138,7 +138,8 @@ class Transaksi extends Model
 
     public function Preorder()
     {
-      return $this->hasOne(Preorders::class);
+      return $this->hasOne(Preorders::class,'transaksi_id','id');
     }
 
+    
 }

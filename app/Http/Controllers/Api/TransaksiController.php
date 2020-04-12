@@ -15,6 +15,7 @@ use App\ItemTransaksi;
 use App\Helpers\Acak;
 use App\Helpers\SendNotif;
 use Validator;
+use DB;
 
 
 
@@ -483,6 +484,13 @@ class TransaksiController extends Controller
     		$find = Item::findOrFail($key['item_id']);
     		$newStock = $find->stock - $key['jumlah'];
     		$update = $find->update(['stock' => $newStock]);
+
+    		DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['jumlah']);
+                
+            DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['jumlah']);
+                
+            DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['jumlah']);
+
     	}
     }
 

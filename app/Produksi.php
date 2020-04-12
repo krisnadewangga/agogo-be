@@ -27,4 +27,10 @@ class Produksi extends Model
 		'sisa_stock'];
 
 
+
+
+	public function Item()
+	{
+		return $this->belongsTo(Item::class);
 	}
+}

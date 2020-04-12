@@ -46,6 +46,12 @@ Route::DELETE('/hapus_stock/{id}','StockerController@destroy')->name('hapus_stoc
 Route::resource('kurir','KurirController');
 Route::post('/set_ongkir','KurirController@SetOngkir')->name('set_ongkir');
 
+Route::get('/member','LaporanController@Member')->name('member');
+Route::get('/not_member','LaporanController@NotMember')->name('not_member');
+Route::get('/detail_user','LaporanController@DetailUser')->name('detail_user');
+
+Route::DELETE('/hapus_user/{id}','LaporanController@HapusUser')->name('hapus_user');
+
 Route::resource('transaksi','TransaksiController');
 Route::get('/pengajuan_batal_pesanan','TransaksiController@PengajuanBatalPesanan')->name('pengajuan_batal_pesanan');
 Route::get('/konfirmasi_pembayaran','TransaksiController@KonfirmasiPembayaran')->name('konfirmasi_pembayaran');
@@ -61,10 +67,18 @@ Route::get('konfir_pembayaran/{id}','TransaksiController@konfirBayar')->name('ko
 
 Route::get('/lap_pendapatan','LaporanController@LapPendapatan')->name('lap_pendapatan');
 Route::get('/detail_transaksi/{id}','LaporanController@DetailTransaksi')->name('detail_transaksi'); // untuk transaksi dari react
+Route::get('/detail_pemesanan/{id}','LaporanController@DetailPemesanan')->name('detail_pemesanan'); 
+
 Route::post('/filter_laporan','LaporanController@FilterLaporan')->name('filter_laporan');
-Route::get('/lap_user','LaporanController@LapUser')->name('lap_user');
-Route::get('/detail_user/{id}','LaporanController@DetailUser')->name('detail_user');
+// Route::get('/lap_user','LaporanController@LapUser')->name('lap_user');
+// Route::get('/detail_user/{id}','LaporanController@DetailUser')->name('detail_user');
 Route::get('/blokir_user/{id}','LaporanController@BlokirUser')->name('blokir_user');
+Route::get("/lap_pemesanan",'LaporanController@LapPemesanan')->name('lap_pemesanan');
+Route::post('/filter_laporan_pemesanan','LaporanController@FilterLaporanPemesanan')->name('filter_laporan_pemesanan');
+Route::get('/lap_kas','LaporanController@LapKas')->name('lap_kas');
+Route::post('/cari_laporan_kas','LaporanController@CariLaporanKas')->name('cari_laporan_kas');
+Route::get('/lap_pergerakan_stock','LaporanController@LapPergerakanStock')->name('lap_pergerakan_stock');
+Route::post('/cari_laporan_pergerakan_stock','LaporanController@CariPergerakanStock')->name('cari_laporan_pergerakan_stock');
 
 Route::get('/penjualan','LaporanController@ShowPenjualan')->name('penjualan');
 Route::get('/set_grafik_penjualan','LaporanController@setGrafikPenjualan')->name('set_grafik_penjualan');
