@@ -77,12 +77,16 @@
 			       					@elseif($key['metode_pembayaran'] == 2)
 			       						<span class="label label-info">Bank Transfer</span>
 			       					@elseif($key['metode_pembayaran'] == 3)
-			       						<span class="label label-success">Bayar Ditempat</span>
+			       						<span class="label label-success">Bayar Di Toko</span>
 			       					@endif
 								</td>
 								<td align="center">
 									@if($key->jalur == "1" && $key->jenis == "1")
 										<a href="{{ route('transaksi.show', $key->id ) }}">
+											<button class="btn btn-warning btn-sm"><i class="fa fa-search"></i></button>
+										</a>
+									@elseif($key->jalur == "2" && $key->jenis == "2")
+										<a href="{{ route('detail_pemesanan', $key->id ) }}">
 											<button class="btn btn-warning btn-sm"><i class="fa fa-search"></i></button>
 										</a>
 									@else

@@ -79,6 +79,8 @@
            
               border : 1px solid #CCC;
           }
+
+           .nowrap { white-space: nowrap } 
     
     </style>
 

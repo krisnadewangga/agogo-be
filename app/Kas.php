@@ -14,6 +14,6 @@ class Kas extends Model
 
     public function User()
     {
-        return belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 }

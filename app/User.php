@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\DetailKonsumen;
 use App\Role;
 use Laravel\Passport\HasApiTokens;
@@ -12,7 +13,7 @@ use Laravel\Passport\HasApiTokens;
 class User extends Authenticatable
 {
 
-    use Notifiable, HasApiTokens;
+    use Notifiable, HasApiTokens, SoftDeletes;
 
 
     /**
@@ -24,7 +25,7 @@ class User extends Authenticatable
 
         'level_id','name', 'email','no_hp','password','foto','status_aktif'
     ];
-
+    
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -43,10 +44,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-  
+    protected $dates = ['deleted_at'];
+
     protected $appends = array('ket_tgl_lahir');
-
-
+    
 
     public function getKetTglLahirAttribute()
     {
@@ -105,5 +106,8 @@ class User extends Authenticatable
         return $this->hasMany(Pesan::class);
     }
     
-    
+    public function Kas()
+    {
+      return $this->hasMany(Kas::class);
+    }
 }
