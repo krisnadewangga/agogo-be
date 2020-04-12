@@ -51,7 +51,7 @@
 	        	<div style="margin-top: 5px;">
 	        		<button class="btn btn-primary">Cari</button>
         			<a href="{{ route('lap_pemesanan') }}"><label class="btn btn-warning" >Reset</label></a>
-        			<a href="{{ route('lap_pendapatan') }}"><label class="btn btn-success" >Export</label></a>
+        			<a href="javascript:export_pdf()"><label class="btn btn-success" >Export</label></a>
 	        	</div>
         	</form>
         </div>
@@ -110,23 +110,23 @@
 						 <tr>
                             <th colspan="7" style="text-align:right"></th>                
                             <th class="nowrap" style="text-align:right">Grand Total :</th>
-                            <th class="nowrap" style="text-align:left">{{ $result['tfoot']->grand_total_th }} </th>
-                            <th class="nowrap" style="text-align:left">{{ $result['tfoot']->grand_total_dp }} </th>
-                            <th  class="nowrap" style="text-align:left">{{ $result['tfoot']->grand_total_sisa }} </th>
+                            <th class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->grand_total_th }} </th>
+                            <th class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->grand_total_dp }} </th>
+                            <th  class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->grand_total_sisa }} </th>
 
                         </tr>
                         <tr>
                                 <th colspan="7" style="text-align:right"></th>
                                 <th  class="nowrap" style="text-align:right">Pembatalan Transaksi : </th>
-                                <th  class="nowrap" style="text-align:left">{{ $result['tfoot']->pembatalan_transaksi_th }}</th>
-                                <th  class="nowrap" style="text-align:left">{{ $result['tfoot']->pembatalan_transaksi_dp }}</th>
+                                <th  class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->pembatalan_transaksi_th }}</th>
+                                <th  class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->pembatalan_transaksi_dp }}</th>
                                 <th class="nowrap" style="text-align:right"></th>
                             </tr>
                             <tr>
                                     <th colspan="7" style="text-align:right"></th>
                                     <th class="nowrap" style="text-align:right">Total Transaksi : </th>
-                                    <th class="nowrap" style="text-align:left">{{ $result['tfoot']->total_transaksi_th }}</th>
-                                    <th class="nowrap" style="text-align:left">{{ $result['tfoot']->total_transaksi_dp }}</th>
+                                    <th class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->total_transaksi_th }}</th>
+                                    <th class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->total_transaksi_dp }}</th>
                                     <th class="nowrap" style="text-align:right"></th>
                                 </tr>
 					</tfoot>
@@ -150,6 +150,25 @@
 			        "info":     false
         		 });
         	});
+
+        	function export_pdf()
+        	{
+        		var tanggal = $("#mt").val();
+        		var tanggal1 = $("#st").val();
+
+        		if(tanggal != "" || tanggal1 != ""){
+        			var pisah = tanggal.split('/');
+	        		var pisah1 = tanggal1.split('/');
+
+	        		var mt = pisah[2]+"-"+pisah[1]+"-"+pisah[0];
+	        		var st = pisah1[2]+"-"+pisah1[1]+"-"+pisah1[0];
+	        		// document.location.href('export_kas');
+	        		window.open('export_pemesanan?mulai_tanggal='+mt+'&sampai_tanggal='+st, '_blank');
+        		}else{
+        			alert("Maaf! Pastikan Mulai Tanggal & Sampat Tanggal Tidak Kosong");
+        		}
+        		
+        	}
         </script>
     @endcomponent
 @endsection
