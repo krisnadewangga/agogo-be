@@ -10,7 +10,7 @@
         	<form method="POST" action="{{ route('filter_laporan') }}">
 	        	@csrf
 	        	<div class="row">
-	        		<div class="col-md-5">
+	        		<div class="col-md-6">
 	        			<div class="form-group">
 			                <label>Mulai Tanggal</label>
 
@@ -23,7 +23,7 @@
 			                <!-- /.input group -->
 	              		</div>
 	        		</div>
-	        		<div class="col-md-5">
+	        		<div class="col-md-6">
 	        			<div class="form-group">
 			                <label>Sampai Tanggal</label>
 
@@ -36,11 +36,13 @@
 			                <!-- /.input group -->
 	              		</div>
 	        		</div>
-	        		<div class="col-md-2" style="margin-top: 25px;">
-	        			<button class="btn btn-primary">Filter</button>
-	        			<a href="{{ route('lap_pendapatan') }}"><label class="btn btn-warning" >Reset</label></a>
-	        		</div>
+	        	
 	        	</div>
+        		<div  style="margin-top: 5px;">
+        			<button class="btn btn-primary">Filter</button>
+        			<a href="{{ route('lap_pendapatan') }}"><label class="btn btn-warning" >Reset</label></a>
+        			<a href="javascript:export_pdf()"><label class="btn btn-success" >Export</label></a>
+        		</div>
         	</form>
         </div>
 
@@ -114,6 +116,13 @@
 		           autoclose: true
 		        });
         	});
+
+        	function export_pdf()
+        	{
+        		var tanggal = $("#mt").val();
+        		var tanggal1 = $("#st").val();
+				window.open('export_pendapatan?mt='+tanggal+'&st='+tanggal1, '_blank');
+        	}
         </script>
     @endcomponent
 @endsection

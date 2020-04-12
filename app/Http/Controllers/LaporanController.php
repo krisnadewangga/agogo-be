@@ -11,7 +11,7 @@ use App\Preorders;
 use App\Kas;
 use App\Produksi;
 use Carbon\Carbon;
-
+use PDF;
 use Auth;
 
 class LaporanController extends Controller
@@ -34,12 +34,13 @@ class LaporanController extends Controller
     						->orWhere([ 
     									['metode_pembayaran','>','1'],
     									['status','=','5']
-    								  ])->orderBy('tgl_bayar','DESC')->get();
+    								  ])
+                ->whereDate('tgl_bayar','=',Carbon::now()->format('Y-m-d'))->orderBy('tgl_bayar','DESC')->get();
         
         // return $transaksi;
-        $kop = "Laporan Pendapatan Sampai Hari Ini / ".Carbon::now()->format('d M Y');
+        $kop = "Laporan Pendapatan Hari Ini ".Carbon::now()->format('d M Y');
 
-        $input = ['mt' => "", 'st' => "" ];
+        $input = ['mt' => Carbon::now()->format('d/m/Y'), 'st' => "" ];
     	  $total_pendapatan = $transaksi->sum('total_bayar');
         $total_bersih_item = $transaksi->sum('sub_total_bersih_item');
         $total_pengiriman = $transaksi->sum('total_biaya_pengiriman');
@@ -74,7 +75,34 @@ class LaporanController extends Controller
         $req = $request->all();
         $input = ['mt' => $req['mt'], 'st' => $req['st'] ];
 
-        if(!empty($req['mt'])){
+        $data = $this->SetDataPendapatan($req);
+        // return $arr_bettwen;
+        $transaksi = $data->transaksi;
+        $total_pendapatan = $data->total_pendapatan;
+        $kop = $data->kop;
+
+        // $total_bersih_item = $transaksi->sum('sub_total_bersih_item');
+        // $total_pengiriman = $transaksi->sum('total_biaya_pengiriman');
+        $menu_active = "laporan|pendapatan|0";
+
+        return view("laporan.lap_pendapatan",compact('transaksi','total_pendapatan','menu_active','kop','input'));
+    }
+
+    public function ExportPendapatan(Request $request)
+    {
+      $req = $request->all();
+
+      $data = $this->SetDataPendapatan($req);
+     
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.pendapatan', compact('data'));
+      // return view('export.pendapatan', compact('data'));
+      return $pdf->download('laporan-pendapatan-'.$data->file_export);
+
+    }
+
+    public function SetDataPendapatan($req)
+    {
+       if(!empty($req['mt'])){
               $explode1 = explode("/", $req['mt']);
               $conv1 = $explode1[1]."/".$explode1[0]."/".$explode1[2];
 
@@ -96,12 +124,17 @@ class LaporanController extends Controller
                                     ->orderBy('tgl_bayar','DESC')->get();
             
             $kop = "Laporan Pendapatan Di Tanggal $kop_mt";
+            $kop_export = "Tanggal : ".$req['mt'];
+            $file_export = str_replace("/", "-", $req['mt']);
+
         }else if( empty($req['mt']) && !empty($req['st']) ){
             $transaksi = Transaksi::whereDate('tgl_bayar','<=',$st)
                                     
                                     ->where('status','!=', '3')
                                     ->orderBy('tgl_bayar','DESC')->get();
             $kop = "Laporan Pendapatan Sampai Tanggal $kop_st";
+            $kop_export = "Sampai Tanggal : ".$req['st'];
+            $file_export = str_replace("/", "-", $req['st']);
         }else if( !empty($req['mt']) && !empty($req['st']) ){
              $arr_bettwen = ["$mt","$st"];
              $transaksi = Transaksi::whereDate('tgl_bayar','>=',$mt)
@@ -110,18 +143,18 @@ class LaporanController extends Controller
                                     ->where('status','!=', '3')
                                     ->orderBy('tgl_bayar','DESC')->get();
              $kop = "Laporan Pendapatan Mulai Tanggal $kop_mt S/D $kop_st";
+             $kop_export = "Tanggal : ".$req['mt']." - ".$req['st'];
+             $file_export = str_replace("/", "-", $req['mt'])."-".str_replace("/", "-", $req['st']);
         }else{
             return redirect()->route('lap_pendapatan');
         }
-        // return $arr_bettwen;
-
         $total_pendapatan = $transaksi->sum('total_bayar');
-        // $total_bersih_item = $transaksi->sum('sub_total_bersih_item');
-        // $total_pengiriman = $transaksi->sum('total_biaya_pengiriman');
-        $menu_active = "laporan|pendapatan|0";
 
-        return view("laporan.lap_pendapatan",compact('transaksi','total_pendapatan','menu_active','kop','input'));
+        $data = (object) ['transaksi' => $transaksi, 'kop' => $kop, 'total_pendapatan' => $total_pendapatan, 'kop_export' => $kop_export, 'file_export' => $file_export ];
+
+        return $data;
     }
+
     // END Pendapatan 
 
     // User
@@ -553,9 +586,26 @@ class LaporanController extends Controller
 
     }
 
+    public function ExportPenjualan(Request $request)
+    {
+      $req = $request->all();
+      $data = $this->MasterDataPenjualan($req);
+
+      // return $data;
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.penjualan', compact('data'))->setPaper('f4', 'landscape');
+      // return view('export.penjualan', compact('data'));
+      return $pdf->download('laporan-penjualan-'.date('YmdHis'));
+    }
+
     public function setDataPenjualan(Request $request)
     {
        $req = $request->all();
+       $response = $this->MasterDataPenjualan($req);
+       return response($response);
+    }
+
+    public function MasterDataPenjualan($req)
+    {
        $tahun = $req['tahun'];
        $bulan = $req['bulan'];
        $item = $req['item'];
@@ -725,8 +775,7 @@ class LaporanController extends Controller
 
             $response = ['table' => 2, 'data' => $fixItem, 'columns' => $columns, 'kop' => 'Rekapitulasi Penjualan '.$titleItem->items.' Dibulan '.$listBulan1[$bulan].' Tahun '.$tahun, 'kopHeader' => 'Hari Di Bulan '.$listBulan1[$bulan]];
        }
-
-       return response($response);
+       return $response;
     }
 
     // Lap Pemesanan
@@ -767,6 +816,29 @@ class LaporanController extends Controller
        return view('laporan.lap_pemesanan',compact('menu_active','input','result') );
     }
 
+    public function ExportPemesanan(Request $request)
+    {
+       $req = $request->all();
+        
+       
+       
+       $dates = [$req['mulai_tanggal'], $req['sampai_tanggal']];
+       $data = $this->SetDataPemesanan($dates);
+
+
+       $explode = explode('-',$req['mulai_tanggal']);
+       $explode1 = explode('-',$req['sampai_tanggal']);
+
+       $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
+       $end_tanggal = $explode1[2]."/".$explode1[1]."/".$explode1[0];
+
+       $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.pemesanan', compact('data', 'start_tanggal','end_tanggal'));
+         return $pdf->download('laporan-pemesanan-'.$start_tanggal.'-'.$end_tanggal);
+       
+       // return View('export.pemesanan', compact('data', 'start_tanggal','end_tanggal'));
+     
+    }
+
     public function SetDataPemesanan($dates)
     {
 
@@ -799,13 +871,13 @@ class LaporanController extends Controller
       $total_transaksi_th = number_format($data->sum('total') - $data_cancel->sum('total'),'0','','.');
       $total_transaksi_dp = number_format($data->sum('uang_muka') - $data_cancel->sum('uang_muka'),'0','','.');
       
-      $tfoot = (object)['grand_total_th' => "Rp. ".$grand_total_th,
-                        'grand_total_dp' => "Rp. ".$grand_total_dp,
-                        'grand_total_sisa' => "Rp. ".$grand_total_sisa,
-                        'pembatalan_transaksi_th' => "Rp. ".$pembatalan_transaksi_th,
-                        'pembatalan_transaksi_dp' => "Rp. ".$pembatalan_transaksi_dp,
-                        'total_transaksi_th' => "Rp. ".$total_transaksi_th,
-                        'total_transaksi_dp' => "Rp. ".$total_transaksi_dp
+      $tfoot = (object)['grand_total_th' => $grand_total_th,
+                        'grand_total_dp' => $grand_total_dp,
+                        'grand_total_sisa' => $grand_total_sisa,
+                        'pembatalan_transaksi_th' => $pembatalan_transaksi_th,
+                        'pembatalan_transaksi_dp' => $pembatalan_transaksi_dp,
+                        'total_transaksi_th' => $total_transaksi_th,
+                        'total_transaksi_dp' => $total_transaksi_dp
                        ];
 
      
@@ -845,6 +917,27 @@ class LaporanController extends Controller
       return view('laporan.lap_kas',compact('menu_active','input','data'));
 
     }
+
+    public function ExportKas(Request $request)
+    {
+ 
+      $dates = [$request->tanggal];
+      $data = $this->SetDataKas($dates);
+      $data->map(function($data){
+        $data['total_pendapatan'] = $data->transaksi - $data->total_refund;
+        $data['kas_tersedia'] = $data->saldo_awal +  $data->transaksi - $data->total_refund;
+      });
+
+    
+      $explode = explode("-", $request->tanggal);
+      $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
+
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.kas', compact('data', 'start_tanggal'));
+
+      return $pdf->download('laporan-kas-'.$start_tanggal);
+
+    }
+
     public function SetDataKas($dates)
     { 
       $kas = Kas::whereDate('created_at',$dates[0])->get();
@@ -880,6 +973,22 @@ class LaporanController extends Controller
       $menu_active = "laporan|pergerakan_stock|0";
       return view('laporan.lap_pergerakan_stock',compact('menu_active','input','data'));
     }
+
+    public function ExportProduksi(Request $request)
+    {
+      $req = $request->all();
+      $dates = [$req['tanggal']];
+      $data = $this->SetDataPergerakanStock($dates);
+
+      $explode = explode("-", $request->tanggal);
+      $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
+
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.produksi', compact('data', 'start_tanggal'));
+      return $pdf->download('laporan-pergerakan-stock-'.$start_tanggal);
+      // return View('export.produksi', compact('data', 'start_tanggal'));
+    
+
+    } 
 
     public function SetDataPergerakanStock($dates)
     {

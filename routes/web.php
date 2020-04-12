@@ -80,6 +80,12 @@ Route::post('/cari_laporan_kas','LaporanController@CariLaporanKas')->name('cari_
 Route::get('/lap_pergerakan_stock','LaporanController@LapPergerakanStock')->name('lap_pergerakan_stock');
 Route::post('/cari_laporan_pergerakan_stock','LaporanController@CariPergerakanStock')->name('cari_laporan_pergerakan_stock');
 
+Route::get('/export_penjualan','LaporanController@ExportPenjualan')->name('export_penjualan'); 
+Route::get('/export_pendapatan','LaporanController@ExportPendapatan')->name('export_pendapatan');
+Route::get('/export_kas','LaporanController@ExportKas')->name('export_kas');
+Route::get('/export_pergerakan_stock','LaporanController@ExportProduksi')->name('export_pergerakan_stock');
+Route::get('/export_pemesanan','LaporanController@ExportPemesanan')->name('export_pemesanan');
+
 Route::get('/penjualan','LaporanController@ShowPenjualan')->name('penjualan');
 Route::get('/set_grafik_penjualan','LaporanController@setGrafikPenjualan')->name('set_grafik_penjualan');
 Route::get('/dataPenjualan','LaporanController@showDataPenjualan')->name('data_penjualan');
