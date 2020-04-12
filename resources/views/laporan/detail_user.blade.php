@@ -156,11 +156,11 @@
                                     @foreach($transaksi as $key)
                                         <tr>
                                             <td align="center"></td>
-                                            <td>{{ $key->created_at->format('d M Y H:i A') }}</td>
+                                            <td class="nowrap">{{ $key->created_at->format('d M Y H:i A') }}</td>
                                          
-                                            <td>Rp {{ number_format($key->total_bayar,'0','','.') }}</td>
-                                            <td align="center">{{ $key->ItemTransaksi()->count() }} Pesanan</td>
-                                            <td align="center">
+                                            <td class="nowrap">Rp {{ number_format($key->total_bayar,'0','','.') }}</td>
+                                            <td class="nowrap" align="center">{{ $key->ItemTransaksi()->count() }} Pesanan</td>
+                                            <td class="nowrap" align="center">
                                                 @if($key['metode_pembayaran'] == 1)
                                                     <span class="label label-success ">TopUp</span>
                                                 @elseif($key['metode_pembayaran'] == 2)
@@ -169,7 +169,7 @@
                                                     <span class="label label-warning">Bayar Di Toko</span>
                                                 @endif
                                             </td>
-                                            <td align="center">
+                                            <td class="nowrap" align="center">
                                                 @if($key->status == '1')
                                                     @php
                                                         $waktu_skrang = strtotime(date('Y-m-d H:i:s'));
@@ -189,7 +189,7 @@
                                                 @endif
                                                
                                             </td>
-                                            <td align="center">
+                                            <td class="nowrap" align="center">
                                                 <a href="{{ route('transaksi.show', $key->id ) }}">
                                                     <button class="btn btn-warning btn-sm"><i class="fa fa-search"></i></button>
                                                 </a>

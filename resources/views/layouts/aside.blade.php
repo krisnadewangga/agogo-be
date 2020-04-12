@@ -27,7 +27,9 @@
               <li id="sm_admin"><a href="{{ route('administrator.index') }}"><i class="fa fa-circle-o"></i>User</a></li>
                 
                <li id="sm_kurir"><a href="{{ route('kurir.index') }}"><i class="fa fa-circle-o"></i>Kurir</a></li>
-               <li id="sm_user" ><a href="{{ route('lap_user') }}"><i class="fa fa-circle-o"></i><span>Konsumen</span></a></li>
+              
+               <li id="sm_member" ><a href="{{ route('member') }}"><i class="fa fa-circle-o"></i><span>Member</span></a></li>
+               <li id="sm_not_member" ><a href="{{ route('not_member') }}"><i class="fa fa-circle-o"></i><span>Not Member</span></a></li>
               
             </ul>
           </li>
@@ -109,6 +111,9 @@
             
               <li id="sm_penjualan"><a href="{{ route('penjualan') }}"><i class="fa fa-circle-o"></i> <span>Penjualan</span></a></li>
               <li id="sm_pendapatan"><a href="{{ route('lap_pendapatan') }}"><i class="fa fa-circle-o"></i> <span>Pendapatan</span></a></li>
+              <li id="sm_pemesanan"><a href="{{ route('lap_pemesanan') }}"><i class="fa fa-circle-o"></i> <span>Pemesanan</span></a></li>
+              <li id="sm_kas"><a href="{{ route('lap_kas') }}"><i class="fa fa-circle-o"></i> <span>Kas</span></a></li>
+              <li id="sm_pergerakan_stock"><a href="{{ route('lap_pergerakan_stock') }}"><i class="fa fa-circle-o"></i> <span>Pergerakan Stock</span></a></li>
               
             </ul>
           </li>
