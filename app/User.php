@@ -74,9 +74,9 @@ class User extends Authenticatable
 
 
    public function Roles()
-    {
-      return $this->hasMany(Role::class);
-    }
+   {
+     return $this->hasMany(Role::class);
+   }
 
 
     public function DetailKonsumen()
@@ -104,5 +104,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(Pesan::class);
     }
+    
     
 }

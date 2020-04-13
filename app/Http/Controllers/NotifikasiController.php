@@ -44,7 +44,11 @@ class NotifikasiController extends Controller
 
     public function GetJumPesanan()
     {
-       $transaksi = Transaksi::whereNotIn('status',['5','3'])->count();
+       $transaksi = Transaksi::whereNotIn('status',['5','3'])
+                              ->where([
+                                  ['jalur','=','1'],
+                                  ['jenis','=','1']
+                              ])->count();
        return $transaksi;
     }
     
@@ -56,13 +60,23 @@ class NotifikasiController extends Controller
 
     public function GetJumAP()
     {
-       $transaksi = Transaksi::where('status','4')->count();
+       $transaksi = Transaksi::where([ 
+                                        ['status','=','4'],
+                                        ['jalur','=','1'],
+                                        ['jenis','=','1']
+
+                                     ])->count();
        return $transaksi;
     }
 
     public function GetJumKP()
     {
-      $transaksi = Transaksi::where('status','6')->count();
+      $transaksi = Transaksi::where([ 
+                                      ['status','=','6'],
+                                      ['jalur','=','1'],
+                                      ['jenis','=','1']
+
+                                   ])->count();
       return $transaksi;
     }
     

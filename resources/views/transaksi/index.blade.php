@@ -110,7 +110,7 @@
                                           <h5>Sedang Mempersiapkan Data</h5>
                                       </div>`);
 					},success:function(msg){
-						console.log(msg);
+						// console.log(msg);
 						// console.log(data);
 						var no = 1;
 						$.each(msg,function(index,value){

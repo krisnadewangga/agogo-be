@@ -40,7 +40,7 @@ class UserController extends Controller
 	        $msg = $validator->messages()->all();
 	    }else{
 	       	$dataUser = $request->except('no_hp');
-	       	$dataUser['level_id'] = 3;
+	       	$dataUser['level_id'] = 6;
 	       	$dataUser['password'] = bcrypt($req['password']);
 	       	$dataUser['status_aktif'] = '0';
           $dataUser['no_hp'] =  $request->no_hp;
@@ -114,7 +114,7 @@ class UserController extends Controller
                 $user = Auth::user()->where('no_hp',$req['no_hp'])->first();
                 $find = User::findOrFail($user->id);
 
-                if($user->level_id == 3){
+                if($user->level_id == 6){
                   if(!empty($user->email_verified_at) && $user->status_aktif == '1' ){
                     if($find->DetailKonsumen->alamat == ""){
                       $user['lengkapi_alamat'] = "0";
@@ -315,7 +315,7 @@ class UserController extends Controller
 
     }else{
         $find = User::where([ ['email','=',$req['email'] ], 
-                              ['level_id', '=' ,'3'] 
+                              ['level_id', '=' ,'6'] 
                            ])->first();
         if(isset($find->id) ){
           
