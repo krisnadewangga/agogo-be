@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Helpers\KompresFoto;
 use App\User;
+use App\Level;
+use App\Role;
 use Auth;
 
 class AdministratorController extends Controller
@@ -20,9 +23,24 @@ class AdministratorController extends Controller
     
     public function index()
     {
-       $administrator = User::where('level_id','2')->get();
+       $administrator = User::whereNotIn('level_id',['1','6'])->get();
+       
+    
+       $administrator->map(function($administrator){
+         $sel_role = Role::where(['user_id' => $administrator->id])->pluck('level_id');
+         $tampil_rol = Level::selectRaw("GROUP_CONCAT(level) as tampil_rol")->whereIn('id', $sel_role)->get();
+         
+         $administrator['roles'] = $sel_role;
+         $administrator['tampil_rol'] =   $tampil_rol[0]['tampil_rol'];
+
+         return $administrator;
+       });  
+
+    
+       $levels = Level::whereNotIn('id',['1','6'])->get();
+
        $menu_active = "user|admin|0";
-       return view('user.administrator', compact('administrator','menu_active'));
+       return view('user.administrator', compact('administrator','menu_active','levels'));
     }
 
     /**
@@ -44,8 +62,17 @@ class AdministratorController extends Controller
     public function store(Request $request)
     {
         $req = $request->all();
+        $rules = ['name' => 'required',
+                  'email' => 'required|unique:users', 
+                  'password' => 'required|min:6',
+                  'roles' => 'required|array|min:1'
+                 ];
 
-        $vaildator = \Validator::make($req,['name' => 'required', 'email' => 'required|unique:users', 'password' => 'required|min:6']);
+        if(isset($req['foto'])){
+            $rules['foto' ] = 'required|image|mimes:jpeg,png,jpg,JPG,PNG,JPEG';
+        }
+
+        $vaildator = \Validator::make($req,$rules);
 
         if($vaildator->fails()){
             return redirect()->back()->withErrors($vaildator)->withInput()->with('gagal','simpan');
@@ -53,9 +80,23 @@ class AdministratorController extends Controller
 
         $req['level_id'] = '2';
         $req['password'] = bcrypt($request->password);
+        
+        if(isset($req['foto'])){
+            $uploadFoto = KompresFoto::UbahUkuran($req['foto'],'user');
+            $req['foto'] = $uploadFoto;
+        }
+
         $insert = User::create($req);
 
-        return redirect()->back()->with("success","Berhasil Buat Administrator");
+        $level_id = [];
+        foreach ($req['roles'] as $key) {
+            $level_id[] = ['level_id' => $key];
+        }
+
+        $find = User::findOrFail($insert->id);
+        $find->Roles()->createMany($level_id);
+
+        return redirect()->back()->with("success","Berhasil Buat User");
     }
 
     /**
@@ -90,26 +131,68 @@ class AdministratorController extends Controller
     public function update(Request $request, $id)
     {
         $req = $request->all();
+        $req_roles = $request->only(['roles']);
+
+        $rules = ['name' => 'required', 'email' => 'required', 'status_aktif' => 'required', 
+                  'roles' => 'required|array|min:1'];
+
         if(isset($req['password'])){
-            $validator = \Validator::make($req,['name' => 'required', 'email' => 'required', 'status_aktif' => 'required', 'password' => 'required|min:6' ]);
-        }else{
-            $validator = \Validator::make($req,['name' => 'required', 'email' => 'required', 'status_aktif' => 'required']);
+            $rules['password'] = 'required|min:6';
         }
 
+        if(isset($req['foto'])){
+            $rules['foto' ] = 'required|image|mimes:jpeg,png,jpg,JPG,PNG,JPEG';
+        }
+
+        $validator = \Validator::make($req,$rules);
         if($validator->fails()){
             return redirect()->back()->withErrors($validator,'edit')->withInput()->with('gagal','update');
         }
         
+       
         if(!isset($req['password'])){
             $req = $request->except(['password']);
         }else{
             $req['password'] = bcrypt($request->password);
         }
 
+
         $find = User::findOrFail($req['id']);
+
+        $roles_new = array_map('intval',$req_roles['roles']);
+        $role_saat_ini = Role::where(['user_id' => $find->id])->pluck('level_id')->toArray();
+
+        if(count($roles_new) > count($role_saat_ini) ){
+            $a = array_diff($roles_new,$role_saat_ini);
+        }else if(count($roles_new) < count($role_saat_ini)){
+            $a = array_diff($role_saat_ini,$roles_new);
+        }else{
+            $a = array_diff($roles_new,$role_saat_ini);
+        }
+
+        
+        if(isset($req['foto'])){
+            if(!empty($find->foto)){
+                $hapusFoto = KompresFoto::HapusFoto($find->foto); 
+            }
+            
+            $uploadFoto = KompresFoto::UbahUkuran($req['foto'],'user');
+            $req['foto'] = $uploadFoto;
+        }
+
+        unset($req['roles']);
         $find->update($req);
         
-        return redirect()->back()->with('success','Berhasil Update Administrator');
+        if(count($a) > 0){
+            $find->Roles()->delete();
+            $level_id = [];
+            foreach ($req_roles['roles'] as $key) {
+                $level_id[] = ['level_id' => $key];
+            }
+            $find->Roles()->createMany($level_id);
+        }
+
+        return redirect()->back()->with('success','Berhasil Update User');
         
     }
 
@@ -123,6 +206,6 @@ class AdministratorController extends Controller
     {
         $find = User::findOrFail($id);
         $find->delete();
-        return redirect()->back()->with('success','Berhasil Hapus Administrator');
+        return redirect()->back()->with('success','Berhasil Hapus User');
     }
 }
