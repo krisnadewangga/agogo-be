@@ -2,6 +2,8 @@ var host = window.location.host;
 var pisah_not = menu_active.split('|');
 if(pisah_not[2] == "1"){
     url = "../";
+}else if(pisah_not[2] == "2"){
+    url = "../../";
 }else{
     url = "";
 }

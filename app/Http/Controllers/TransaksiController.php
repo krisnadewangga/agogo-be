@@ -10,7 +10,7 @@ use App\User;
 use App\Notifikasi;
 use Carbon\Carbon;
 use App\Helpers\SendNotif;
-
+use DB;
 use Auth;
 
 class TransaksiController extends Controller
@@ -332,6 +332,12 @@ class TransaksiController extends Controller
             $find = Item::findOrFail($key['item_id']);
             $newStock = $find->stock + $key['jumlah'];
             $update = $find->update(['stock' => $newStock]);
+
+            DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->decrement('penjualan_toko', $key['jumlah']);
+                
+            DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->decrement('total_penjualan', $key['jumlah']);
+                
+            DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('sisa_stock', $key['jumlah']);
         }
 
         $this->setKunciTransaksi($penerima_id);

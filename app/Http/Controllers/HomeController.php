@@ -118,11 +118,15 @@ class HomeController extends Controller
         $tahun = Transaksi::selectRaw("MIN(YEAR(tgl_bayar)) as min_tahun,
                                             MAX(YEAR(tgl_bayar)) as max_tahun ")->first();
         
+
         $tahunNow = date('Y');
         $tahun['max_tahun'] = $tahunNow;
-        if(!isset($tahun->min_tahun) ){
-            $tahun = ['min_tahun' => $tahunNow, 'max_tahun' => $tahunNow];
+        $cek = $tahun->count();
+        if($cek == 0){
+
+            $tahun = (object) ['min_tahun' => $tahunNow, 'max_tahun' => $tahunNow];
         }
+
         $top_ten = Item::selectRaw("item.*,
                                    (select sum(a.jumlah) from item_transaksi as a,transaksi as b
                                     where  a.transaksi_id=b.id and a.item_id=item.id and YEAR(b.tgl_bayar) = $tahunNow and MONTH(b.tgl_bayar) = ".date('m')." and b.status != '3' ) as total_belanja
@@ -141,6 +145,7 @@ class HomeController extends Controller
         
 
         $menu_active = "dashboard||0";
+        
         return view('home',compact('menu_active', 'top_ten','tahun','tahunNow','dashboard_k'));
     }
 
