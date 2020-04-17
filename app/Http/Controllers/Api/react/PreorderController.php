@@ -122,6 +122,7 @@ public function store(Request $request)
     'banyak_item' => count($req),
     'lat' => '-',
     'long' => '-',
+    // 'kasir_id' => $req[0]['user_id'],
     'catatan' => $request[0]['catatan'],
     'detail_alamat' => $request[0]['alamat'],
     'metode_pembayaran' => '3',
@@ -382,7 +383,7 @@ public function bayarPreorder(Request $request)
 
 
 
-    $db->update(['status' => '5','tgl_bayar' => date("Y-m-d H:i:s")]);
+    $db->update(['status' => '5','tgl_bayar' => date("Y-m-d H:i:s"),'kasir_id' => $request[0]['user_id']]);
 
   }
 

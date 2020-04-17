@@ -98,6 +98,7 @@ $req_transaksi = ['user_id' => $req[0]['user_id'],
 'lat' => '-',
 'long' => '-',
 'detail_alamat' => '-',
+'kasir_id' => $req[0]['user_id'],
 'metode_pembayaran' => '3',
 'tgl_bayar' => date("Y-m-d H:i:s"),
 'waktu_kirim' => date("Y-m-d H:i:s")
@@ -178,6 +179,7 @@ public function bayarTransaksiM(Request $request)
       'banyak_item' => count($req),
       'total_bayar' => $total, 
       'status' => '5',
+      'kasir_id' => $kasir_id,
       'tgl_bayar' => date("Y-m-d H:i:s")
     ]);
 
@@ -224,6 +226,10 @@ return response()->json([
   'message' => $new_no_transaksi,
 ], 200);
 }
+
+
+
+
 
 public function getTransaksi($no_transaksi)
 {
@@ -292,6 +298,7 @@ public function keepOrder(Request $request)
       'lat' => '-',
       'long' => '-',
       'detail_alamat' => '-',
+      'kasir_id' => $req[0]['user_id'],
       'metode_pembayaran' => '3',
       'tgl_bayar' => date("Y-m-d H:i:s"),
       'waktu_kirim' => date("Y-m-d H:i:s")
@@ -311,6 +318,7 @@ public function keepOrder(Request $request)
                 'banyak_item' => count($req),
                 'lat' => '-',
                 'long' => '-',
+                'kasir_id' => $req[0]['user_id'],
                 'detail_alamat' => '-',
                 'metode_pembayaran' => '3',
                 'tgl_bayar' => date("Y-m-d H:i:s"),
