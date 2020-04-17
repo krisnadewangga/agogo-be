@@ -96,7 +96,7 @@ class LaporanController extends Controller
      
       $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.pendapatan', compact('data'));
       // return view('export.pendapatan', compact('data'));
-      return $pdf->download('laporan-pendapatan-'.$data->file_export);
+      return $pdf->download('laporan-pendapatan-'.$data->file_export.'.pdf');
 
     }
 
@@ -594,7 +594,7 @@ class LaporanController extends Controller
       // return $data;
       $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.penjualan', compact('data'))->setPaper('f4', 'landscape');
       // return view('export.penjualan', compact('data'));
-      return $pdf->download('laporan-penjualan-'.date('YmdHis'));
+      return $pdf->download('laporan-penjualan-'.date('YmdHis').'.pdf');
     }
 
     public function setDataPenjualan(Request $request)
@@ -833,7 +833,7 @@ class LaporanController extends Controller
        $end_tanggal = $explode1[2]."/".$explode1[1]."/".$explode1[0];
 
        $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.pemesanan', compact('data', 'start_tanggal','end_tanggal'));
-         return $pdf->download('laporan-pemesanan-'.$start_tanggal.'-'.$end_tanggal);
+         return $pdf->download('laporan-pemesanan-'.$start_tanggal.'-'.$end_tanggal.'.pdf');
        
        // return View('export.pemesanan', compact('data', 'start_tanggal','end_tanggal'));
      
@@ -934,7 +934,7 @@ class LaporanController extends Controller
 
       $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.kas', compact('data', 'start_tanggal'));
 
-      return $pdf->download('laporan-kas-'.$start_tanggal);
+      return $pdf->download('laporan-kas-'.$start_tanggal.'.pdf');
 
     }
 
@@ -984,7 +984,7 @@ class LaporanController extends Controller
       $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
 
       $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.produksi', compact('data', 'start_tanggal'));
-      return $pdf->download('laporan-pergerakan-stock-'.$start_tanggal);
+      return $pdf->download('laporan-pergerakan-stock-'.$start_tanggal.'.pdf');
       // return View('export.produksi', compact('data', 'start_tanggal'));
     
 

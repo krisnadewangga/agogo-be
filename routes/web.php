@@ -98,6 +98,9 @@ Route::get('/msessages','MessageController@Index');
 Route::get('/dashboard_pesan','PesanController@dashboardPesan');
 Route::get('/list_pesan','PesanController@listPesan');
 Route::post('/kirim_pesan','PesanController@kirimPesan')->name('kirim_pesan');
+Route::post('/pesan_user','PesanController@pesanUser')->name('pesan_user');
+
+
 Route::get('/hapus_pesan/{id}','PesanController@hapusPesan')->name('hapus_pesan');
 Route::get('/get_jum_pesan','PesanController@getJumPesan')->name('get_jum_pesan');
 Route::get('/baca_pesan/{id}','PesanController@bacaPesan')->name('baca_pesan');

@@ -65,6 +65,7 @@
 									@endif
 								</td>
 								<td align="center" class="nowrap">
+									<button class="btn btn-sm btn-success" onclick="modal_pesan('{{$key->id}}','{{$key->name}}')"><i class="fa fa-envelope"></i></button>
 									<a href="{{ route('detail_user', ['id' => $key->id,'status_member' => $key->DetailKonsumen->status_member]) }}">
 										<button class="btn btn-warning btn-sm"><i class="fa fa-search"></i></button>
 									</a>
@@ -83,4 +84,55 @@
         </div>
      
      @endcomponent
+
+      @component("components.modal", ["id" => "modal_input" ,"kop_modal" => "Form Kirim Pesan"])
+		<form method="POST" action="{{ route('pesan_user') }}" >
+			@csrf
+			<input type="text" id="id" name="id" hidden readonly>
+			
+			<div class="form-group @error('judul') has-error @enderror ">
+		        <label>Tujuan</label>
+		        <input id="tujuan" type="text" class="form-control  " readonly value="{{ old('tujuan') }}" name="tujuan" >
+		      
+	        </div>
+
+	         <div class="form-group @error('pesan') has-error @enderror" >
+	        	<label>Pesan</label>
+	        	<textarea id="pesan" class="form-control" name="pesan">
+	        		
+	        	</textarea>
+	        	@error('pesan')
+	        		 <label class="control-label" for="inputError">
+                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
+                	</label>  
+	        	@enderror
+	        </div>
+
+	        <div class="text-right">
+	        	 <button type="submit" class="btn btn-primary btn-sm"  >Simpan</button>
+	        </div>
+		</form>
+	 @endcomponent
+
+
+     <script type="text/javascript">
+
+
+     	$(function(){
+     		CKEDITOR.replace('pesan');
+
+     	
+
+			@if(Session::get('gagal') == 'simpan' )
+				$("#modal_input").modal('show');
+			@endif
+     	});
+     	function modal_pesan(id,nama)
+     	{
+     		$("#id").val(id);
+     		$("#tujuan").val(nama);
+
+     		$("#modal_input").modal('show');
+     	}
+     </script>
 @endsection
