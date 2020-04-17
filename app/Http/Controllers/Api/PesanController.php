@@ -98,28 +98,28 @@ class PesanController extends Controller
 
    public function pesanById(Request $request)
    {
-   	 $req = $request->all();
+   	$req = $request->all();
     $rules = ['pesan_id' => 'required'];
     $messsages = ['pesan_id.required' => 'pesan_id Tidak Bisa Kosong' ];
    
     $validator = Validator::make($req, $rules,$messsages);
     if($validator->fails()){
-        $success = 0;
-        $msg = $validator->messages()->all();
-        $kr = 400;
+      $success = 0;
+      $msg = $validator->messages()->all();
+      $kr = 400;
     }else{
 
     	$pesan = Pesan::findOrFail($req['pesan_id']);
-
-    
-    	
+      if($pesan->dibaca == "0"){
+        $pesan->update(['dibaca' => '1']);
+      }
+      
     	$success = 1;
-      	$msg = $pesan;
-      	$kr = 200;
+      $msg = $pesan;
+      $kr = 200;
 
     }
     return response()->json(['success' => $success,'msg' => $msg], $kr);
-
    }
 
    public function bacaPesanTiapUser(Request $request)
@@ -141,7 +141,7 @@ class PesanController extends Controller
     							['dibaca', '=', '0']
     						 ]);
     	$pesan->update(['dibaca' => '1']);
-    
+      
     	$success = 1;
       	$msg = 'Berhasil Baca Seluruh Pesan';
       	$kr = 200;
@@ -166,7 +166,7 @@ class PesanController extends Controller
 
     	 $pesan = Pesan::findOrFail($req['pesan_id']);
     	 $pesan->update(['dibaca' => '1']);
-    
+      
     	 $success = 1;
       	 $msg = 'Berhasil Baca Pesan';
       	 $kr = 200;
