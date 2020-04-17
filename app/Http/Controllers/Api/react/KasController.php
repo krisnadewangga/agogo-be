@@ -144,14 +144,14 @@ class KasController extends Controller
    //      ->sum('preorders.uang_muka');
 
 
-   //          //total pesanana uang muka
-   //      $sumPreordersDP = DB::table('transaksi')->join('preorders','preorders.transaksi_id','=','transaksi.id')
-   //      ->where('transaksi.tg', '>', $waktu)
-   //      ->where('transaksi.status','1') //belum bayar
-   //      // ->where('hari_pelunasan','notsameday')
- 		// ->where('transaksi.user_id',$id)
-   //      ->where('transaksi.jenis','2')
-   //      ->sum('preorders.uang_muka');
+            //total pesanana uang muka
+        $sumPreordersDP = DB::table('transaksi')->join('preorders','preorders.transaksi_id','=','transaksi.id')
+        ->where('transaksi.created_at', '>', $waktu)
+        ->where('transaksi.status','1') //belum bayar
+        // ->where('hari_pelunasan','notsameday')
+ 		->where('transaksi.user_id',$id)
+        ->where('transaksi.jenis','2')
+        ->sum('preorders.uang_muka');
 
              //total pelunasan pesanan
         $sumPreordersPelunasan = DB::table('transaksi')->join('preorders','preorders.transaksi_id','=','transaksi.id')
