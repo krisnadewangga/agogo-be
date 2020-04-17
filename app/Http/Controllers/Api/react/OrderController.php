@@ -194,7 +194,7 @@ public function bayarTransaksiM(Request $request)
      }
    }
  }else{
-  $sel->update(['status' => '5', 'tgl_bayar' => date("Y-m-d H:i:s") ]);
+  $sel->update(['status' => '5', 'tgl_bayar' => date("Y-m-d H:i:s") , 'kasir_id' => $kasir_id]);
 }
 $sel->AmbilPesanan()->create(['diambil_oleh' => '-', 
   'input_by' => 'Kasir - '.$nama_kasir 
