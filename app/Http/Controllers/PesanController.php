@@ -43,6 +43,41 @@ class PesanController extends Controller
 		return response()->json($pesan);
 	}
 
+	public function pesanUser(Request $request)
+	{
+		$req = $request->all();
+		$validator = \Validator::make($req,['tujuan' => 'required', 
+                                            'pesan' => 'required']);
+    	if($validator->fails()){
+          return redirect()->back()->withErrors($validator)->with('gagal','simpan')->withInput();
+        }
+        $req['user_id'] = $req['id'];
+        $find_user = User::findOrFail($req['id']);
+
+        $req['status'] = '1';
+        $req['dibuat_oleh'] = Auth::User()->name;
+        $insert = Pesan::create($req);
+
+         //Insert Notifikasi
+        $dnotif =
+        [
+        'pengirim_id' => Auth::User()->id,
+        'penerima_id' => $req['user_id'],
+        'judul_id' => $insert->id,
+        'judul' => 'Anda Memiliki Pesan Baru Dari AGOGO BAKERY',
+        'isi' => $insert->pesan,
+        'jenis_notif' => 5,
+        'dibaca' => '0'
+        ];
+
+        $notif = Notifikasi::create($dnotif);
+        // //NotifGCM ($pengirim,$judul,$pesan,$gambar, $id_user,$namaTable, $id)
+        SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'pesan', $notif->judul_id);
+
+        return redirect()->back()->with('success','Berhasil Mengirimkan Pesan Ke '.$find_user->name);
+	}
+
+	
 	public function kirimPesan(Request $request)
 	{
 		$req = $request->all();

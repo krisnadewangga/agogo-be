@@ -37,6 +37,7 @@ class PromoController extends Controller
     {
     	$req = $request->all();
     	$validator = \Validator::make($req,['judul' => 'required', 
+                                            'deskripsi' => 'required',
     									    'berlaku_sampai' => 'required',
     									    'gambar' => 'required|image|mimes:jpeg,png,jpg,JPG,PNG,JPEG' ]);
     	if($validator->fails()){
@@ -63,10 +64,11 @@ class PromoController extends Controller
         if(isset($req['gambar'])){
             $data_validator =['judul' => 'required', 
     						  'berlaku_sampai' => 'required',
+                              'deskripsi' => 'required',
 						      'gambar' => 'required|image|mimes:jpeg,png,jpg,JPG,PNG,JPEG' ];
         }else{
             $data_validator = ['judul' => 'required', 
-    						  'berlaku_sampai' => 'required'];
+    						  'berlaku_sampai' => 'required','deskripsi' => 'required'];
         }
 
         $validator = \Validator::make($req,$data_validator);
