@@ -41,7 +41,16 @@ class TransaksiController extends Controller
 		         ];
 	
 		$sel_user = User::findOrFail($req['user_id']);
-		if($sel_user->DetailKonsumen->kunci_transaksi == 0){
+		$transaksi_berlangsung = $sel_user->Transaksi->whereNotIn('status',['5','3'] )
+		->where('waktu_kirim','>',date('Y-m-d H:i:s'))->count();
+		
+
+    	// if($transaksi_berlangsung == '3'){
+    	// 	$sel_user->DetailKonsumen()->update(['kunci_transaksi' => '1']);
+    	// }
+		
+		// if($sel_user->DetailKonsumen->kunci_transaksi == 0){
+		if($transaksi_berlangsung < '3'){
 			$itemTransaksi = [];
 			$countItemError = 0;
 			$ItemError = [];
@@ -322,16 +331,15 @@ class TransaksiController extends Controller
 		        	}
 		        	
 	            	$transaksi_berlangsung = $sel_user->Transaksi->whereNotIn('status',['5','3'] )->count();
-	            	if($transaksi_berlangsung == '3'){
-	            		$sel_user->DetailKonsumen()->update(['kunci_transaksi' => '1']);
-	            	}
+	            	// if($transaksi_berlangsung == '3'){
+	            	// 	$sel_user->DetailKonsumen()->update(['kunci_transaksi' => '1']);
+	            	// }
 		    	}
 		    }
 		}else{
 			$success = '0';
 			$msg = 'Maaf! Maksimal Pesanan Sebanyak 3, Silahkan Selesaikan Terlebih Dahulu Pesanan Yang Sedang Berlangsung';
 		}
-		
 
 	    return response()->json(['success' => $success,'msg' => $msg],200);
 
@@ -450,7 +458,12 @@ class TransaksiController extends Controller
     public function SimpanTransaksi($req_transaksi,$itemTransaksi)
     {
     	$maxKD = Transaksi::where('no_transaksi','LIKE','T'.date('Ymd').'%')->orderBy('id','DESC')->first();
-        $nexKD = Acak::AmbilId($maxKD['no_transaksi'],'T'.date('Ymd'),9,3);
+    	if(!empty($maxKD->id)){
+    		$nexKD = Acak::AmbilId($maxKD['no_transaksi'],'T'.date('Ymd'),9,3);	
+    	}else{
+    		$nexKD = 'T'.date('Ymd').'001';
+    	}
+        
         $req_transaksi['no_transaksi'] = $nexKD;
 
         // if(isset($req_transaksi['durasi_kirim'])){

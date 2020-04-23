@@ -37,8 +37,9 @@ class TransaksiController extends Controller
     public function index()
     {
     	$transaksi = Transaksi::whereIn('status',['1','6'])->orderBy('created_at','desc')->get();
-        $menu_active = "transaksi|transaksi|0";
-    	return view('transaksi.index',compact('transaksi','menu_active'));
+      $menu_active = "transaksi|transaksi|0";
+    	
+      return view('transaksi.index',compact('transaksi','menu_active'));
     }
 
     public function PengajuanBatalPesanan()
@@ -50,7 +51,8 @@ class TransaksiController extends Controller
 
     public function KonfirmasiPembayaran()
     {
-        $transaksi = Transaksi::where('status','6')->orderBy('updated_at','desc')->get();
+        $transaksi = Transaksi::where('status','6')->where('waktu_kirim','>',date('Y-m-d H:i:s'))
+                     ->orderBy('updated_at','desc')->get();
         $menu_active = "transaksi|kp|0";
         return view('transaksi.konfirmasi_pembayaran',compact('transaksi','menu_active'));
     }
@@ -72,6 +74,7 @@ class TransaksiController extends Controller
         $waktu_sekarang = Carbon::now()->format('Y-m-d H:i:s');
         if($jenis_transaksi == "0" && $status_transaksi == "0"){
             $transaksi = Transaksi::whereNotIn('status',['5','3'])
+                                    ->where('waktu_kirim','>',$waktu_sekarang)
                                     ->where('jenis','1')
                                     ->where('jalur','1')
                                     ->orderBy('updated_at','desc')->get();
@@ -369,6 +372,13 @@ class TransaksiController extends Controller
         }
 
         $find = Transaksi::findOrFail($req['transaksi_id']);
+        $waktu_skrang = strtotime(date('Y-m-d H:i:s'));
+        $batas_ambe = strtotime($find->waktu_kirim);
+
+        if($waktu_skrang > $batas_ambe){
+          return redirect()->back()->with('error','Transaksi Telah Expire, Silahkan Lakukan Pemesanan Kembali');
+        }
+
         $penerima_id = $find->user_id;
         $find->update(['status' => '5', 'tgl_bayar' => Carbon::now() ]);
         
@@ -398,8 +408,14 @@ class TransaksiController extends Controller
     public function konfirBayar($id)
     {
         $find = Transaksi::findOrFail($id);
-        $find->update(['status' => '1', 'tgl_bayar' => Carbon::now() ]);
+        $waktu_skrang = strtotime(date('Y-m-d H:i:s'));
+        $batas_ambe = strtotime($find->waktu_kirim);
 
+        if($waktu_skrang > $batas_ambe){
+          return redirect()->back()->with('error','Transaksi Telah Expire, Silahkan Lakukan Pemesanan Kembali');
+        }
+
+        $find->update(['status' => '1', 'tgl_bayar' => Carbon::now() ]);
         $find->LogKonfirBayar()->create(['input_by' => Auth::User()->name ]);
 
         SendNotif::SendNotPesan('5',['jenisNotif' => '4']);

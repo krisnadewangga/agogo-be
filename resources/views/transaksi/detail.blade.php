@@ -14,6 +14,12 @@
 			@endcomponent
 		@endif
 
+		@if(session('error'))
+			@component("components.alert_error", ["type" => "error"])
+				{{ session('error') }}
+			@endcomponent
+		@endif
+
 		@php
 			if(isset($transaksi->AjukanBatalPesanan->id)){
 			 	$cek_batal_ajukan = $transaksi->AjukanBatalPesanan->id;
@@ -303,7 +309,6 @@
 												@if($transaksi->status == '3' )
 													@if(!isset($cek_batal_ajukan))
 														<th><center>Dibatalkan Oleh</center></th>
-														
 													@else
 														<th><center>Diajukan Pembatalan</center></th>
 														<th><center>Disetujui Pembatalan</center></th>
@@ -418,9 +423,11 @@
 						</div>
 					</div>
 				</div>
+
 				@if(isset($transaksi->AjukanBatalPesanan->id) && $transaksi->AjukanBatalPesanan->status == '0' )
 					<div class="bg-danger text-red" style="margin-top: 10px; padding:10px">
 						<div><i class="fa fa-info-circle fa-2x"> <u>INFO</u></i>  </div>
+						
 						<p style="margin-top: 5px;">Pesanan Ini Telah Diajukan Oleh <b>{{ $transaksi->AjukanBatalPesanan->diajukan_oleh }}</b> Untuk Pembatalan Pesanan Pada Tanggal : <b>{{ $transaksi->AjukanBatalPesanan->created_at->format('d/m/Y h:i A') }}</b>  </p>
 					</div>
 				@endif
@@ -428,33 +435,44 @@
 				<!-- Tombol -->
 				@if($transaksi->status == '1' && $transaksi->metode_pembayaran != '3')
 					<div style="margin-top: 10px;">
+						
 						<button class="btn btn-primary" data-target="#modal_input" data-toggle="modal">Mulai Pengiriman</button>
 
 						@if($transaksi->status < '2' && $transaksi->status != '6')
 							<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
 						@endif
 					</div>
+				<!-- Tombol Konfir Bayar -->
 				@elseif($transaksi->status == '6' && $transaksi->metode_pembayaran == '2')
 					<div style="margin-top: 10px;"> 
-						<a href="{{ route('konfir_pembayaran',$transaksi->id) }}" onclick="return confirm('Apakah Anda Yakin Mengkonfirmasi Pembayaran ?')">
-							<button class="btn btn-success">Konfir Pembayaran</button>
-						</a>
+						@if($waktu_skrang < $batas_ambe)
+							<a href="{{ route('konfir_pembayaran',$transaksi->id) }}" onclick="return confirm('Apakah Anda Yakin Mengkonfirmasi Pembayaran ?')">
+								<button class="btn btn-success">Konfir Pembayaran</button>
+							</a>
+						@endif
 
 						<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
 					</div>
+
+				<!-- tombol bayar di toko -->
 				@elseif($transaksi->status == '1' && $transaksi->metode_pembayaran == '3')
 					<div style="margin-top: 10px;">
-						<button class="btn btn-success" data-target="#modal_ambil_pesanan" data-toggle="modal">Pesanan Diambil</button>
-						
+						@if($waktu_skrang < $batas_ambe)
+							<button class="btn btn-success" data-target="#modal_ambil_pesanan" data-toggle="modal">Pesanan Diambil</button>
+						@endif
+
+
 						@if($waktu_skrang > $batas_ambe )
 							<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
 						@endif
 					</div>
 				@elseif($transaksi->status == '4' && $transaksi->metode_pembayaran == '2')
 					<div style="margin-top: 10px;"> 
+						@if($waktu_skrang < $batas_ambe)
 						<a href="{{ route('konfir_pembayaran',$transaksi->id) }}" onclick="return confirm('Apakah Anda Yakin Mengkonfirmasi Pembayaran ?')">
 							<button class="btn btn-success">Konfir Pembayaran</button>
 						</a>
+						@endif
 
 						<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
 					</div>
@@ -466,8 +484,9 @@
 					</div>
 				@elseif($transaksi->status == '4' && $transaksi->metode_pembayaran == '3')
 					<div style="margin-top: 10px;"> 
-						<button class="btn btn-success" data-target="#modal_ambil_pesanan" data-toggle="modal">Pesanan Diambil</button>
-						
+						@if($waktu_skrang < $batas_ambe)
+							<button class="btn btn-success" data-target="#modal_ambil_pesanan" data-toggle="modal">Pesanan Diambil</button>
+						@endif
 						<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>
 					</div>
 				@endif
@@ -498,7 +517,6 @@
 					$("#modal_ambil_pesanan").modal('show');
 				@endif
 
-
 				@if(Session::get('gagal') == 'kurir')
 					$("#modal_input").modal('show');
 				@endif
@@ -514,8 +532,7 @@
 	     	}
      	</script>
 
-     	@if( 
-     			($transaksi->metode_pembayaran == '1' && $transaksi->status > '1' && $transaksi->status != '3' && $transaksi->status != '4') 
+     	@if( ($transaksi->metode_pembayaran == '1' && $transaksi->status > '1' && $transaksi->status != '3' && $transaksi->status != '4') 
      			|| ($transaksi->metode_pembayaran == '2' && $transaksi->status >= '2' && $transaksi->status != '3'  && $transaksi->status != '6'  && $transaksi->status != '6' && $transaksi->status != '4' ) )
 	     	
 	     	<div class="modal fade"  id="modal_profil">
