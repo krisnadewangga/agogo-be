@@ -70,7 +70,7 @@
 								<td align="center"></td>
 								<td>{{ $key->tgl_bayar->format('d M Y H:i A') }}</td>
 								<td>{{ $key->no_transaksi }}</td>
-								<td>{{ $key->User->name }}</td>
+								<td>{{ $key->nama_tampil }}</td>
 								<td align="center">{{ $key->ItemTransaksi()->count() }} Pesanan</td>
 								<td>Rp. {{ number_format($key->total_bayar,'0','','.') }}</td>
 								<td align="center">
