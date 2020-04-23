@@ -44,7 +44,10 @@ class NotifikasiController extends Controller
 
     public function GetJumPesanan()
     {
+       $waktu_sekarang = date('Y-m-d H:i:s');
+
        $transaksi = Transaksi::whereNotIn('status',['5','3'])
+                              ->where('waktu_kirim','>',$waktu_sekarang)
                               ->where([
                                   ['jalur','=','1'],
                                   ['jenis','=','1']
@@ -71,10 +74,12 @@ class NotifikasiController extends Controller
 
     public function GetJumKP()
     {
+      $waktu_sekarang = date('Y-m-d H:i:s');
       $transaksi = Transaksi::where([ 
                                       ['status','=','6'],
                                       ['jalur','=','1'],
-                                      ['jenis','=','1']
+                                      ['jenis','=','1'],
+                                      ['waktu_kirim','>',$waktu_sekarang]
 
                                    ])->count();
       return $transaksi;

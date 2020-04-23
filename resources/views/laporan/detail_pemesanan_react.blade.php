@@ -88,7 +88,7 @@
 						<div class="col-md-8">
 							<h4 style="margin-top: 5px; margin-bottom: 5px;"><b>Total Transaksi</b></h4>
 							<div>
-								Kasir Yang Bertugas : {{$transaksi->User->name }} | TGL : {{ $transaksi->created_at->format('d/m/Y h:i A') }}
+								Kasir Yang Bertugas : {{$transaksi->nama_tampil }}
 
 								
 							</div>
@@ -158,6 +158,17 @@
 			</div>
 		</div>
 
+		@if($transaksi->jum_kasir == 2)
+			<div class="row" style="margin-top: 10px;">
+				<div class="col-md-6 col-xs-6">
+					Kasir
+				</div>
+				<div class="col-md-6 text-right col-xs-6">
+					{{ $transaksi['entri_by']}} <br/> {{ $transaksi['waktu_entri'] }}
+				</div>
+			</div>
+		@endif
+
 		<hr></hr>
 		<h4><u>Pelunasan</u></h4>
 		<div class="row" style="margin-top: 10px;">
@@ -198,6 +209,16 @@
 			</div>
 		@endif
 
+		@if($transaksi->jum_kasir == 2)
+			<div class="row" style="margin-top: 10px;">
+				<div class="col-md-6 col-xs-6">
+					Kasir
+				</div>
+				<div class="col-md-6 text-right col-xs-6">
+					{{ $transaksi['checkout_by']}} <br/> {{ $transaksi['waktu_checkout'] }}
+				</div>
+			</div>
+		@endif
 		
 	@endcomponent
 
