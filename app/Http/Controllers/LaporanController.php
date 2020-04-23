@@ -37,6 +37,22 @@ class LaporanController extends Controller
     								  ])
                 ->whereDate('tgl_bayar','=',Carbon::now()->format('Y-m-d'))->orderBy('tgl_bayar','DESC')->get();
         
+        $transaksi->map(function($transaksi){
+          if($transaksi->jenis == "2"){
+            $kasir_entri = User::findOrFail($transaksi->user_id);
+            $kasir_checkout = User::findOrFail($transaksi->kasir_id);
+
+            if($kasir_entri != $kasir_checkout){
+              $transaksi['nama_tampil'] = $kasir_entri->name." - ".$kasir_checkout->name;
+            }else{
+              $transaksi['nama_tampil'] = $kasir_entri->name;
+            }
+          }else{
+            $transaksi['nama_tampil'] = $transaksi->User->name;
+          }
+          
+        });
+
         // return $transaksi;
         $kop = "Laporan Pendapatan Hari Ini ".Carbon::now()->format('d M Y');
 
@@ -63,6 +79,23 @@ class LaporanController extends Controller
     public function DetailPemesanan($id)
     {
       $transaksi = Transaksi::findOrFail($id);
+
+      $kasir_entri = User::findOrFail($transaksi->user_id);
+      $kasir_checkout = User::findOrFail($transaksi->kasir_id);
+
+      if($kasir_entri != $kasir_checkout){
+        $transaksi['nama_tampil'] = $kasir_entri->name." - ".$kasir_checkout->name;
+        $transaksi['entri_by'] = $kasir_entri->name;
+        $transaksi['waktu_entri'] = $transaksi->created_at->format('d/m/Y h:i A');
+        $transaksi['checkout_by'] = $kasir_checkout->name;
+        $transaksi['waktu_checkout'] = $transaksi->updated_at->format('d/m/Y h:i A');
+        $transaksi['jum_kasir'] = 2;
+
+      }else{
+        $transaksi['nama_tampil'] = $kasir_entri->name." | TGL : ".$transaksi->created_at->format('d/m/Y h:i A') ;
+         $transaksi['jum_kasir'] = 1;
+      }
+     
       $transaksi->ItemTransaksi;
 
       $menu_active = "laporan|pendapatan|1";
@@ -96,7 +129,7 @@ class LaporanController extends Controller
      
       $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.pendapatan', compact('data'));
       // return view('export.pendapatan', compact('data'));
-      return $pdf->download('laporan-pendapatan-'.$data->file_export.'.pdf');
+      return $pdf->stream('laporan-pendapatan-'.$data->file_export.'.pdf');
 
     }
 
@@ -148,6 +181,23 @@ class LaporanController extends Controller
         }else{
             return redirect()->route('lap_pendapatan');
         }
+
+        $transaksi->map(function($transaksi){
+          if($transaksi->jenis == "2"){
+            $kasir_entri = User::findOrFail($transaksi->user_id);
+            $kasir_checkout = User::findOrFail($transaksi->kasir_id);
+
+            if($kasir_entri != $kasir_checkout){
+              $transaksi['nama_user'] = $kasir_entri->name."-".$kasir_checkout->name;
+            }else{
+              $transaksi['nama_user'] = $kasir_entri->name;
+            }
+          }else{
+            $transaksi['nama_user'] = $transaksi->User->name;
+          }
+          
+        });
+
         $total_pendapatan = $transaksi->sum('total_bayar');
 
         $data = (object) ['transaksi' => $transaksi, 'kop' => $kop, 'total_pendapatan' => $total_pendapatan, 'kop_export' => $kop_export, 'file_export' => $file_export ];
@@ -594,7 +644,7 @@ class LaporanController extends Controller
       // return $data;
       $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.penjualan', compact('data'))->setPaper('f4', 'landscape');
       // return view('export.penjualan', compact('data'));
-      return $pdf->download('laporan-penjualan-'.date('YmdHis').'.pdf');
+      return $pdf->stream('laporan-penjualan-'.date('YmdHis').'.pdf');
     }
 
     public function setDataPenjualan(Request $request)
@@ -833,7 +883,7 @@ class LaporanController extends Controller
        $end_tanggal = $explode1[2]."/".$explode1[1]."/".$explode1[0];
 
        $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.pemesanan', compact('data', 'start_tanggal','end_tanggal'));
-         return $pdf->download('laporan-pemesanan-'.$start_tanggal.'-'.$end_tanggal.'.pdf');
+         return $pdf->stream('laporan-pemesanan-'.$start_tanggal.'-'.$end_tanggal.'.pdf');
        
        // return View('export.pemesanan', compact('data', 'start_tanggal','end_tanggal'));
      
@@ -934,7 +984,7 @@ class LaporanController extends Controller
 
       $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.kas', compact('data', 'start_tanggal'));
 
-      return $pdf->download('laporan-kas-'.$start_tanggal.'.pdf');
+      return $pdf->stream('laporan-kas-'.$start_tanggal.'.pdf');
 
     }
 
@@ -984,7 +1034,7 @@ class LaporanController extends Controller
       $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
 
       $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.produksi', compact('data', 'start_tanggal'));
-      return $pdf->download('laporan-pergerakan-stock-'.$start_tanggal.'.pdf');
+      return $pdf->stream('laporan-pergerakan-stock-'.$start_tanggal.'.pdf');
       // return View('export.produksi', compact('data', 'start_tanggal'));
     
 

@@ -138,9 +138,17 @@ class HomeController extends Controller
                         ->limit('10')
                         ->get();
 
-        $pesanan = Transaksi::where('status','1')->orWhere('status','2')->orWhere('status','6')->count();
+        $pesanan = Transaksi::where(function($q){
+                                $q->where('status','1');
+                                $q->orWhere('status','2');
+                                $q->orWhere('status','6');
+                              })
+                              ->where('waktu_kirim','>',date('Y-m-d H:i:s'))
+                              ->where('jalur','1')
+                              ->count();
+
         $pengiriman = Pengiriman::where('status','0')->count();
-        $total_p = Transaksi::where('status','5')->count();
+        $total_p = Transaksi::where('status','5')->where('jalur','1')->count();
         $dashboard_k = ['pesanan' => $pesanan, 'pengiriman' => $pengiriman, 'total_p' => $total_p];
         
 

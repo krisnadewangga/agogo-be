@@ -238,6 +238,7 @@ public function getTransaksi($no_transaksi)
     ['no_transaksi','=',$no_transaksi],
     ['status','=','1']
   ]);
+
   if($transaksi->count() > 0){
    $transaksi1 = $transaksi->first();
    $item_transaksi = ItemTransaksi::join('item as a','a.id','=','item_transaksi.item_id')
@@ -248,12 +249,22 @@ public function getTransaksi($no_transaksi)
    ->where('item_transaksi.transaksi_id', $transaksi1->id)
    ->get();
             // return $item_transaksi;
-   $transaksi1['item_transaksi'] = $item_transaksi; 
-   $success = '1';
-   $message = $transaksi1;
+   
+   $waktu_kirim = $transaksi1->waktu_kirim;
+   $waktu_sekarang = date('Y-m-d H:i:s');
+
+   if($waktu_kirim > $waktu_sekarang){
+      $transaksi1['item_transaksi'] = $item_transaksi; 
+      $success = '1';
+      $message = $transaksi1;
+   }else{
+      $success = '0';
+      $message = 'Pesanan Dengan No Transaksi '.$no_transaksi.' Telah Expire';
+   }
+   
  }else{
-  $success = '0';
-  $message = "No Transaksi Tidak Ditemukan";
+   $success = '0';
+   $message = "No Transaksi ".$no_transaksi." Tidak Ditemukan";
 }
 
 return response()->json(['success' => $success, 'message' => $message],200);
