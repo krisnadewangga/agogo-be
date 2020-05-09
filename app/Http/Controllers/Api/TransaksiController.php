@@ -431,7 +431,7 @@ class TransaksiController extends Controller
 
         	if($transaksi->metode_pembayaran != "3"){
         		
-        		if( $transaksi->status >= '2' && $transaksi->status != '3' && $transaksi->status != '6'){
+        		if( $transaksi->status >= '2' && $transaksi->status != '3' && $transaksi->status != '6' && $transaksi->status != '4'){
         			$kurir = $transaksi->Pengiriman->Kurir;
         			$transaksi['pengiriman'] = $kurir;
         		}else{
@@ -441,11 +441,13 @@ class TransaksiController extends Controller
         	}else{
         		$transaksi->AmbilPesanan;	
         	}
+
         	if(isset($transaksi->AjukanBatalPesanan->id) && $transaksi->status == '3' ){
         		$transaksi['status_pembatalan'] = "1";
         	}else{
         		$transaksi['status_pembatalan'] = "0";
         	}
+
         	$transaksi->BatalPesanan;
         	
         	$success = 1;
