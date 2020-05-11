@@ -46,12 +46,26 @@ class NotifikasiController extends Controller
     {
        $waktu_sekarang = date('Y-m-d H:i:s');
 
-       $transaksi = Transaksi::whereNotIn('status',['5','3'])
-                              ->where('waktu_kirim','>',$waktu_sekarang)
-                              ->where([
-                                  ['jalur','=','1'],
-                                  ['jenis','=','1']
-                              ])->count();
+       // $transaksi = Transaksi::whereNotIn('status',['5','3'])
+       //                        ->where('waktu_kirim','>',$waktu_sekarang)
+       //                        ->where([
+       //                            ['jalur','=','1'],
+       //                            ['jenis','=','1']
+       //                        ])->count();
+
+       $transaksi = Transaksi::where(function($q) use ($waktu_sekarang){
+                                      return $q->whereNotIn('status',['5','3'])
+                                                ->whereNotIn('metode_pembayaran',['1'])
+                                                ->where('waktu_kirim','>',$waktu_sekarang)
+                                                ->where('jenis','1')
+                                                ->where('jalur','1');
+                                    })
+                                    ->orWhere(function($a) {
+                                      return $a->whereNotIn('status',['5','3'])
+                                               ->where('metode_pembayaran','1')
+                                               ->where('jenis','1')
+                                               ->where('jalur','1');
+                                    })->count();
        return $transaksi;
     }
     

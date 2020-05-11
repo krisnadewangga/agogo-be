@@ -122,7 +122,7 @@
 
 								@if($transaksi->metode_pembayaran == '1')
 									@if( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '1') )
-										<label class="label label-danger">Pesanan Expired</label>
+										<label class="label label-danger">Lewat Batas Pengiriman</label>
 									@elseif( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '3') )
 										<label class="label label-danger">Pesanan Dibatalkan</label>
 									@elseif( ($waktu_skrang < $batas_ambe) && ($transaksi->status == '3') )
@@ -397,9 +397,9 @@
 									@elseif( ($waktu_skrang < $batas_ambe) && ($transaksi->status == '3') )
 										<label class="label label-danger">Pesanan Dibatalkan</label>
 									@else
-										@if($transaksi->status == '6')
+										@if($transaksi->status == '6' || $transaksi->status)
 											&nbsp <label class="label label-info">Menunggu Transfer</label> &nbsp; <label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim->format('d/m/Y h:i A') }} </label>
-										@else 
+										@else
 											&nbsp <label class="label label-success">Terbayar</label> &nbsp; <label class="label label-default">TGL BAYAR : {{ $transaksi->tgl_bayar->format('d/m/Y h:i A') }} </label>
 										@endif
 
