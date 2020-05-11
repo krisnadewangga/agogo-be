@@ -63,33 +63,37 @@
 				var jenis_transaksi = $("#jenis_transaksi").val();
 				var html = `<option value="0">Aktif</option>`;
 				if(jenis_transaksi == "0"){
+					// <option value="7">Pesanan Expired</option>
 					html += `<option value="6">Menunggu Transfer</option>
 							 <option value="8">Menunggu Pengambilan</option>
 							 <option value="1">Menunggu Pengiriman</option>
 							 <option value="2">Sementara Pengiriman</option>
 							 <option value="4">Pengajuan Pembatalan Pesanan</option>
-							 <option value="7">Pesanan Expired</option>
+							 
 							 <option value="5">Pesanan Diterima</option>
 							 <option value="3">Pesanan Yang Dibatalkan</option>`;
 				}else if(jenis_transaksi == "1"){
+					// <option value="7">Pesanan Expired</option>
 					html += `<option value="1">Menunggu Pengiriman</option>
 							 <option value="2">Sementara Pengiriman</option>
 							 <option value="4">Pengajuan Pembatalan Pesanan</option>
-							 <option value="7">Pesanan Expired</option>
+							 
 							 <option value="5">Pesanan Diterima</option>
 							 <option value="3">Pesanan Yang Dibatalkan</option>`;
 				}else if(jenis_transaksi == "2"){
+					// <option value="7">Pesanan Expired</option>
 					html += `<option value="6">Menunggu Transfer</option>
 							 <option value="1">Menunggu Pengiriman</option>
 							 <option value="2">Sementara Pengiriman</option>
 							 <option value="4">Pengajuan Pembatalan Pesanan</option>
-							 <option value="7">Pesanan Expired</option>
+							 
 							 <option value="5">Pesanan Diterima</option>
 							 <option value="3">Pesanan Yang Dibatalkan</option>`;
 				}else if(jenis_transaksi == "3"){
+					 // <option value="7">Pesanan Expired</option>
 					html += `<option value="1">Menunggu Pengambilan</option>
 							 <option value="4">Pengajuan Pembatalan Pesanan</option>
-							 <option value="7">Pesanan Expired</option>
+							
 							 <option value="5">Pesanan Diterima</option>
 							 <option value="3">Pesanan Yang Dibatalkan</option>`;
 				}
