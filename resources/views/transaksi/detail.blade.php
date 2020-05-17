@@ -33,7 +33,7 @@
 					<div class="row">
 						<div class="col-md-12">
 							<div  style="padding:10px;">
-								<h4 style="margin-top: 5px; margin-bottom: 5px;"><b>Daftar Pesanan</b></h4>
+								<h4 style="margin-top: 5px; margin-bottom: 5px;"><b>Daftar Item</b></h4>
 								<div>Daftar Item Belanja Yang Masuk Dalam Pesanan </div>
 							</div>
 						</div>
@@ -397,8 +397,10 @@
 									@elseif( ($waktu_skrang < $batas_ambe) && ($transaksi->status == '3') )
 										<label class="label label-danger">Pesanan Dibatalkan</label>
 									@else
-										@if($transaksi->status == '6' || $transaksi->status)
+										@if($transaksi->status == '6' )
 											&nbsp <label class="label label-info">Menunggu Transfer</label> &nbsp; <label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim->format('d/m/Y h:i A') }} </label>
+										@elseif($transaksi->status == '4')
+											&nbsp <label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim->format('d/m/Y h:i A') }} </label>
 										@else
 											&nbsp <label class="label label-success">Terbayar</label> &nbsp; <label class="label label-default">TGL BAYAR : {{ $transaksi->tgl_bayar->format('d/m/Y h:i A') }} </label>
 										@endif

@@ -29,8 +29,12 @@ class TopupSaldoController extends Controller
     public function ListTopupSaldo()
     {
         $menu_active = "transaksi|topup";
-        $list_topup = HistoriTopup::orderBy('created_at','desc')->get();
+        $list_topup = HistoriTopup::join('users as a','a.id','=','histori_topup.user_id')
+                                    ->join('detail_konsumen as b','a.id','=','b.user_id')
+                                    ->select('histori_topup.*','a.name','a.no_hp','b.alamat')
+                                    ->orderBy('created_at','desc')->get();
 
+      
         return view('topup_saldo.list',compact('menu_active','list_topup'));
     }
 

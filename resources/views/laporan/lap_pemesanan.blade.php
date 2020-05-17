@@ -51,7 +51,7 @@
 	        	<div style="margin-top: 5px;">
 	        		<button class="btn btn-primary">Cari</button>
         			<a href="{{ route('lap_pemesanan') }}"><label class="btn btn-warning" >Reset</label></a>
-        			<a href="javascript:export_pdf()"><label class="btn btn-success" >Export</label></a>
+        			<a href="javascript:export_pdf()"><label class="btn btn-success" >Export PDF</label></a>
 	        	</div>
         	</form>
         </div>
@@ -71,6 +71,7 @@
 							<th class="nowrap">Tanggal Selesai</th>
 							<th class="nowrap">Jam Selesai</th>
 							<th class="nowrap">Status Order</th>
+							<th class="nowrap">Metode Pembayaran</th>
 							<th class="nowrap">Pencatat</th>
 							<th class="nowrap">Total Harga</th>
 							<th class="nowrap">DP</th>
@@ -83,19 +84,44 @@
 						@forelse($result['data'] as $key)
 							<tr>
 								<td align="center">{{ $no++ }}</td>
-								<td class="nowrap">{{ $key->no_transaksi }}</td>
+								<td class="nowrap">{{$key->no_transaksi}}</td>
 								<td class="nowrap">{{ $key->nama }}</td>
-								<td class="nowrap">{{ $key->tgl_pesan->format('d/m/Y') }}</td>
-								<td class="nowrap">{{ $key->tgl_selesai->format('d/m/Y') }}</td>
-								<td class="nowrap">{{ $key->waktu_selesai }}</td>
+								<td class="nowrap">{{ $key->tgl_pesan }}</td>
+								<td class="nowrap">{{ $key->tgl_selesai}}</td>
+								<td class="nowrap">{{ $key->jam}}</td>
 								<td class="nowrap">
-									@if($key->status == "1")
-										Belum Diambil
+									
+									@if($key->status == "5")
+										@if($key->metode_pembayaran == "1" || $key->metode_pembayaran == "2")
+											Sudah Diterima
+										@else
+											Sudah Diambil
+										@endif
 									@else
-
+									    @if($key->metode_pembayaran == "1" || $key->metode_pembayaran == "2")
+											Belum Diterima
+										@else
+											Belum Diambil
+										@endif
+									@endif
+									
+								</td>
+								<td class="nowrap">
+									@if($key->jenis == "2")
+										Pemesanan
+									@else
+										@if($key->metode_pembayaran == "1")
+											TopUp
+										@elseif($key->metode_pembayaran == "2")
+											Bank Transfer
+										@else
+											Bayar Ditoko
+										@endif
 									@endif
 								</td>
-								<td class="nowrap">{{ $key->pencatat }}</td>
+								<td class="nowrap">
+									{{ $key->pencatat }}
+								</td>
 								<td class="nowrap">Rp. {{ number_format($key->total,'0','','.') }}</td>
 								<td class="nowrap">Rp. {{ number_format($key->uang_muka,'0','','.') }}</td>
 								<td class="nowrap">Rp. {{ number_format($key->sisa_bayar,'0','','.') }}</td>
@@ -108,7 +134,7 @@
 					</tbody>
 					<tfoot>
 						 <tr>
-                            <th colspan="7" style="text-align:right"></th>                
+                            <th colspan="8" style="text-align:right"></th>                
                             <th class="nowrap" style="text-align:right">Grand Total :</th>
                             <th class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->grand_total_th }} </th>
                             <th class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->grand_total_dp }} </th>
@@ -116,14 +142,14 @@
 
                         </tr>
                         <tr>
-                                <th colspan="7" style="text-align:right"></th>
+                                <th colspan="8" style="text-align:right"></th>
                                 <th  class="nowrap" style="text-align:right">Pembatalan Transaksi : </th>
                                 <th  class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->pembatalan_transaksi_th }}</th>
                                 <th  class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->pembatalan_transaksi_dp }}</th>
                                 <th class="nowrap" style="text-align:right"></th>
                             </tr>
                             <tr>
-                                    <th colspan="7" style="text-align:right"></th>
+                                    <th colspan="8" style="text-align:right"></th>
                                     <th class="nowrap" style="text-align:right">Total Transaksi : </th>
                                     <th class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->total_transaksi_th }}</th>
                                     <th class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->total_transaksi_dp }}</th>

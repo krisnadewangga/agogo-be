@@ -1,3 +1,4 @@
+
 <?php
 
 
@@ -80,8 +81,16 @@ Route::post('/cari_laporan_kas','LaporanController@CariLaporanKas')->name('cari_
 Route::get('/lap_pergerakan_stock','LaporanController@LapPergerakanStock')->name('lap_pergerakan_stock');
 Route::post('/cari_laporan_pergerakan_stock','LaporanController@CariPergerakanStock')->name('cari_laporan_pergerakan_stock');
 
+Route::get('/lap_penjualan_per_item','LaporanController@LaporanPenjualanPerItem')->name('lap_penjualan_per_item');
+Route::post('/cari_laporan_penjualan_per_item','LaporanController@CariPenjualanPerItem')->name('cari_laporan_penjualan_per_item');
+Route::get('/lap_pendapatan_harian','LaporanController@LaporanPendapatanHarian')->name('lap_pendapatan_harian');
+Route::post('/cari_pendapatan_harian','LaporanController@CariPendapatanHarian')->name('cari_pendapatan_harian');
+
 Route::get('/export_penjualan','LaporanController@ExportPenjualan')->name('export_penjualan'); 
 Route::get('/export_pendapatan','LaporanController@ExportPendapatan')->name('export_pendapatan');
+Route::get('/export_penjualan_per_item','LaporanController@ExportPenjualanPerItem')->name('export_penjualan_per_item');
+Route::get('/export_pendapatan_harian','LaporanController@ExportPendapatanHarian')->name('export_pendapatan_harian');
+
 Route::get('/export_kas','LaporanController@ExportKas')->name('export_kas');
 Route::get('/export_pergerakan_stock','LaporanController@ExportProduksi')->name('export_pergerakan_stock');
 Route::get('/export_pemesanan','LaporanController@ExportPemesanan')->name('export_pemesanan');

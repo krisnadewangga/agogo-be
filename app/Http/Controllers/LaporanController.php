@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use App\Transaksi;
 use App\User;
 use App\Item;
@@ -13,6 +14,7 @@ use App\Produksi;
 use Carbon\Carbon;
 use PDF;
 use Auth;
+use DB;
 
 class LaporanController extends Controller
 {
@@ -65,6 +67,8 @@ class LaporanController extends Controller
     	
         return view("laporan.lap_pendapatan",compact('transaksi','total_pendapatan','menu_active','kop','input','total_bersih_item','total_pengiriman'));
     }
+
+
 
     public function DetailTransaksi($id)
     {
@@ -240,148 +244,169 @@ class LaporanController extends Controller
 
     public function Member()
     {
-        $user = User::where('level_id','6')
-                     ->selectRaw("users.*, 
-                                 (SELECT count(transaksi.id) from transaksi where transaksi.user_id=users.id and transaksi.status != '3') as total_belanja,
-                                 (SELECT count(transaksi.id) from transaksi where transaksi.user_id=users.id and transaksi.status = '3') as batal_belanja
-                               ")
-                     ->where('email_verified_at','!=','')
-                     ->whereIn('id',function($q){
-                        $q->from('detail_konsumen')
-                          ->select('user_id')
-                          ->where('status_member','1');
+        if(Gate::allows('manage-konsu')){
+          $user = User::where('level_id','6')
+                       ->selectRaw("users.*, 
+                                   (SELECT count(transaksi.id) from transaksi where transaksi.user_id=users.id and transaksi.status != '3') as total_belanja,
+                                   (SELECT count(transaksi.id) from transaksi where transaksi.user_id=users.id and transaksi.status = '3') as batal_belanja
+                                 ")
+                       ->where('email_verified_at','!=','')
+                       ->whereIn('id',function($q){
+                          $q->from('detail_konsumen')
+                            ->select('user_id')
+                            ->where('status_member','1');
 
-                        return $q;
-                     })
-                     ->orderBy('users.id','DESC')
-                     ->get();
+                          return $q;
+                       })
+                       ->orderBy('users.id','DESC')
+                       ->get();
 
-        $total_user = $user->count();
-        $total_user_diblokir =  User::where([ 
-                                                ['email_verified_at','!=',''],
-                                                ['status_aktif','=','0']
-                                            ])
-                                      ->whereIn('id',function($q){
-                                          $q->from('detail_konsumen')
-                                            ->select('user_id')
-                                            ->where('status_member','1');
+          $total_user = $user->count();
+          $total_user_diblokir =  User::where([ 
+                                                  ['email_verified_at','!=',''],
+                                                  ['status_aktif','=','0']
+                                              ])
+                                        ->whereIn('id',function($q){
+                                            $q->from('detail_konsumen')
+                                              ->select('user_id')
+                                              ->where('status_member','1');
 
-                                          return $q;
-                                       })->count();
-        $total_user_aktif =  User::where([ 
-                                                ['email_verified_at','!=',''],
-                                                ['status_aktif','=','1']
-                                            ])
-                                      ->whereIn('id',function($q){
-                                          $q->from('detail_konsumen')
-                                            ->select('user_id')
-                                            ->where('status_member','1');
+                                            return $q;
+                                         })->count();
+          $total_user_aktif =  User::where([ 
+                                                  ['email_verified_at','!=',''],
+                                                  ['status_aktif','=','1']
+                                              ])
+                                        ->whereIn('id',function($q){
+                                            $q->from('detail_konsumen')
+                                              ->select('user_id')
+                                              ->where('status_member','1');
 
-                                          return $q;
-                                       })->count();
-      
-        $menu_active = "user|member|0";
-        return view("user.member",compact('menu_active','user', 'total_user','total_user_diblokir','total_user_aktif'));
+                                            return $q;
+                                         })->count();
+        
+          $menu_active = "user|member|0";
+          return view("user.member",compact('menu_active','user', 'total_user','total_user_diblokir','total_user_aktif'));          
+        }else{
+          abort('404','Halaman Tidak Ditemukan');
+        }
+
     }
 
     public function NotMember()
     {
-        $user = User::where('level_id','6')
-                     ->selectRaw("users.*, 
-                                 (SELECT count(transaksi.id) from transaksi where transaksi.user_id=users.id and transaksi.status != '3') as total_belanja,
-                                 (SELECT count(transaksi.id) from transaksi where transaksi.user_id=users.id and transaksi.status = '3') as batal_belanja
-                               ")
-                     ->where('email_verified_at','!=','')
-                     ->whereIn('id',function($q){
-                        $q->from('detail_konsumen')
-                          ->select('user_id')
-                          ->where('status_member','0');
+        if(Gate::allows('manage-konsu')){
+          $user = User::where('level_id','6')
+                       ->selectRaw("users.*, 
+                                   (SELECT count(transaksi.id) from transaksi where transaksi.user_id=users.id and transaksi.status != '3') as total_belanja,
+                                   (SELECT count(transaksi.id) from transaksi where transaksi.user_id=users.id and transaksi.status = '3') as batal_belanja
+                                 ")
+                       ->where('email_verified_at','!=','')
+                       ->whereIn('id',function($q){
+                          $q->from('detail_konsumen')
+                            ->select('user_id')
+                            ->where('status_member','0');
 
-                        return $q;
-                     })
-                     ->orderBy('users.id','DESC')
-                     ->get();
+                          return $q;
+                       })
+                       ->orderBy('users.id','DESC')
+                       ->get();
 
-        $total_user = $user->count();
-        $total_user_diblokir =  User::where([ 
-                                                ['email_verified_at','!=',''],
-                                                ['status_aktif','=','0']
-                                            ])
-                                      ->whereIn('id',function($q){
-                                          $q->from('detail_konsumen')
-                                            ->select('user_id')
-                                            ->where('status_member','0');
+          $total_user = $user->count();
+          $total_user_diblokir =  User::where([ 
+                                                  ['email_verified_at','!=',''],
+                                                  ['status_aktif','=','0']
+                                              ])
+                                        ->whereIn('id',function($q){
+                                            $q->from('detail_konsumen')
+                                              ->select('user_id')
+                                              ->where('status_member','0');
 
-                                          return $q;
-                                       })->count();
+                                            return $q;
+                                         })->count();
 
-        $total_user_aktif =  User::where([ 
-                                                ['email_verified_at','!=',''],
-                                                ['status_aktif','=','1']
-                                            ])
-                                      ->whereIn('id',function($q){
-                                          $q->from('detail_konsumen')
-                                            ->select('user_id')
-                                            ->where('status_member','0');
+          $total_user_aktif =  User::where([ 
+                                                  ['email_verified_at','!=',''],
+                                                  ['status_aktif','=','1']
+                                              ])
+                                        ->whereIn('id',function($q){
+                                            $q->from('detail_konsumen')
+                                              ->select('user_id')
+                                              ->where('status_member','0');
 
-                                          return $q;
-                                       })->count();
-      
-        $menu_active = "user|not_member|0";
-        return view("user.not_member",compact('menu_active','user', 'total_user','total_user_diblokir','total_user_aktif'));
+                                            return $q;
+                                         })->count();
+        
+          $menu_active = "user|not_member|0";
+          return view("user.not_member",compact('menu_active','user', 'total_user','total_user_diblokir','total_user_aktif'));
+        }else{
+          abort('404','Halaman Tidak Ditemukan');
+        }
     }
 
     public function DetailUser(Request $request)
     {
-        $req = $request->all();
+        if(Gate::allows('manage-konsu')){
+          $req = $request->all();
 
-        $user = User::findOrFail($req['id']);
-        $transaksi = $user->Transaksi()->orderBy('id','DESC')->get();
-        
-        if($user->status_aktif=='0'){
-           $logBan = $user->LogBan()->where('status_ban','0')->orderBy('id','DESC')->first();
+          $user = User::findOrFail($req['id']);
+          $transaksi = $user->Transaksi()->orderBy('id','DESC')->get();
+          
+          if($user->status_aktif=='0'){
+             $logBan = $user->LogBan()->where('status_ban','0')->orderBy('id','DESC')->first();
+          }else{
+              $logBan = "";
+          }
+          
+          if($req['status_member'] == "1"){
+            $ma = "member"; 
+          }else{
+            $ma = "not_member";
+          }
+
+          $menu_active = "user|$ma|0";
+      	  return view("laporan.detail_user",compact('user','menu_active','transaksi','logBan'));
         }else{
-            $logBan = "";
+          abort('404','Halaman Tidak Ditemukan');
         }
-        
-        if($req['status_member'] == "1"){
-          $ma = "member"; 
+      }
+
+      public function BlokirUser($id){
+         if(Gate::allows('manage-konsu')){
+          $user = User::findOrFail($id);
+          $input_by = Auth::user()->name;
+
+          if($user->status_aktif == "1"){
+              $new_status = "0";  
+              $msg = "Blokir";
+          }else if($user->status_aktif == "0"){
+              $new_status = "1";
+              $msg = "Buka Blokir";
+          }
+          $user->update(['status_aktif' => $new_status]);
+          $user->LogBan()->create(['status_ban' => $new_status,'input_by' => $input_by ]);
+
+          return redirect()->back()->with("success","Berhasil $msg User");
         }else{
-          $ma = "not_member";
+          abort('404','Halaman Tidak Ditemukan');
         }
-
-        $menu_active = "user|$ma|0";
-    	  return view("laporan.detail_user",compact('user','menu_active','transaksi','logBan'));
-    }
-
-    public function BlokirUser($id){
-        $user = User::findOrFail($id);
-        $input_by = Auth::user()->name;
-
-        if($user->status_aktif == "1"){
-            $new_status = "0";  
-            $msg = "Blokir";
-        }else if($user->status_aktif == "0"){
-            $new_status = "1";
-            $msg = "Buka Blokir";
-        }
-        $user->update(['status_aktif' => $new_status]);
-        $user->LogBan()->create(['status_ban' => $new_status,'input_by' => $input_by ]);
-
-        return redirect()->back()->with("success","Berhasil $msg User");
 
     }
 
     public function HapusUser($id,$stat = '1')
     {
-       $find = User::findOrFail($id);
-       $find->delete();
-       if($stat== "1"){
-         $hapus = "Konsumen (Member)";
-       }else{
-         $hapus = "Konsumen (Not Member)";
-       }
-       return redirect()->back()->with('success','Berhasil Hapus '.$hapus);
+       if(Gate::allows('manage-konsu')){
+         $find = User::findOrFail($id);
+         $find->delete();
+         if($stat== "1"){
+           $hapus = "Konsumen (Member)";
+         }else{
+           $hapus = "Konsumen (Not Member)";
+         }
+         return redirect()->back()->with('success','Berhasil Hapus '.$hapus);
+        }else{
+          abort('404','Halaman Tidak Ditemukan');
+        }
     }
     //END User
 
@@ -835,7 +860,8 @@ class LaporanController extends Controller
       $dates = [ Carbon::now()->format('Y-m-d'), Carbon::now()->format('Y-m-d')];
 
       $result = $this->SetDataPemesanan($dates);
-     
+       // return $result;
+
       $input = ['mulai_tanggal' => Carbon::now()->format('d/m/Y'), 'sampai_tanggal' => Carbon::now()->format('d/m/Y') ];
       $menu_active = "laporan|pemesanan|0";
 
@@ -859,6 +885,8 @@ class LaporanController extends Controller
        
        $dates = [$mt, $st];
        $result = $this->SetDataPemesanan($dates);
+
+
        
        $input = ['mulai_tanggal' => $req['mulai_tanggal'], 'sampai_tanggal' => $req['sampai_tanggal'] ];
        $menu_active = "laporan|pemesanan|0";
@@ -870,8 +898,6 @@ class LaporanController extends Controller
     {
        $req = $request->all();
         
-       
-       
        $dates = [$req['mulai_tanggal'], $req['sampai_tanggal']];
        $data = $this->SetDataPemesanan($dates);
 
@@ -893,28 +919,106 @@ class LaporanController extends Controller
     {
 
       if($dates[0] == $dates[1]){
-            $select = Preorders::join('transaksi as a','a.id','=','preorders.transaksi_id')
-                        ->join('users as b','b.id','=','a.user_id')
-                        ->select('preorders.*','a.status','b.name as pencatat','a.no_transaksi')
-                        ->whereDate('tgl_pesan',$dates[0])
-                        ;
+          $select = Transaksi::leftJoin('preorders as a', 'transaksi.id','=','a.transaksi_id')
+                          ->select('transaksi.*')
+                          
+                          ->where(function($q) use($dates){
+                            return $q->where('transaksi.jenis','2')
+                                     ->whereIn('transaksi.status',['1','5'])
+                                     ->where('for_ps','1')
+                                     ->whereDate('transaksi.created_at',$dates[0]);
+                          })
+                          ->orWhere(function($b) use($dates){
+                            return $b->where('transaksi.jenis','1')
+                                     ->whereIn('transaksi.metode_pembayaran',['1','2'])
+                                     ->whereIn('transaksi.status',['1','2','5'])
+                                     ->where('for_ps','1')
+                                     ->whereDate('transaksi.created_at',$dates[0]);
+                          })
+                          ->orWhere(function($c) use($dates){
+                            return $c->where('transaksi.jenis','1')
+                                     ->where('transaksi.metode_pembayaran','3')
+                                     ->whereIn('transaksi.status',['1','5'])
+                                     ->where('for_ps','1')
+                                     ->whereDate('transaksi.created_at',$dates[0]);
+                          });
+                          
                  
       }else{
-         $select = Preorders::join('transaksi as a','a.id','=','preorders.transaksi_id')
-                        ->join('users as b','b.id','=','a.user_id')
-                        ->select('preorders.*','a.status','b.name as pencatat','a.no_transaksi')
-                        ->whereBetween('tgl_selesai',$dates);
-                        ;
-        
+          $select = Transaksi::leftJoin('preorders as a', 'transaksi.id','=','a.transaksi_id')
+                          ->select('transaksi.*')
+                          ->where(function($q) use($dates){
+                            return $q->where('transaksi.jenis','2')
+                                     ->whereIn('transaksi.status',['1','5'])
+                                     ->where('for_ps','1')
+                                     ->whereBetween('transaksi.created_at',$dates);
+                          })
+                          ->orWhere(function($b) use($dates){
+                            return $b->where('transaksi.jenis','1')
+                                     ->whereIn('transaksi.metode_pembayaran',['1','2'])
+                                     ->whereIn('transaksi.status',['1','2','5'])
+                                     ->where('for_ps','1')
+                                     ->whereBetween('transaksi.created_at',$dates);
+                          })
+                          ->orWhere(function($c) use($dates){
+                            return $c->where('transaksi.jenis','1')
+                                     ->where('transaksi.metode_pembayaran','3')
+                                     ->whereIn('transaksi.status',['1','5'])
+                                     ->where('for_ps','1')
+                                     ->whereBetween('transaksi.created_at',$dates);
+                          });
+                          
       }
-    
-      $data = $select->where('status','1')->get();
-      $data_cancel = $select->where('status','3')->get();
 
+      $data = $select->get();
+      
+
+      $data->map(function($data){
+        if($data->jenis == "2"){
+          $data['nama'] = $data->Preorder->nama;
+          $data['tgl_pesan'] = $data->created_at->format('d/m/Y');
+          $data['tgl_selesai'] = $data->Preorder->tgl_selesai->format('d/m/Y');
+          $data['jam'] = $data->Preorder->waktu_selesai;
+          $data['total'] = $data->Preorder->total;
+          $data['uang_muka'] = $data->Preorder->uang_muka;
+          $data['sisa_bayar'] = $data->Preorder->sisa_bayar;
+          $data['pencatat'] = $data->User->name;
+        }else{
+          $data['nama'] = $data->User->name;
+          if($data->status == '5'){
+            $data['tgl_selesai'] = $data->updated_at->format('d/m/Y');
+            $data['jam'] = $data->updated_at->format('H:i');
+          }else{
+            $data['tgl_selesai'] = '';
+            $data['jam'] = '';
+          }
+
+          $data['total'] = $data->total_bayar;
+          $data['uang_muka'] = 0;
+          $data['sisa_bayar'] = 0;
+          $data['pencatat'] = '';
+          $data['tgl_pesan'] = $data->created_at->format('d/m/Y');
+        }
+      });
+
+      
       $grand_total_th = number_format($data->sum('total'),'0','','.');
       $grand_total_dp = number_format($data->sum('uang_muka'),'0','','.');
       $grand_total_sisa = number_format($data->sum('sisa_bayar'),'0','','.');
 
+      $data_cancel = Transaksi::where('status','3')->get();
+      $data_cancel->map(function($data_cancel){
+        if($data_cancel->jenis == "2"){
+          $data_cancel['total'] = $data_cancel->Preorder->total;
+          $data_cancel['uang_muka'] = $data_cancel->Preorder->uang_muka;
+          $data_cancel['sisa_bayar'] = $data_cancel->Preorder->sisa_bayar;
+        }else{
+          $data_cancel['total'] = $data_cancel->total_bayar;
+          $data_cancel['uang_muka'] = 0;
+          $data_cancel['sisa_bayar'] = 0;
+        }
+      });
+      
       $pembatalan_transaksi_th = number_format($data_cancel->sum('total'),'0','','.');
       $pembatalan_transaksi_dp = number_format($data_cancel->sum('uang_muka'),'0','','.');
 
@@ -1052,5 +1156,157 @@ class LaporanController extends Controller
                                   })->get();
 
         return $data;
-    }    
+    } 
+
+    //penjualan per item
+    public function LaporanPenjualanPerItem()
+    {
+      $dates = [Carbon::now()->format('Y-m-d')];
+      $data = $this->SetDataPenjualanPerItem($dates);
+
+      $input = ['tanggal' => Carbon::now()->format('d/m/Y') ];
+      $menu_active = "laporan|penjualan_item|0";
+
+      return view('laporan.lap_penjualan_item',compact('menu_active','input','data'));    
+    } 
+
+    public function CariPenjualanPerItem(Request $request)
+    {
+      
+      $req = $request->all();
+      $validator = \Validator::make($req,['tanggal' => 'required|date_format:d/m/Y']);
+      if($validator->fails()){
+       return redirect()->back()->withErrors($validator)->with('gagal','simpan')->withInput();
+      }
+
+      $explode = explode('/',$req['tanggal']);
+      $dates = [$explode[2]."-".$explode[1]."-".$explode[0]];
+      $data = $this->SetDataPenjualanPerItem($dates);
+
+      $input = ['tanggal' => $req['tanggal']];
+      $menu_active = "laporan|penjualan_item|0";
+      return view('laporan.lap_penjualan_item',compact('menu_active','input','data')); 
+    }
+
+    public function SetDataPenjualanPerItem($dates)
+    {
+      $transaksi = ItemTransaksi::selectRaw("item_transaksi.item_id,
+                                            (SELECT nama_item FROM item where id = item_transaksi.item_id ) as nama_item,
+                                            (SELECT code FROM item where id = item_transaksi.item_id ) as kode_menu,
+                                            sum(jumlah) as qty,
+                                            sum(total) as total ")
+                                  ->whereIn('transaksi_id',function($q) use ($dates){
+                                    return $q->from('transaksi')
+                                              ->select('id')
+                                              ->where('status','5')
+                                              ->whereDate('updated_at',$dates[0]);
+                                  })->groupBy('item_transaksi.item_id')->get();
+      $transaksi->map(function($transaksi){
+        $transaksi['tampil_total'] = number_format($transaksi->total,'0','','.');
+      });
+      
+      $grandTotal = number_format($transaksi->sum('total'),'0','','.');
+
+      $array = ['data' => $transaksi, 'grandTotal' => $grandTotal];
+      return $array;
+    } 
+
+    public function ExportPenjualanPerItem(Request $request)
+    {
+      $req = $request->all();
+      $dates = [$req['tanggal']];
+      $data = $this->SetDataPenjualanPerItem($dates);
+      
+      $explode = explode("-", $request->tanggal);
+      $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
+
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.penjualan_per_item', compact('data', 'start_tanggal'));
+      return $pdf->stream('laporan-penjualan-per-item'.$start_tanggal.'.pdf');
+      // return "Oke";
+    } 
+
+    public function LaporanPendapatanHarian()
+    {
+      $dates = [Carbon::now()->startOfMonth()->format('Y-m-d'), Carbon::now()->endOfMonth()->format('Y-m-d')];
+      $data = $this->SetDataPendapatanHarian($dates);
+     
+      $input = ['mt' => Carbon::now()->startOfMonth()->format('d/m/Y') , 'st' => Carbon::now()->endOfMonth()->format('d/m/Y')];
+      $menu_active = "laporan|pendapatan_harian|0";
+
+      return view('laporan.lap_pendapatan_harian',compact('menu_active','input','data'));   
+    }
+
+    public function CariPendapatanHarian(Request $request)
+    {
+      $req = $request->all();
+      if(empty($req['mt'])){
+        $mt = Carbon::now()->startOfMonth()->format('Y-m-d');
+      }else{
+        $explode = explode('/', $req['mt']);
+        $mt = $explode[2].'-'.$explode[1].'-'.$explode[0];
+      }
+
+      if(empty($req['st'])){
+        $st =  Carbon::now()->endOfMonth()->format('Y-m-d');
+      }else{
+        $explode1 = explode('/', $req['st']);
+        $st = $explode1[2].'-'.$explode1[1].'-'.$explode1[0];
+      }
+
+      $dates = [$mt." 00:00:00", $st." 23:59:00"];
+      $data = $this->SetDataPendapatanHarian($dates);
+
+      $input = ['mt' => Carbon::parse($mt)->format('d/m/Y') , 'st' => Carbon::parse($st)->format('d/m/Y')];
+      $menu_active = "laporan|pendapatan_harian|0";
+
+      return view('laporan.lap_pendapatan_harian',compact('menu_active','input','data'));  
+    }
+
+    public function SetDataPendapatanHarian($dates)
+    {
+
+      $transaksi = Kas::selectRaw("date(updated_at) as tgl, sum(transaksi) as total_transaksi, sum(diskon) as total_diskon, 
+                                   (sum(transaksi) + sum(diskon) ) as transaksi ")
+                        ->whereBetween('updated_at',$dates)          
+                        ->groupBy(DB::raw('date(updated_at)'))
+                        ->get();
+
+
+      $grandTotalTransaksi = $transaksi->sum('transaksi');
+      $grandTotaldiskon = $transaksi->sum('total_diskon');
+      $grandTotal = $transaksi->sum('total_transaksi');
+
+      $data = ['data' => $transaksi, 
+               'grandTotalTransaksi' => number_format($grandTotalTransaksi),
+               'grandTotalDiskon' =>  number_format($grandTotaldiskon),
+               'grandTotal' => number_format($grandTotal) ];
+      return $data;
+    }
+
+    public function ExportPendapatanHarian(Request $request)
+    {
+      $req = $request->all();
+      if(empty($req['mt'])){
+        $mt = Carbon::now()->startOfMonth()->format('Y-m-d');
+      }else{
+        $explode = explode('/', $req['mt']);
+        $mt = $explode[2].'-'.$explode[1].'-'.$explode[0];
+      }
+
+      if(empty($req['st'])){
+        $st =  Carbon::now()->endOfMonth()->format('Y-m-d');
+      }else{
+        $explode1 = explode('/', $req['st']);
+        $st = $explode1[2].'-'.$explode1[1].'-'.$explode1[0];
+      }
+
+      $dates = [$mt." 00:00:00", $st." 23:59:00"];
+      $data = $this->SetDataPendapatanHarian($dates);
+
+      $start_tanggal = Carbon::parse($mt)->format('d/m/Y')." - ".Carbon::parse($st)->format('d/m/Y');
+      
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.pendapatan_harian', compact('data', 'start_tanggal'));
+      return $pdf->stream('laporan-pendapatan-harian-'.$start_tanggal.'.pdf');
+
+    }
 }

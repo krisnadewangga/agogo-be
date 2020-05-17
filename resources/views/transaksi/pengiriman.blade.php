@@ -20,7 +20,7 @@
 						<th>Waktu Kirim</th>
 						<th>No Transaksi</th>
 						<th>Pemesan</th>
-						<th ><center>Jumlah Pesanan</center></th>
+						<th ><center>Jumlah Item</center></th>
 						<th ><center>Kurir</center></th>
 						<th ><center>Jenis Transaksi</center></th>
 						<th style="width: 50px; text-align: center;">Aksi</th>
@@ -33,7 +33,7 @@
 								<td>{{ $key->created_at->format('d M Y H:i A') }}</td>
 								<td>{{ $key->Transaksi->no_transaksi }}</td>
 								<td>{{ $key->Transaksi->User->name }}</td>
-								<td align="center">{{ $key->Transaksi->ItemTransaksi()->count() }} Pesanan</td>
+								<td align="center">{{ $key->Transaksi->ItemTransaksi()->count() }} Item</td>
 								<td align="center">{{ $key->Kurir->nama}}</td>
 								<td align="center">
 									@if($key->Transaksi->metode_pembayaran == 1)

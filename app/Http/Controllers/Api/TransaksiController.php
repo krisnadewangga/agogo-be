@@ -153,7 +153,7 @@ class TransaksiController extends Controller
 				}else if($req['metode_pembayaran'] == "2"){
 					if($countItemError == 0){
 						$waktu_skrang = Carbon::now();
-						$batas_bayar = $waktu_skrang->addHours(2);
+						$batas_bayar = $waktu_skrang->addHours(6);
 						$req_transaksi['waktu_kirim'] = $batas_bayar;
 
 						// return $req_transaksi;	
@@ -319,7 +319,7 @@ class TransaksiController extends Controller
 				// }
 				
 		    	if($success == "1"){
-	            	$admin = User::where('level_id','2')->get();
+	            	$admin = User::whereIn('level_id',['2','7'])->where('status_aktif','1')->get();
 		        	foreach($admin as $key){
 		        		SendNotif::SendNotifPus($sel_user->id,$sel_user->name,$key->id,$ins_transaksi->id,$sel_user->name.' Baru Saja Melakukan Transaksi','1');
 		        	}
@@ -367,6 +367,7 @@ class TransaksiController extends Controller
         	 
         	 $list_transaksi = Transaksi::where('user_id','=',$req['user_id'])
         	 							  ->selectRaw("id,user_id,no_transaksi,banyak_item,total_bayar,metode_pembayaran,status,created_at,updated_at")
+        	 							  ->where('status','!=','3')
         	  							  ->orderBy('transaksi.id','DESC')
 										  ->limit($dataPerpage)
 										  ->offset($offset)->get();
@@ -543,7 +544,7 @@ class TransaksiController extends Controller
 
 	        	// ($pengirim_id,$pengirim_nama,$penerima_id,$judul_id,$judul,$jenis_notif)
 
-	        	$admin = User::where('level_id','2')->get();
+	        	$admin = User::whereIn('level_id',['2','7'])->where('status_aktif','1')->get();
 	        	
 	        	foreach($admin as $key){
 	        		SendNotif::SendNotifPus($find->user_id,$req['nama_user'],$key->id,$req['transaksi_id'],$req['nama_user'].' Mengajukan Untuk Pembatalan Pesanan','7');

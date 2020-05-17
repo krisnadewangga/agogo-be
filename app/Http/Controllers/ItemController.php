@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use App\Helpers\KompresFoto;
 use App\Item;
 use App\GambarItem;
@@ -15,6 +16,10 @@ class ItemController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware(function($request,$next){
+            if(Gate::allows('manage_items')) return $next($request);
+            abort(404,'Halaman Tidak Ditemukan');
+        });
     }
     /**
      * Display a listing of the resource.

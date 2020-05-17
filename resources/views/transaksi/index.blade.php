@@ -123,7 +123,7 @@
 											<td>`+value.waktu_tampil+`</td>
 											<td>`+value.no_transaksi+`</td>
 											<td>`+value.nama+`</td>
-											<td>`+value.jum_pesanan+` Pesanan</td>
+											<td>`+value.jum_pesanan+` Item</td>
 											<td>Rp. `+value.total_bayar+`</td>
 											<td align='center'>`+value.tampil_jt+`</td>
 											<td align='center'>`+value.tampil_status+`</td>
@@ -144,7 +144,7 @@
 										<th>Waktu </th>
 										<th>No Transaksi</th>
 										<th>Pemesan</th>
-										<th ><center>Jumlah Pesanan</center></th>
+										<th ><center>Jumlah Item</center></th>
 										<th ><center>Total Bayar</center></th>
 										<th ><center>Jenis Transaksi</center></th>
 										<th ><center>Status</center></th>
