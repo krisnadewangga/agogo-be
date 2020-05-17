@@ -101,7 +101,8 @@ $req_transaksi = ['user_id' => $req[0]['user_id'],
 'kasir_id' => $req[0]['user_id'],
 'metode_pembayaran' => '3',
 'tgl_bayar' => date("Y-m-d H:i:s"),
-'waktu_kirim' => date("Y-m-d H:i:s")
+'waktu_kirim' => date("Y-m-d H:i:s"),
+'for_ps' => '0'
 ];
 
 if(!empty( $request[0]['id']) ){ 
@@ -113,14 +114,15 @@ $insItem = [];
 foreach ($req as $key) {
   $array = [];
           // $array['transaksi_id'] =  $insertTransaksi->id;
+  $findItem = Item::findOrFail($key['product_id']);
   $array['item_id'] = $key['product_id'];
   $array['jumlah'] = $key['qty'];
-  $array['harga'] = $key['price'];
+  $array['harga'] = $findItem['harga'];
   $array['margin'] = 0;
-  $array['total'] = $key['qty'] * $key['price'];
+  $array['total'] = $key['qty'] * $findItem['harga'];
 
   $insItem[] = $array;
-
+  
 
 
   $getCount = Item::where(['id' => $key['product_id']])->get();

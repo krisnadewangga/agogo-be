@@ -4,22 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>LAPORAN PEMESANAN</title>
+    <title>LAPORAN PENDAPATAN HARIAN</title>
     <style>
         body{
             padding: 0;
             margin: 0;
         }
-        .page{
-           
+     
+         .page{
+            font-size: 16px !important; 
             max-width: 80em;
             margin: 0 auto;
         }
-        table {
-            width: 100%;
+
+        table 
+        { 
+        table-layout:auto !important; 
+        width: 100% !important;
         }
-        table td {border-collapse: none; border:1px solid black; padding:5px; font-size: 16px;}
-        table th {border-collapse: none; border:1px solid black; padding: 10px; background: #ededed;  font-size: 19px;}
+
+
+        table th,
+        table td{
+            text-align: center;
+        }
+        table.layout{
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table.display{
+            margin: 1em 0;
+        }
+        table.display th,
+        table.display td{
+            border-bottom: 1px solid black;
+            padding: .2em 0,8em;
+        }
+
+        table.display th{ background: #fff; }
+        table.display td{ background: #fff; }
+
+        table.responsive-table{
+            box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
+        }
 
         .listcust {
             margin: 0;
@@ -46,89 +73,111 @@
     </style>
 </head>
 <body>
-        <div class="header">
-                <div style="width: 40%; display: inline-block;">
-                <img src="{{ asset('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>        
-                </div>
-                <div style="display: inline-block; text-align: right; width: 50%; ">
-                    <h3 style="">LAPORAN PEMESANAN</h3>
-                    <p >Tanggal : {{$start_tanggal}} - {{ $end_tanggal }}</p>
-                </div>            
-                <br>
+    <table border="0">
+        <tr>
+            <td>
+                 <img src="{{ asset('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>     
+            </td>
+            <td  style="width: 70%; text-align: right;">
+                <h4 style="">LAPORAN PEMESANAN</h4>
+                <p>Tanggal Transaksi : {{$start_tanggal}} - {{ $end_tanggal }}</p>
+            </td>
+        </tr>
+    </table>
+    <hr>
+
+    <div class="page" >
+        <table cellspacing="0" class="layout display responsive-table">
+            <thead>
+                <tr>
+                    <th style="width: 5px;"><ceter>No</ceter></th>
+                    <th ><center>Order</center></th>
+                    <th ><center>Tanggal</center></th>
+                    <th ><center>Tanggal Selesai</center></th>
+                    <th ><center>Jam</center></th>
+                    <th ><center>Status</center></th>
+                    <th ><center>Metode</center></th>
+                    <th ><center>Pencatat</center></th>
+                    <th ><center>Pelanggan</center></th>
+                    <th style="text-align: right;">Total Harga</th>
+                    <th style="text-align: right;">DP</th>
+                    <th style="text-align: right;">Sisa</th>
+                </tr>
+               
               
-        </div>
-          
-        <hr>
-
-    <div class="page">
-            <table cellspacing="0">
-                <thead>
+            </thead>
+            <tbody>
+                @php $no=1; @endphp
+                @foreach($data['data'] as $key)
                     <tr>
-                        <th style="width: 5px;">No</th>
-                        <th >Order</th>
-                        <th >Tanggal</th>
-                        <th >Tanggal Selesai</th>
-                        <th >Jam </th>
-                        <th >Status Order</th>
-                        <th >Pencatat</th>
-                        <th >Pelanggan</th>
-                        <th >Total Harga</th>
-                        <th >DP</th>
-                        <th >Sisa</th>
-                    </tr>
-                   
-                  
-                </thead>
-            	<tbody>
-                    @php $no=1; @endphp
-                    @foreach($data['data'] as $key)
-                        <tr>
-                            <td align="center">{{ $no++ }}</td>
-                             <td >{{ $key->no_transaksi }}</td>
-                           
-                            <td >{{ $key->tgl_pesan->format('d/m/Y') }}</td>
-                            <td >{{ $key->tgl_selesai->format('d/m/Y') }}</td>
-                            <td >{{ $key->waktu_selesai }}</td>
-                            <td >
-                                @if($key->status == "1")
-                                    Belum Diambil
+                        <td style="text-align:center;border-bottom:0px">{{ $no++ }}</td>
+                        <td style="text-align:center;border-bottom:0px" >{{ $key->no_transaksi }}</td>
+                        <td style="text-align:center;border-bottom:0px" >{{ $key->tgl_pesan }}</td>
+                        <td style="text-align:center;border-bottom:0px" >{{ $key->tgl_selesai}}</td>
+                        <td style="text-align:center;border-bottom:0px" >{{ $key->jam}}</td>
+                        <td style="text-align:center;border-bottom:0px" >
+                            @if($key->status == "5")
+                                @if($key->metode_pembayaran == "1" || $key->metode_pembayaran == "2")
+                                    Sudah Diterima
                                 @else
-
+                                    Sudah Diambil
                                 @endif
-                            </td>
-                            <td >{{ $key->pencatat }}</td>
-                             <td >{{ $key->nama }}</td>
-                            <td align="right">{{ number_format($key->total,'0','','.') }}</td>
-                            <td align="right">{{ number_format($key->uang_muka,'0','','.') }}</td>
-                            <td align="right">{{ number_format($key->sisa_bayar,'0','','.') }}</td>
-                        </tr>
-                    @endforeach
-            	</tbody>
-                <tfoot>
-                        <tr>
-                            <td colspan="7" style="text-align:right"></td>                
-                            <td  style="text-align:right">Grand Total :</td>
-                            <td  style="text-align:right" >{{ $data['tfoot']->grand_total_th }} </td>
-                            <td  style="text-align:right" >{{ $data['tfoot']->grand_total_dp }} </td>
-                            <td  style="text-align:right" >{{ $data['tfoot']->grand_total_sisa }} </td>
+                            @else
+                                @if($key->metode_pembayaran == "1" || $key->metode_pembayaran == "2")
+                                    Belum Diterima
+                                @else
+                                    Belum Diambil
+                                @endif
+                            @endif
+                        </td>
+                        <td style="text-align:center;border-bottom:0px" >
+                            @if($key->jenis == "2")
+                                Pemesanan
+                            @else
+                                @if($key->metode_pembayaran == "1")
+                                    TopUp
+                                @elseif($key->metode_pembayaran == "2")
+                                    Bank Transfer
+                                @else
+                                    Bayar Ditoko
+                                @endif
+                            @endif
+                        </td>
+                        <td style="text-align:center;border-bottom:0px">{{ $key->pencatat }}</td>
+                        <td style="text-align:center;border-bottom:0px">{{ $key->nama }}</td>
+                        <td style="text-align:right; border-bottom:0px">{{ number_format($key->total,'0','','.') }}</td>
+                        <td style="text-align:right; border-bottom:0px">{{ number_format($key->uang_muka,'0','','.') }}</td>
+                        <td style="text-align:right; border-bottom:0px">{{ number_format($key->sisa_bayar,'0','','.') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+            <tfoot>
+                    <tr>
+                        <td colspan="8" style="text-align:right;border-bottom:0px;border-top: 1px solid black;"></td>                
+                        <td style="text-align:right; border-bottom:0px; border-top: 1px solid black;">Grand Total :</td>
+                        <td style="text-align:right;border-bottom:0px;border-top: 1px solid black;" >
+                            {{ $data['tfoot']->grand_total_th }} </td>
+                        <td  style="text-align:right;border-bottom:0px;border-top: 1px solid black;">{{ $data['tfoot']->grand_total_dp }} </td>
+                        <td  style="text-align:right;border-bottom:0px;border-top: 1px solid black;">{{ $data['tfoot']->grand_total_sisa }} </td>
 
-                        </tr>
-                        <tr>
-                            <td colspan="7" style="text-align:right"></td>
-                            <td   style="text-align:right">Pembatalan Transaksi : </td>
-                            <td   style="text-align:right" >{{ $data['tfoot']->pembatalan_transaksi_th }}</td>
-                            <td   style="text-align:right" >{{ $data['tfoot']->pembatalan_transaksi_dp }}</td>
-                            <td  style="text-align:right"></td>
-                        </tr>
-                        <tr>
-                            <td colspan="7" style="text-align:right"></td>
-                            <td  style="text-align:right">Total Transaksi : </td>
-                            <td  style="text-align:right" >{{ $data['tfoot']->total_transaksi_th }}</td>
-                            <td  style="text-align:right" >{{ $data['tfoot']->total_transaksi_dp }}</td>
-                            <td  style="text-align:right" ></td>
-                        </tr>
-                </tfoot>
-            </table>  
+                    </tr>
+                    <tr>
+                        <td colspan="8" style="text-align:right;border-bottom:0px"></td>
+                        <td  style="text-align:right;border-bottom:0px">Pembatalan Transaksi : </td>
+                        <td  style="text-align:right;border-bottom:0px" >{{ $data['tfoot']->pembatalan_transaksi_th }}</td>
+                        <td  style="text-align:right;border-bottom:0px">{{ $data['tfoot']->pembatalan_transaksi_dp }}</td>
+                        <td  style="text-align:right;border-bottom:0px"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="8"  style="text-align:right;border-bottom:0px"></td>
+                        <td  style="text-align:right;border-bottom:0px">Total Transaksi : </td>
+                        <td  style="text-align:right;border-bottom:0px" >{{ $data['tfoot']->total_transaksi_th }}</td>
+                        <td  style="text-align:right;border-bottom:0px" >{{ $data['tfoot']->total_transaksi_dp }}</td>
+                        <td  style="text-align:right;border-bottom:0px" ></td>
+                    </tr>
+            </tfoot>
+        </table>  
     </div>
+
 </body>
 </html>

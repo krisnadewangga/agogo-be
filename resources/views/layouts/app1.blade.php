@@ -168,10 +168,10 @@
 
         @if (Auth::check())
          
-          if(level_id == "2"){
+          if(level_id == "2" || level_id == "7"){
             var channelPesan = pusher.subscribe('agogoPesan');
             channelPesan.bind('App\\Events\\PusherEvent', function(data) {
-               // console.log(data);
+              
               // console.log(data);
               var cek_buka_pesan_us = $("input[name='user_id_k']").val();
               if(data.type == "2"){

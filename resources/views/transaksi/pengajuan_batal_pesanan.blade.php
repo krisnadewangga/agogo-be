@@ -20,7 +20,7 @@
 						<th>Waktu Pengajuan</th>
 						<th>No Transaksi</th>
 						<th>Pemesan</th>
-						<th ><center>Jumlah Pesanan</center></th>
+						<th ><center>Jumlah Item</center></th>
 						<th ><center>Jenis Transaksi</center></th>
 						<th style="width: 50px; text-align: center;">Aksi</th>
 						</tr>
@@ -32,7 +32,7 @@
 								<td>{{ $key->updated_at->format('d M Y H:i A') }}</td>
 								<td>{{ $key->no_transaksi }}</td>
 								<td>{{ $key->User->name }}</td>
-								<td align="center">{{ $key->ItemTransaksi()->count() }} Pesanan</td>
+								<td align="center">{{ $key->ItemTransaksi()->count() }} Item</td>
 								<td align="center">
 									@if($key->metode_pembayaran == 1)
 		       							<span class="label label-warning ">TopUp</span>
