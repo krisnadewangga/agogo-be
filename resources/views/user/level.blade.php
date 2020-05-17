@@ -7,8 +7,8 @@
                                                     	) 
                                   ])
 		<div class="card">
-			<button class="btn btn-primary" data-toggle="modal" data-target="#modal_input">Create</button>
-			<hr></hr>
+			<!-- <button class="btn btn-primary" data-toggle="modal" data-target="#modal_input">Create</button> -->
+			<!-- <hr></hr> -->
 
 			@if (session('success'))
 			 	@component("components.alert", ["type" => "success"])

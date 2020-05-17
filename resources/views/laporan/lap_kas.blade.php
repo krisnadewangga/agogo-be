@@ -32,7 +32,7 @@
 	        	<div style="margin-top: 5px;">
 	        			<button class="btn btn-primary">Cari</button>
 	        			<a href="{{ route('lap_kas') }}"><label class="btn btn-warning" >Reset</label></a>
-	        			<a href="javascript:export_pdf()"><label class="btn btn-success" >Export</label></a>
+	        			<a href="javascript:export_pdf()"><label class="btn btn-success" >Export PDF</label></a>
 	        	</div>
         	</form>
         </div>
@@ -71,6 +71,76 @@
 			
 		
 			
+        </div>
+
+        <div class="card" >
+        	<div class="row">
+        		<div class="col-md-4">
+        			<table id="example2" class="table table-bordered table-hover dataTable" >
+                <thead>
+                    <tr>
+                        <th>Penerimaan Uang</th>
+                        <th style="text-align: Center;">Jumlah</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                   
+                    <tr>
+                        <td>100.000</td>      
+                        <td style="text-align: right;"></td>                                                                                        
+                    </tr>
+                    <tr>
+                        <td>50.000</td>      
+                        <td style="text-align: right;"></td>                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                    </tr>
+                    <tr>
+                        <td>20.000</td>      
+                        <td style="text-align: right;"></td>                                                                                            
+                    </tr>
+                    <tr>
+                        <td>10.000</td>      
+                        <td style="text-align: right;"></td>                                                                                            
+                    </tr>
+                    <tr>
+                        <td>5000</td>      
+                        <td style="text-align: right;"></td>                                                                                            
+                    </tr>
+                    <tr>
+                        <td>2000</td>      
+                        <td style="text-align: right;"></td>                                                                                            
+                    </tr>
+                    <tr>
+                        <td>1000</td>      
+                        <td style="text-align: right;"></td>                                                                                            
+                    </tr>
+                    <tr>
+                        <td>500</td>      
+                        <td style="text-align: right;"></td>                                                                                            
+                    </tr>
+                    <tr>
+                        <td>200</td>      
+                        <td style="text-align: right;"></td>                                                                                            
+                    </tr>
+                    <tr>
+                        <td>100</td>      
+                        <td style="text-align: right;"></td>                                                                                            
+                    </tr>
+                    <tr>
+                        <td>10</td>      
+                        <td style="text-align: right;"></td>                                                                                            
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Total Kas Selisih </th>      
+                        <th style="text-align: right;"></th>                                                                                                                                                                                                                                                                                                                                             
+                    </tr>
+                    
+                </tfoot>
+            		</table>
+            	</div>
+        	</div>
         </div>
 
         <script type="text/javascript">
