@@ -12,6 +12,8 @@
             </a>
            
           </li>
+
+          @if(Auth::user()->level_id == "1" || Auth::user()->level_id == "2") 
           <li class="treeview" id="m_user">
             <a href="#">
               <i class="fa  fa-users"></i>
@@ -33,6 +35,7 @@
               
             </ul>
           </li>
+          @endif
 
           <li class="treeview" id="m_item">
             <a href="#">
@@ -44,8 +47,10 @@
               
             </a>
             <ul class="treeview-menu">
-              <li id="sm_kategori"><a href="{{ route('kategori.index') }}"><i class="fa fa-circle-o"></i>Kategori</a></li>
-              <li id="sm_item"><a href="{{ route('item.index') }}"><i class="fa fa-circle-o"></i>Item</a></li>
+               @if(Auth::user()->level_id == "1" || Auth::user()->level_id == "2") 
+                <li id="sm_kategori"><a href="{{ route('kategori.index') }}"><i class="fa fa-circle-o"></i>Kategori</a></li>
+                <li id="sm_item"><a href="{{ route('item.index') }}"><i class="fa fa-circle-o"></i>Item</a></li>
+               @endif
                <li id="sm_topup"><a href="{{ route('topup_saldo.index') }}"><i class="fa fa-circle-o"></i> <span>TopUp Saldo</span></a></li>
                <li id="sm_promo"><a href="{{ route('setup_promo.index') }}"><i class="fa fa-circle-o"></i> <span>SetUp Promo</span></a></li>
             </ul>
@@ -109,8 +114,13 @@
             </a>
             <ul class="treeview-menu">
             
-              <li id="sm_penjualan"><a href="{{ route('penjualan') }}"><i class="fa fa-circle-o"></i> <span>Penjualan</span></a></li>
-              <li id="sm_pendapatan"><a href="{{ route('lap_pendapatan') }}"><i class="fa fa-circle-o"></i> <span>Pendapatan</span></a></li>
+              <!-- <li id="sm_penjualan"><a href="{{ route('penjualan') }}"><i class="fa fa-circle-o"></i> <span>Penjualan</span></a></li> -->
+              <!-- <li id="sm_pendapatan"><a href="{{ route('lap_pendapatan') }}"><i class="fa fa-circle-o"></i> <span>Pendapatan</span></a></li> -->
+
+              <li id="sm_penjualan_item"><a href="{{ route('lap_penjualan_per_item') }}"><i class="fa fa-circle-o"></i> <span>Total Penjualan Per Item</span></a></li>
+
+              <li id="sm_pendapatan_harian"><a href="{{ route('lap_pendapatan_harian') }}"><i class="fa fa-circle-o"></i> <span>Total Pendapatan Harian</span></a></li>
+
               <li id="sm_pemesanan"><a href="{{ route('lap_pemesanan') }}"><i class="fa fa-circle-o"></i> <span>Pemesanan</span></a></li>
               <li id="sm_kas"><a href="{{ route('lap_kas') }}"><i class="fa fa-circle-o"></i> <span>Kas</span></a></li>
               <li id="sm_pergerakan_stock"><a href="{{ route('lap_pergerakan_stock') }}"><i class="fa fa-circle-o"></i> <span>Pergerakan Stock</span></a></li>

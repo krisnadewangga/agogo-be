@@ -28,10 +28,10 @@
 								<tr>
 									<td align="center"></td>
 									<td>{{ $key->created_at->format('d M Y H:i A') }}</td>
-									<td>{{ $key->User->name }}</td>
-									<td>{{ $key->User->DetailKonsumen->no_hp }}</td>
-									<td>{{ $key->User->DetailKonsumen->alamat }}</td>
-									<td align="center">Rp {{ number_format($key->nominal,'0','','.') }}</td>
+									<td>{{ $key->name }}</td>
+									<td>{{ $key->no_hp }}</td>
+									<td>{{ $key->alamat }}</td>
+									<td align="left">Rp {{ number_format($key->nominal,'0','','.') }}</td>
 								</tr>
 							@endforeach
 						</tbody>

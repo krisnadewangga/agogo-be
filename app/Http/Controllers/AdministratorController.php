@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use App\Helpers\KompresFoto;
 use App\User;
 use App\Level;
@@ -19,13 +20,17 @@ class AdministratorController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware(function($request,$next){
+            if(Gate::allows('add_users')) return $next($request);
+            abort(404, 'Halaman Tidak Ditemukan');
+        });
+
     }
     
     public function index()
     {
        $administrator = User::whereNotIn('level_id',['1','6'])->get();
        
-    
        $administrator->map(function($administrator){
          $sel_role = Role::where(['user_id' => $administrator->id])->pluck('level_id');
          $tampil_rol = Level::selectRaw("GROUP_CONCAT(level) as tampil_rol")->whereIn('id', $sel_role)->get();
@@ -78,7 +83,12 @@ class AdministratorController extends Controller
             return redirect()->back()->withErrors($vaildator)->withInput()->with('gagal','simpan');
         }
 
-        $req['level_id'] = '2';
+        if(in_array('7', $req['roles'])){
+            $req['level_id'] = '7';
+        }else{
+            $req['level_id'] = '2';
+        }
+        
         $req['password'] = bcrypt($request->password);
         
         if(isset($req['foto'])){

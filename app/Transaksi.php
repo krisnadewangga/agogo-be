@@ -32,7 +32,8 @@ class Transaksi extends Model
     					   'status',
                  'jenis',
                  'jalur',
-                 'kasir_id'];
+                 'kasir_id',
+                 'for_ps'];
     protected $dates = ['waktu_kirim','tgl_bayar','tgl_bayar'];
 
   	protected $appends = array('ket_metodepembayaran','ket_status_transaksi');

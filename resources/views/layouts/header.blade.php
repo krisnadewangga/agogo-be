@@ -75,7 +75,7 @@
 
                   <p>
                     <small><span style="cursor: pointer;" data-target="#modal_ganti_fp" data-toggle="modal"><u>Ganti Foto Profil</u></span></small>
-                    {{ Auth::User()->name }} - @if(Auth::User()->level_id == 1)SuperAdmin @else Administrator @endif
+                    {{ Auth::User()->name }} - @if(Auth::User()->level_id == 1)SuperAdmin @elseif(Auth::User()->level_id == 2) Administrator @else Office @endif
                    
                   </p>
                 </li>

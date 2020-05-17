@@ -277,10 +277,11 @@ class TransaksiController extends Controller
                        })
                        ->get();
     	
-        $findNot = Notifikasi::where('judul_id',$id)->where('dibaca','0')->first();
+        $findNot = Notifikasi::where('judul_id',$id)->where('dibaca','0')->count();
 
-        if(isset($findNot->id)){
-            $findNot->Update(['dibaca' => '1']);
+        if($findNot > 0){
+            $update = Notifikasi::where('judul_id',$id)->where('dibaca','0')->Update(['dibaca' => '1']);
+            // $findNot->Update(['dibaca' => '1']);
         }
 
         $menu_active = "transaksi|transaksi|1";

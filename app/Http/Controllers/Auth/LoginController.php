@@ -46,7 +46,7 @@ class LoginController extends Controller
      */
     protected function attemptLogin(Request $request)
     {
-        $request->merge(['status_aktif' => '1', 'level_id' => ['1','2'] ]);
+        $request->merge(['status_aktif' => '1', 'level_id' => ['1','2','7'] ]);
 
         
         return $this->guard()->attempt(
