@@ -942,6 +942,7 @@ class LaporanController extends Controller
                                      ->where('for_ps','1')
                                      ->whereDate('transaksi.created_at',$dates[0]);
                           });
+           $data_cancel = Transaksi::where('status','3') ->whereDate('transaksi.created_at',$dates[0])->get();
                           
                  
       }else{
@@ -967,7 +968,7 @@ class LaporanController extends Controller
                                      ->where('for_ps','1')
                                      ->whereBetween('transaksi.created_at',$dates);
                           });
-                          
+           $data_cancel = Transaksi::where('status','3')->whereBetween('transaksi.created_at',$dates)->get();              
       }
 
       $data = $select->get();
@@ -1006,7 +1007,7 @@ class LaporanController extends Controller
       $grand_total_dp = number_format($data->sum('uang_muka'),'0','','.');
       $grand_total_sisa = number_format($data->sum('sisa_bayar'),'0','','.');
 
-      $data_cancel = Transaksi::where('status','3')->get();
+     
       $data_cancel->map(function($data_cancel){
         if($data_cancel->jenis == "2"){
           $data_cancel['total'] = $data_cancel->Preorder->total;
