@@ -75,159 +75,178 @@ public function checkLastInvoice()
 
 public function postOrder(Request $request)
 {
- $req = $request->all();
+  $req = $request->all();
 
- if(!empty($request[0]['invoice']) ){            
-  $no_transaksi = $request[0]['invoice'] ;
-}
-else {
-  $no_transaksi = $this->generateInvoice('1');
-}
+  if(!empty($request[0]['invoice']) ){            
+    $no_transaksi = $request[0]['invoice'] ;
+  }
+  else {
+    $no_transaksi = $this->generateInvoice('1');
+  }
 
-$req_transaksi = ['user_id' => $req[0]['user_id'],
-'no_transaksi' => $no_transaksi,
-'total_transaksi' => $req[0]['subtotal'],
-'total_bayar' => $req[0]['total'],
-'status' => '5',
-'jalur' => '2',
-'biaya_pengiriman' => '0',
-'biaya_pengiriman' => '0',
-'jarak_tempuh' => '0',
-'total_biaya_pengiriman' => '0',
-'banyak_item' => count($req),
-'lat' => '-',
-'long' => '-',
-'detail_alamat' => '-',
-'kasir_id' => $req[0]['user_id'],
-'metode_pembayaran' => '3',
-'tgl_bayar' => date("Y-m-d H:i:s"),
-'waktu_kirim' => date("Y-m-d H:i:s"),
-'for_ps' => '0'
-];
+  $req_transaksi = ['user_id' => $req[0]['user_id'],
+                    'no_transaksi' => $no_transaksi,
+                    'total_transaksi' => $req[0]['subtotal'],
+                    'total_bayar' => $req[0]['total'],
+                    'status' => '5',
+                    'jalur' => '2',
+                    'biaya_pengiriman' => '0',
+                    'biaya_pengiriman' => '0',
+                    'jarak_tempuh' => '0',
+                    'total_biaya_pengiriman' => '0',
+                    'banyak_item' => count($req),
+                    'lat' => '-',
+                    'long' => '-',
+                    'detail_alamat' => '-',
+                    'kasir_id' => $req[0]['user_id'],
+                    'metode_pembayaran' => '3',
+                    'tgl_bayar' => date("Y-m-d H:i:s"),
+                    'waktu_kirim' => date("Y-m-d H:i:s"),
+                    'for_ps' => '0'
+  ];
 
-if(!empty( $request[0]['id']) ){ 
-  $req_transaksi['id'] = $request[0]['id'];
-}
-
-
-$insItem = [];
-foreach ($req as $key) {
-  $array = [];
-          // $array['transaksi_id'] =  $insertTransaksi->id;
-  $findItem = Item::findOrFail($key['product_id']);
-  $array['item_id'] = $key['product_id'];
-  $array['jumlah'] = $key['qty'];
-  $array['harga'] = $findItem['harga'];
-  $array['margin'] = 0;
-  $array['total'] = $key['qty'] * $findItem['harga'];
-
-  $insItem[] = $array;
-  
+  if(!empty( $request[0]['id']) ){ 
+    $req_transaksi['id'] = $request[0]['id'];
+  }
 
 
-  $getCount = Item::where(['id' => $key['product_id']])->get();
+  $insItem = [];
+  foreach ($req as $key) {
+    $array = [];
+    // $array['transaksi_id'] =  $insertTransaksi->id;
+    $findItem = Item::findOrFail($key['product_id']);
+    $array['item_id'] = $key['product_id'];
+    $array['jumlah'] = $key['qty'];
+    $array['harga'] = $findItem['harga'];
+    $array['margin'] = 0;
+    $array['total'] = $key['qty'] * $findItem['harga'];
 
-           $getCount = Item::where(['id' => $key['product_id']])->get();
-            
-            if ($getCount[0]['stock'] >= $key['qty']) {
-                DB::table('item')->where('id', $key['product_id'])
-                    ->decrement('stock', $key['qty']);  
-              
-               
-                DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['qty']);
-                
-                DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['qty']);
-                
-                DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['qty']);
+    $insItem[] = $array;
 
-            }else {
-                throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
-            }
+    $getCount = Item::where(['id' => $key['product_id']])->get();
+    if ($getCount[0]['stock'] >= $key['qty']) {
+        DB::table('item')->where('id', $key['product_id'])
+            ->decrement('stock', $key['qty']);  
+      
+       
+        DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['qty']);
+        
+        DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['qty']);
+        
+        DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['qty']);
 
+    }else {
+        throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
+    }
 
-}
+  }
 
+  $sel = Transaksi::where([ 
+                            ['no_transaksi', '=', $no_transaksi],
+                            ['user_id' ,'=', $req[0]['user_id'] ]
+                          ])->first();
+  if(isset($sel->id)){
+    $find_delete = Transaksi::findOrFail($sel->id);
+    $find_delete->delete(); 
+  }
 
+  $insertTransaksi = Transaksi::create($req_transaksi);
+  $find = Transaksi::findOrFail($insertTransaksi->id);
+  $find->ItemTransaksi()->createMany($insItem);
+  $find->R_Order()->create(['transaksi_id' => $insertTransaksi->id, 
+   'uang_dibayar' => $req[0]['dibayar'],
+   'uang_kembali' => $req[0]['kembali'],
+   'status' => $req[0]['status'] ]);
 
-
-$insertTransaksi = Transaksi::create($req_transaksi);
-$find = Transaksi::findOrFail($insertTransaksi->id);
-$find->ItemTransaksi()->createMany($insItem);
-$find->R_Order()->create(['transaksi_id' => $insertTransaksi->id, 
- 'uang_dibayar' => $req[0]['dibayar'],
- 'uang_kembali' => $req[0]['kembali'],
- 'status' => $req[0]['status'] ]);
-
-
-return response()->json([
- 'status' => 'success',
- 'message' => $no_transaksi,
-], 200);
+  return response()->json([
+   'status' => 'success',
+   'message' => $no_transaksi,
+  ], 200);
 }
 
 public function bayarTransaksiM(Request $request)
 {
-  $req = $request->all();
-  $no_transaksi = $req[0]['no_transaksi'];
-  $total = $req[0]['total'];
+    $req = $request->all();
+    $no_transaksi = $req[0]['no_transaksi'];
+    $total = $req[0]['total'];
 
-  $kasir_id = $req[0]['user_id'];
-  $sel_kasir = User::findOrFail($kasir_id);
-  $nama_kasir = $sel_kasir->name;
+    $kasir_id = $req[0]['user_id'];
+    $sel_kasir = User::findOrFail($kasir_id);
+    $nama_kasir = $sel_kasir->name;
 
-  $sel = Transaksi::where('no_transaksi',$no_transaksi)->first();
-  if($sel->total_bayar != $total){
-    $sel->update(['total_transaksi' => $total,
-      'banyak_item' => count($req),
-      'total_bayar' => $total, 
-      'status' => '5',
-      'kasir_id' => $kasir_id,
-      'tgl_bayar' => date("Y-m-d H:i:s")
-    ]);
+    $sel = Transaksi::where('no_transaksi',$no_transaksi)->first();
+    if($sel->total_bayar != $total){
+      $sel->update(['total_transaksi' => $total,
+        'banyak_item' => count($req),
+        'total_bayar' => $total, 
+        'status' => '5',
+        'kasir_id' => $kasir_id,
+        'tgl_bayar' => date("Y-m-d H:i:s")
+      ]);
 
-    foreach ($req as $key ) {
-      $cek = ItemTransaksi::where([ 
-        ['transaksi_id','=',$sel->id],
-        ['item_id', '=', $key['product_id']]
-      ])->first();
+      foreach ($req as $key ) {
+        $cek = ItemTransaksi::where([ 
+          ['transaksi_id','=',$sel->id],
+          ['item_id', '=', $key['product_id']]
+        ])->first();
 
-      if($cek->jumlah != $key['qty']){
-       $cek->update(['jumlah' => $key['qty'], 'total' => $key['price'] ]);
+        if($cek->jumlah != $key['qty']){
+         $cek->update(['jumlah' => $key['qty'], 'total' => $key['price'] ]);
+        }
+
+        $getCount = Item::where(['id' => $key['product_id']])->get();
+        if ($getCount[0]['stock'] >= $key['qty']) {
+            DB::table('item')->where('id', $key['product_id'])
+                ->decrement('stock', $key['qty']);  
+          
+            DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['qty']);
+            
+            DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['qty']);
+            
+            DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['qty']);
+
+        }else {
+            throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
+        }
+
+
      }
-   }
- }else{
-  $sel->update(['status' => '5', 'tgl_bayar' => date("Y-m-d H:i:s") , 'kasir_id' => $kasir_id]);
+   }else{
+    $sel->update(['status' => '5', 'tgl_bayar' => date("Y-m-d H:i:s") , 'kasir_id' => $kasir_id]);
+  }
+
+
+  $sel->AmbilPesanan()->create(['diambil_oleh' => '-', 
+    'input_by' => 'Kasir - '.$nama_kasir 
+  ]);
+  $dnotif =
+  [
+    'pengirim_id' => $kasir_id,
+    'penerima_id' => $sel->user_id,
+    'judul_id' => $sel->id,
+    'judul' => 'Pengambilan Pesanan Nomor Transaksi '.$sel->no_transaksi,
+    'isi' => 'Terima Kasih Telah Belanja Di Agogo Bakery, Pesanan Dengan Nomor Transaksi '.$sel->no_transaksi.' Telah Diterima ',
+    'jenis_notif' => 8,
+    'dibaca' => '0'
+  ];
+
+  $notif = Notifikasi::create($dnotif);
+           //NotifGCM
+  SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'transaksi', $notif->judul_id);
+
+  $this->setKunciTransaksi($sel->user_id);
+  $inserR_Order = R_Order::create(['transaksi_id' => $sel->id, 
+   'uang_dibayar' => $req[0]['dibayar'],
+   'uang_kembali' => $req[0]['kembali'],
+   'status' => $req[0]['status'] ]);
+
+  $new_no_transaksi = $this->generateInvoice("1");
+  return response()->json([
+    'status' => 'success',
+    'message' => $new_no_transaksi,
+  ], 200);
 }
-$sel->AmbilPesanan()->create(['diambil_oleh' => '-', 
-  'input_by' => 'Kasir - '.$nama_kasir 
-]);
-$dnotif =
-[
-  'pengirim_id' => $kasir_id,
-  'penerima_id' => $sel->user_id,
-  'judul_id' => $sel->id,
-  'judul' => 'Pengambilan Pesanan Nomor Transaksi '.$sel->no_transaksi,
-  'isi' => 'Terima Kasih Telah Belanja Di Agogo Bakery, Pesanan Dengan Nomor Transaksi '.$sel->no_transaksi.' Telah Diterima ',
-  'jenis_notif' => 8,
-  'dibaca' => '0'
-];
 
-$notif = Notifikasi::create($dnotif);
-         //NotifGCM
-SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'transaksi', $notif->judul_id);
-
-$this->setKunciTransaksi($sel->user_id);
-$inserR_Order = R_Order::create(['transaksi_id' => $sel->id, 
- 'uang_dibayar' => $req[0]['dibayar'],
- 'uang_kembali' => $req[0]['kembali'],
- 'status' => $req[0]['status'] ]);
-
-$new_no_transaksi = $this->generateInvoice("1");
-return response()->json([
-  'status' => 'success',
-  'message' => $new_no_transaksi,
-], 200);
-}
 
 
 

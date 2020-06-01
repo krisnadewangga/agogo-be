@@ -131,7 +131,7 @@ class TransaksiController extends Controller
 								$req_transaksi['tgl_bayar'] = Carbon::now();
 								// return $req_transaksi;
 								$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
-								$min_stock_item = $this->UpdateStock($itemTransaksi);
+								// $min_stock_item = $this->UpdateStock($itemTransaksi);
 
 								$new_saldo = $saldo - $req['total_bayar'];
 								$this->UpdateSaldo($req['user_id'],$new_saldo);
@@ -159,7 +159,7 @@ class TransaksiController extends Controller
 						// return $req_transaksi;	
 						$req_transaksi['status'] = '6';
 						$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
-						$min_stock_item = $this->UpdateStock($itemTransaksi);
+						// $min_stock_item = $this->UpdateStock($itemTransaksi);
 						
 						$itemForEmail = "";
 						$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
@@ -265,7 +265,7 @@ class TransaksiController extends Controller
 				}else if($req['metode_pembayaran'] == "3"){
 					if($countItemError == 0){
 						$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
-						$min_stock_item = $this->UpdateStock($itemTransaksi);
+						// $min_stock_item = $this->UpdateStock($itemTransaksi);
 
 						$success = 1;
 						$msg = "Berhasil Simpan Transaksi";
@@ -494,21 +494,22 @@ class TransaksiController extends Controller
 		$update_saldo = $sel_user->DetailKonsumen()->update(['saldo' => $new_saldo]);
     }
 
-    public function UpdateStock($itemTransaksi)
-    {
-    	foreach ($itemTransaksi as $key ) {
-    		$find = Item::findOrFail($key['item_id']);
-    		$newStock = $find->stock - $key['jumlah'];
-    		$update = $find->update(['stock' => $newStock]);
+    // public function UpdateStock($itemTransaksi)
+    // {
+    	
+    // 	foreach ($itemTransaksi as $key ) {
+    // 		$find = Item::findOrFail($key['item_id']);
+    // 		$newStock = $find->stock - $key['jumlah'];
+    // 		$update = $find->update(['stock' => $newStock]);
 
-    		DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['jumlah']);
+    // 		DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['jumlah']);
                 
-            DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['jumlah']);
+    //         DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['jumlah']);
                 
-            DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['jumlah']);
+    //         DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['jumlah']);
 
-    	}
-    }
+    // 	}
+    // }
 
     public function GetOngkir()
     {

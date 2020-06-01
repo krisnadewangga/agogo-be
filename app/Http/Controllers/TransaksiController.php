@@ -296,7 +296,7 @@ class TransaksiController extends Controller
         $transaksi->Pengiriman()->update(['diterima' => Carbon::now(), 
                                           'diterima_oleh' => 'Admin - '.Auth::user()->name,
                                           'status' => '1']);
-
+        $min_stock_item = $this->UpdateStock($transaksi->no_transaksi);
         //Insert Notifikasi
         $dnotif =
         [
@@ -404,6 +404,7 @@ class TransaksiController extends Controller
         
         $req['input_by'] = 'Admin - '.Auth::User()->name;
         $find->AmbilPesanan()->create($req);
+        $min_stock_item = $this->UpdateStock($find->no_transaksi);
 
         $dnotif =
         [
@@ -423,6 +424,27 @@ class TransaksiController extends Controller
         $this->setKunciTransaksi($penerima_id);
         
         return redirect()->back()->with("success","Berhasil Menyelesaikan Transaksi");
+    }
+
+
+    public function UpdateStock($no_transaksi)
+    {
+     
+     $sel = Transaksi::where('no_transaksi',$no_transaksi)->first();
+     $itemTransaksi = $sel->ItemTransaksi;
+
+     foreach ($itemTransaksi as $key ) {
+       $find = Item::findOrFail($key['item_id']);
+       $newStock = $find->stock - $key['jumlah'];
+       $update = $find->update(['stock' => $newStock]);
+
+       DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['jumlah']);
+                
+       DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['jumlah']);
+                
+       DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['jumlah']);
+
+     }
     }
 
     public function konfirBayar($id)
