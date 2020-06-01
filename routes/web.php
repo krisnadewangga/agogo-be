@@ -121,3 +121,5 @@ Route::get('/tes_event',function(){
 	SendNotif::SendNotPesan('2',$message);
 });
 
+
+
