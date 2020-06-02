@@ -183,8 +183,12 @@ public function bayarTransaksiM(Request $request)
         'kasir_id' => $kasir_id,
         'tgl_bayar' => date("Y-m-d H:i:s")
       ]);
+      
+    }else{
+      $sel->update(['status' => '5', 'tgl_bayar' => date("Y-m-d H:i:s") , 'kasir_id' => $kasir_id]);
+    }
 
-      foreach ($req as $key ) {
+    foreach ($req as $key ) {
         $cek = ItemTransaksi::where([ 
           ['transaksi_id','=',$sel->id],
           ['item_id', '=', $key['product_id']]
@@ -198,7 +202,7 @@ public function bayarTransaksiM(Request $request)
         if ($getCount[0]['stock'] >= $key['qty']) {
             DB::table('item')->where('id', $key['product_id'])
                 ->decrement('stock', $key['qty']);  
-          
+
             DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['qty']);
             
             DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['qty']);
@@ -210,41 +214,37 @@ public function bayarTransaksiM(Request $request)
         }
 
 
-     }
-   }else{
-    $sel->update(['status' => '5', 'tgl_bayar' => date("Y-m-d H:i:s") , 'kasir_id' => $kasir_id]);
-  }
+      }
 
+    $sel->AmbilPesanan()->create(['diambil_oleh' => '-', 
+      'input_by' => 'Kasir - '.$nama_kasir 
+    ]);
+    $dnotif =
+    [
+      'pengirim_id' => $kasir_id,
+      'penerima_id' => $sel->user_id,
+      'judul_id' => $sel->id,
+      'judul' => 'Pengambilan Pesanan Nomor Transaksi '.$sel->no_transaksi,
+      'isi' => 'Terima Kasih Telah Belanja Di Agogo Bakery, Pesanan Dengan Nomor Transaksi '.$sel->no_transaksi.' Telah Diterima ',
+      'jenis_notif' => 8,
+      'dibaca' => '0'
+    ];
 
-  $sel->AmbilPesanan()->create(['diambil_oleh' => '-', 
-    'input_by' => 'Kasir - '.$nama_kasir 
-  ]);
-  $dnotif =
-  [
-    'pengirim_id' => $kasir_id,
-    'penerima_id' => $sel->user_id,
-    'judul_id' => $sel->id,
-    'judul' => 'Pengambilan Pesanan Nomor Transaksi '.$sel->no_transaksi,
-    'isi' => 'Terima Kasih Telah Belanja Di Agogo Bakery, Pesanan Dengan Nomor Transaksi '.$sel->no_transaksi.' Telah Diterima ',
-    'jenis_notif' => 8,
-    'dibaca' => '0'
-  ];
+    $notif = Notifikasi::create($dnotif);
+             //NotifGCM
+    SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'transaksi', $notif->judul_id);
 
-  $notif = Notifikasi::create($dnotif);
-           //NotifGCM
-  SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'transaksi', $notif->judul_id);
+    $this->setKunciTransaksi($sel->user_id);
+    $inserR_Order = R_Order::create(['transaksi_id' => $sel->id, 
+     'uang_dibayar' => $req[0]['dibayar'],
+     'uang_kembali' => $req[0]['kembali'],
+     'status' => $req[0]['status'] ]);
 
-  $this->setKunciTransaksi($sel->user_id);
-  $inserR_Order = R_Order::create(['transaksi_id' => $sel->id, 
-   'uang_dibayar' => $req[0]['dibayar'],
-   'uang_kembali' => $req[0]['kembali'],
-   'status' => $req[0]['status'] ]);
-
-  $new_no_transaksi = $this->generateInvoice("1");
-  return response()->json([
-    'status' => 'success',
-    'message' => $new_no_transaksi,
-  ], 200);
+    $new_no_transaksi = $this->generateInvoice("1");
+    return response()->json([
+      'status' => 'success',
+      'message' => $new_no_transaksi,
+    ], 200);
 }
 
 
