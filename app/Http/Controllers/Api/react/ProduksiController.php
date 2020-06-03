@@ -49,12 +49,22 @@ public function getTrxByProduct($id)
             //Cek apakah ada initial produksi / tidak
         if ($date_produksi == null) {  
 
+
+
             $order = DB::table('item_transaksi')
             ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
             ->where('item_transaksi.item_id', $id)
                 // ->whereBetween('order_details.created_at', [$start_date, $end_date])
             ->where('transaksi.status','5')
-            ->orWhere('transaksi.status','2')
+            ->where('transaksi.jenis','1')
+                // ->get();
+            ->sum('jumlah');
+
+             $orderDalamPengantaran = DB::table('item_transaksi')
+            ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
+            ->where('item_transaksi.item_id', $id)
+                // ->whereBetween('order_details.created_at', [$start_date, $end_date])
+            ->where('transaksi.status','2')
             ->where('transaksi.jenis','1')
                 // ->get();
             ->sum('jumlah');
@@ -77,7 +87,7 @@ public function getTrxByProduct($id)
             ->where('id', $id) 
             ->orderBy('created_at', 'DESC')
             ->first();
-            $stock_awal = $getStock->stock + $preorder + $order;
+            $stock_awal = $getStock->stock + $preorder + $order + $orderDalamPengantaran ;
 
 
 
@@ -112,7 +122,15 @@ public function getTrxByProduct($id)
             ->where('item_transaksi.item_id', $id)
             ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
             ->where('transaksi.status','5')
-            ->orWhere('transaksi.status','2')
+            ->where('transaksi.jenis','1')
+                // ->get();
+            ->sum('jumlah');
+
+            $orderDalamPengantaran = DB::table('item_transaksi')
+            ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
+            ->where('item_transaksi.item_id', $id)
+            ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
+            ->where('transaksi.status','2')
             ->where('transaksi.jenis','1')
                 // ->get();
             ->sum('jumlah');
@@ -138,7 +156,7 @@ public function getTrxByProduct($id)
             ->where('item_id', $id) 
             ->orderBy('created_at', 'DESC')
             ->first();
-            $stock_awal = $getStock->stock_awal + $preorder + $order;
+            $stock_awal = $getStock->stock_awal + $preorder + $order + $orderDalamPengantaran;
 
             return response()->json(array(
                     // 'last_trx_date' =>  null,
@@ -166,7 +184,15 @@ public function getTrxByProduct($id)
         ->where('item_transaksi.item_id', $id)
         ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
         ->where('transaksi.status','5')
-        ->orWhere('transaksi.status','2')
+        ->where('transaksi.jenis','1')
+            // ->get();
+        ->sum('jumlah');
+
+            $orderDalamPengantaran = DB::table('item_transaksi')
+        ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
+        ->where('item_transaksi.item_id', $id)
+        ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
+        ->where('transaksi.status','2')
         ->where('transaksi.jenis','1')
             // ->get();
         ->sum('jumlah');
@@ -194,7 +220,7 @@ public function getTrxByProduct($id)
 
         return response()->json(array(
             'last_trx_date' => $curent_date,
-            'count_order'   => $order,
+            'count_order'   => $order + $orderDalamPengantaran,
             'count_preorder'=> $preorder,
             'stok_awal'     => $stock_awal,
             'production'    => $production,
