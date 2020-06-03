@@ -6,10 +6,12 @@ use Illuminate\Http\Request;
 use App\Helpers\SendNotif;
 use App\Pengiriman;
 use App\Transaksi;
+use App\Item;
 use App\Notifikasi;
 use App\Kurir;
 use Carbon\Carbon;
 use Auth;
+use DB;
 
 class PengirimanController extends Controller
 {
@@ -71,6 +73,7 @@ class PengirimanController extends Controller
         $insert = Pengiriman::create($input);
         $find = Transaksi::findOrfail($req['transaksi_id']);
         $find->update(['status' => '2']);   
+        $min_stock_item = $this->UpdateStock($find->no_transaksi);
         
         //Insert Notifikasi
         $dnotif =
@@ -92,6 +95,26 @@ class PengirimanController extends Controller
         SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'pengiriman', $notif->judul_id);
 
         return redirect()->back()->with("success","Berhasil Mengaktifkan Pengiriman");
+    }
+
+    public function UpdateStock($no_transaksi)
+    {
+        $sel = Transaksi::where('no_transaksi',$no_transaksi)->first();
+        $itemTransaksi = $sel->ItemTransaksi;
+
+
+        foreach ($itemTransaksi as $key ) {
+           $find = Item::findOrFail($key['item_id']);
+           $newStock = $find->stock - $key['jumlah'];
+           $update = $find->update(['stock' => $newStock]);
+
+           DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['jumlah']);
+                    
+           DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['jumlah']);
+                    
+           DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['jumlah']);
+
+        }
     }
 
     /**
