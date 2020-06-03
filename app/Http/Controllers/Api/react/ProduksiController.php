@@ -54,6 +54,7 @@ public function getTrxByProduct($id)
             ->where('item_transaksi.item_id', $id)
                 // ->whereBetween('order_details.created_at', [$start_date, $end_date])
             ->where('transaksi.status','5')
+            ->orWhere('transaksi.status','2')
             ->where('transaksi.jenis','1')
                 // ->get();
             ->sum('jumlah');
@@ -111,6 +112,7 @@ public function getTrxByProduct($id)
             ->where('item_transaksi.item_id', $id)
             ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
             ->where('transaksi.status','5')
+            ->orWhere('transaksi.status','2')
             ->where('transaksi.jenis','1')
                 // ->get();
             ->sum('jumlah');
@@ -164,6 +166,7 @@ public function getTrxByProduct($id)
         ->where('item_transaksi.item_id', $id)
         ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
         ->where('transaksi.status','5')
+        ->orWhere('transaksi.status','2')
         ->where('transaksi.jenis','1')
             // ->get();
         ->sum('jumlah');
