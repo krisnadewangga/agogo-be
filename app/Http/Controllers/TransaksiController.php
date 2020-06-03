@@ -296,7 +296,7 @@ class TransaksiController extends Controller
         $transaksi->Pengiriman()->update(['diterima' => Carbon::now(), 
                                           'diterima_oleh' => 'Admin - '.Auth::user()->name,
                                           'status' => '1']);
-        $min_stock_item = $this->UpdateStock($transaksi->no_transaksi);
+        
         //Insert Notifikasi
         $dnotif =
         [
@@ -310,7 +310,6 @@ class TransaksiController extends Controller
         ];
         
         $notif = Notifikasi::create($dnotif);
-
         SendNotif::SendNotPesan('5',['jenisNotif' => '2']);
 
         //NotifGCM
