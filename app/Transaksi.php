@@ -143,5 +143,9 @@ class Transaksi extends Model
       return $this->hasOne(Preorders::class,'transaksi_id','id');
     }
 
+    public function NotifExpired()
+    {
+      return $this->hasOne(Transaksi::class);
+    }
     
 }
