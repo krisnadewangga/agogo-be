@@ -14,6 +14,7 @@ use App\Ongkir;
 use App\ItemTransaksi;
 use App\Helpers\Acak;
 use App\Helpers\SendNotif;
+use App\NotifExpired;
 use Validator;
 use DB;
 
@@ -153,7 +154,11 @@ class TransaksiController extends Controller
 				}else if($req['metode_pembayaran'] == "2"){
 					if($countItemError == 0){
 						$waktu_skrang = Carbon::now();
+						$waktu_skrang1 = Carbon::now();
+
 						$batas_bayar = $waktu_skrang->addHours(6);
+						$kirim_notif = $waktu_skrang1->addMinutes(330)->format('Y-m-d H:i:s');
+
 						$req_transaksi['waktu_kirim'] = $batas_bayar;
 
 						// return $req_transaksi;	
@@ -175,6 +180,9 @@ class TransaksiController extends Controller
 											  </tr>";
 							$noItemForEmail++;
 						}
+
+
+
 						$itemForEmail .= "<tr>
 											 <td align='center'>#</td>
 											 <td colspan='3'>Ongkir </td>
@@ -185,6 +193,7 @@ class TransaksiController extends Controller
 											 <td colspan='3'>Total Bayar </td>
 											 <td align='right'>Rp. ".number_format($ins_transaksi->total_bayar,'0','','.')."</td>
 										  </tr>";
+						
 
 						$email_body = "<div style='padding:10px;'>
 										<div>
@@ -250,11 +259,19 @@ class TransaksiController extends Controller
 								      ";
 					    $email = $sel_user->email;
 						$data = ['name' => $sel_user->name,
-					               'email_body' => $email_body
+					             'email_body' => $email_body
 					            ];
       
 					    $subject = "Invoice Pembayaran Agogobakery.com";
 					    $a = SendNotif::kirimEmail($email,$data,$subject);
+
+					    //setNotifExpired
+						$dataNE = ['transaksi_id' => $ins_transaksi->id, 
+								   'email' => $sel_user->email,
+								   'waktu_kirim' => $kirim_notif ,
+								   'item' => $itemForEmail,
+								   'status' => '0'];
+						$insDataNE = NotifExpired::create($dataNE);
 
 						$success = 1;
 						$msg = "Berhasil Simpan Transaksi";
