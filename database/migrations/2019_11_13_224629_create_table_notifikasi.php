@@ -20,7 +20,7 @@ class CreateTableNotifikasi extends Migration
             $table->integer('judul_id');
             $table->text('judul');
             $table->text('isi');
-            $table->enum('jenis_notif',['1','2','3','4','5','6','7','8']);
+            $table->enum('jenis_notif',['1','2','3','4','5','6','7','8','9']);
             //1 = transaksi
             //2 = pengiriman
             //3 = terima pengiriman
@@ -29,6 +29,7 @@ class CreateTableNotifikasi extends Migration
             //6 = Batal pesanan
             //7 = konfir bayar
             //8 = ambil pesanan
+            //9 = pembayaran pesanan
 
             $table->enum('dibaca',['0','1'])->default(0);
             $table->timestamps();
