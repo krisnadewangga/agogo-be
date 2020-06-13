@@ -14,8 +14,8 @@
 */
 use App\Events\PusherEvent;
 use App\Helpers\SendNotif;
-
-
+use App\Transaksi;
+use Carbon\Carbon;
 Auth::routes();
 
 Route::get('/', 'HomeController@index')->name('home');
@@ -110,7 +110,6 @@ Route::get('/list_pesan','PesanController@listPesan');
 Route::post('/kirim_pesan','PesanController@kirimPesan')->name('kirim_pesan');
 Route::post('/pesan_user','PesanController@pesanUser')->name('pesan_user');
 
-
 Route::get('/hapus_pesan/{id}','PesanController@hapusPesan')->name('hapus_pesan');
 Route::get('/get_jum_pesan','PesanController@getJumPesan')->name('get_jum_pesan');
 Route::get('/baca_pesan/{id}','PesanController@bacaPesan')->name('baca_pesan');
@@ -121,6 +120,7 @@ Route::get('/tes_event',function(){
 	$message = ['user_id' => 21, 'name' => 'Fajrin Ismail', 'waktu' => '2020-01-01', 'jumPesan' => 0];
 	SendNotif::SendNotPesan('2',$message);
 });
+
 
 
 

@@ -502,6 +502,11 @@
 					</div>
 				@endif
 
+				@if($transaksi->status == '3')
+   					<div style="margin-top: 10px;"> 
+   						<button onclick="hapus_pesanan('{{ $transaksi->id }}')" id="btn-hapus" class=' btn btn-danger '>Hapus Pesanan</button>
+   					</div>
+				@endif
 			</div>
 		</div>	
 
@@ -532,6 +537,36 @@
 	     		$("#modal_edit").modal('show');
 
 	     	}
+
+	     	function hapus_pesanan(id)
+			{
+				var konfir  = confirm('Apakah Anda Yakin ?');
+				if(konfir){
+				
+					$.ajax({
+						url : '../transaksi/'+id,
+						headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+						type : 'POST',
+						data : '_method=delete',
+						beforeSend:function(){
+							$('#btn-hapus').html("<i class='fa fa-spinner fa-pulse fa-fw ' ></i> Loading ....");
+						},
+						success:function(msg){
+							if(msg.success == "1"){
+								alert("Berhasil Hapus Pesanan");
+								window.location.href = "{{route('transaksi.index')}}";
+							}
+						},
+				        error: function(reason) {
+	            			if(reason.status === 419 || reason.status === 401 || reason.status === 403){
+					          // alert("Maaf! Sesi Anda Telah Habis, Silahkan Login Kembali");
+					            window.location.href = "{{route('home')}}";
+					        }
+	        			}	
+					});
+				}
+			}
+
      	</script>
 
      	@if( ($transaksi->metode_pembayaran == '1' && $transaksi->status > '1' && $transaksi->status != '3' && $transaksi->status != '4') 
