@@ -158,7 +158,7 @@
          });
 
           //Date picker
-       
+
         
         var pusher = new Pusher('{{ env('MIX_PUSHER_APP_KEY') }}', {
                               cluster: '{{ env('MIX_PUSHER_APP_CLUSTER') }}',
@@ -214,7 +214,11 @@
                     getJumAP();
                   }else if(data.message.jenisNotif == "4"){
                     getJumKP();
+                  }else if(data.message.jenisNotif == "5"){
+                    getJumPesanan();
+                    getJumKP();
                   }
+
               }
             });
           }

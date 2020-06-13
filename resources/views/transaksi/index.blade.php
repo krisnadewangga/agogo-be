@@ -6,7 +6,11 @@
                                                           array('judul' => 'Pesanan','link' => '#')
                                                     	) 
                                   ])
-        <div class="card" style="margin-bottom: 10px;">
+
+    
+		
+
+        <div class="card" style="margin-bottom: 10px;" >
         	<form id="form-filter" method="POST" action="get_pesanan">
         		@csrf
 
@@ -118,6 +122,13 @@
 						// console.log(data);
 						var no = 1;
 						$.each(msg,function(index,value){
+							if(value.status == "3"){
+							
+						  		sambung_tombol = `<button  onclick="hapus_pesanan('`+value.id+`')" class=' btn btn-danger btn-sm btn_hapus_`+value.id+`'><i class='fa fa-trash'  ></i></button>`;
+							}else{
+								sambung_tombol = '';
+							}
+
 							isiTable += `<tr>
 											<td align='center'>`+no+`</td>
 											<td>`+value.waktu_tampil+`</td>
@@ -132,6 +143,7 @@
 													<button class="btn btn-warning btn-sm"><i class="fa fa-search"></i>
 													</button>
 												</a>
+												`+sambung_tombol+`
 											</td>
 									     </tr>`;
 						 no++;
@@ -162,6 +174,34 @@
 					}
 
 				})
+			}
+
+			function hapus_pesanan(id)
+			{
+				var konfir  = confirm('Apakah Anda Yakin ?');
+				if(konfir){
+					$.ajax({
+						url : 'transaksi/'+id,
+						headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+						type : 'POST',
+						data : '_method=delete',
+						beforeSend:function(){
+							$('.btn_hapus_'+id).html("<i class='fa fa-spinner fa-pulse fa-fw ' ></i>");
+						},
+						success:function(msg){
+							if(msg.success == "1"){
+								alert("Berhasil Hapus Pesanan");
+								loadTable();
+							}
+						},
+				        error: function(reason) {
+	            			if(reason.status === 419 || reason.status === 401 || reason.status === 403){
+					          // alert("Maaf! Sesi Anda Telah Habis, Silahkan Login Kembali");
+					            window.location.href = "{{route('home')}}";
+					        }
+	        			}	
+					});
+				}
 			}
 		</script>                      
 	@endcomponent
