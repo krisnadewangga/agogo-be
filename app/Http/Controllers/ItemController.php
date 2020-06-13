@@ -105,14 +105,13 @@ class ItemController extends Controller
 
     public function ganti_gambar_utama($id)
     {
-        $sel = GambarItem::where('utama','1')->first();
-        $reset = GambarItem::findOrFail($sel->id);
-        $reset->update(['utama' => '0']);
+
+        $sel = GambarItem::where('id',$id)->first();
+        $reset = GambarItem::where('item_id', $sel->item_id)->update(['utama' => '0']);
         
         $findNew = GambarItem::findOrFail($id);
         $findNew->update(['utama' => '1']);
-
-
+        
         return redirect()->back()->with('success_gu_gambar','Berhasil Mengubah Gambar Utama')->with('success_tab','gambar');
     }
 
