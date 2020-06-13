@@ -43,9 +43,9 @@ class DemoCron extends Command
     public function handle()
     {
 
-        $select = NotifExpired::whereDate('waktu_kirim', '<', Carbon::now() )->where('status','=','0')->get();
+        $select = NotifExpired::where('waktu_kirim', '<', Carbon::now()->format('Y-m-d H:i:s') )->where('status','=','0')->get();
         $count = $select->count();
-        // dd($count);
+        //dd($count);
 
         if($count > 0){
             foreach($select as $key){
@@ -121,7 +121,7 @@ class DemoCron extends Command
                 
                 $dnotif =
                 [
-                'pengirim_id' => '0',
+                'pengirim_id' => '1',
                 'penerima_id' => $key->Transaksi->user_id,
                 'judul_id' => $key->transaksi_id,
                 'judul' => 'Pembayaran Pesanan '.$key->Transaksi->no_transaksi,
@@ -135,26 +135,15 @@ class DemoCron extends Command
                 $kirim_email = SendNotif::kirimEmail($email,$data,$subject);
 
 
-                if($sendNotAndroid && $kirim_email){
+           
                      $update = NotifExpired::where('id', $key->id)->update(['status' => '1']);
-                }
+               
                
                 \Log::info("Successfully Send Email No Transaksi ".$key->Transaksi->no_transaksi);
             }
         }
-
+        // \Log::info("Successfully Send Email No Transaksi ");
         $this->info('Demo:Cron Cummand Run successfully!');
-        // $email = 'fajrin.ismail18@gmail.com';
-        // $data = ['name' => 'Fajrin ISmail',
-        //        'email_body' => "testing command console"
-        //        ];
-      
-        // $subject = "Testing Command Console";
-        // SendNotif::kirimEmail($email,$data,$subject);
-        /*
-           Write your database logic we bellow:
-           Item::create(['name'=>'hello new']);
-        */
       
         
     }

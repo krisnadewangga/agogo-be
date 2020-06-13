@@ -60,6 +60,7 @@ class TransaksiController extends Controller
     public function filterTransaksi(Request $request)
     {
         $req = $request->all();
+        // return $req;
 
         $jenis_transaksi = $req['jenis_transaksi'];
         $status_transaksi = $req['status_transaksi'];
@@ -105,18 +106,19 @@ class TransaksiController extends Controller
                                             ])
                                     ->orderBy('updated_at','desc')->get();
         }else if($jenis_transaksi == "0" && $status_transaksi == "1"){
+            // menunggu pengiriman dan pengambilan
             $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2'])
                                     ->where([
                                               ['status','=','1'],
-                                              // ['waktu_kirim','>', $waktu_sekarang ],
                                               ['jenis','=','1'],
                                               ['jalur','=','1']
                                             ])
                                     ->orderBy('updated_at','desc')->get();
         }else if($jenis_transaksi == "0" && $status_transaksi == "7"){
+                // status pesanan yang status transaksi expired nda ta pake
                 $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3'])
                                          ->whereNotIn('status',['5','3','2','4'])
-                                         ->where('waktu_kirim','<', $waktu_sekarang)
+                                         ->where('waktu_kirim','>', $waktu_sekarang)
                                           ->where('jenis','1')
                                           ->where('jalur','1')
                                          ->orderBy('updated_at','desc')->get();
@@ -155,18 +157,42 @@ class TransaksiController extends Controller
                                          ->orderBy('updated_at','desc')->get();
 
         }else if($jenis_transaksi != "0" && $status_transaksi == "0"){
-                $transaksi = Transaksi::whereNotIn('status',['5','3'])
-                                    ->where('metode_pembayaran',$jenis_transaksi)
-                                    ->where('jenis','1')
-                                    ->where('jalur','1')
-                                    ->orderBy('updated_at','desc')->get();
+               
+                if($jenis_transaksi != '1'){
+                  $transaksi = Transaksi::whereNotIn('status',['5','3'])
+                                      ->where('metode_pembayaran',$jenis_transaksi)
+                                      ->where('jenis','1')
+                                      ->where('jalur','1')
+                                      ->where('waktu_kirim','>', $waktu_sekarang)
+                                      ->orderBy('updated_at','desc')->get();
+                }else{
+                  $transaksi = Transaksi::whereNotIn('status',['5','3'])
+                                      ->where('metode_pembayaran',$jenis_transaksi)
+                                      ->where('jenis','1')
+                                      ->where('jalur','1')
+                                      ->orderBy('updated_at','desc')->get();
+                }
+
+
         }else if($jenis_transaksi != "0" &&  ($status_transaksi == "5" || $status_transaksi == "3") ){
+                //status pesanan diterima dan dibatalkan
                 $transaksi = Transaksi::where('metode_pembayaran',$jenis_transaksi)
                                    ->where('status',$status_transaksi)
                                    ->where('jenis','1')
                                    ->where('jalur','1')
                                    ->orderBy('updated_at','desc')->get();
         }else if( $jenis_transaksi != "0" && $status_transaksi == "4") {
+                // status pengajuan pesanan untuk dibatalkan
+                $transaksi = Transaksi::where([ 
+                                                  ['metode_pembayaran','=',$jenis_transaksi],
+                                                  ['status','=',$status_transaksi],
+                                                  ['jenis','=','1'],
+                                                  ['jalur','=','1'],
+                                                  // ['waktu_kirim','>', $waktu_sekarang ]
+                                              ])
+                                         ->orderBy('updated_at','desc')->get();
+        }else if( $jenis_transaksi != "0" &&  $status_transaksi == "1" ){
+                // status pesanan yang smntra mempersiapkan pesanan 
                 $transaksi = Transaksi::where([ 
                                                   ['metode_pembayaran','=',$jenis_transaksi],
                                                   ['status','=',$status_transaksi],
@@ -174,7 +200,8 @@ class TransaksiController extends Controller
                                                   ['jalur','=','1']
                                               ])
                                          ->orderBy('updated_at','desc')->get();
-        }else if( $jenis_transaksi != "0" && ($status_transaksi == "1" || $status_transaksi == "6" ) ){
+        }else if( $jenis_transaksi != "0" &&  $status_transaksi == "6" ){
+                // menunggu transfer pembayaran
                 $transaksi = Transaksi::where([ 
                                                   ['metode_pembayaran','=',$jenis_transaksi],
                                                   ['status','=',$status_transaksi],
@@ -183,7 +210,10 @@ class TransaksiController extends Controller
                                                   ['jalur','=','1']
                                               ])
                                          ->orderBy('updated_at','desc')->get();
+
         }else if($jenis_transaksi != "0" && $status_transaksi == "7"){
+                //untuk melihat yang tidak kepake / expired
+
                 $transaksi = Transaksi::whereNotIn('status',['5','3','2','4'])
                                          ->where('metode_pembayaran',$jenis_transaksi)
                                          ->where('waktu_kirim','<', $waktu_sekarang)
@@ -191,6 +221,7 @@ class TransaksiController extends Controller
                                          ->where('jalur','1')
                                          ->orderBy('updated_at','desc')->get();
         }else if($jenis_transaksi != "0" && $status_transaksi == "2"){
+                // status pesanan yang smntra pengiriman
                 $transaksi = Transaksi::where([ 
                                                   ['metode_pembayaran','=',$jenis_transaksi],
                                                   ['status','=',$status_transaksi],
@@ -233,13 +264,13 @@ class TransaksiController extends Controller
                     
                 }else if(  ($waktu_skrang > $batas_ambe )  && $transaksi['metode_pembayaran'] == "2"){
                     if($transaksi['status'] == "6"){
-                        $status = '<label class="label label-danger">Expired</label>';
+                        $status = '<label class="label label-danger">Pesanan Dibatalkan </label>';
                     }else{
                         $status = '<label class="label label-info">Menunggu Pengiriman</label>';
                     }     
                     
                 }else{
-                    $status = '<label class="label label-danger">Expired</label>';
+                    $status = '<label class="label label-danger>Pesanan Dibatalkan </label>';
                 } 
                
                 
@@ -338,7 +369,7 @@ class TransaksiController extends Controller
             $sambunganNotif = "";
         }
 
-
+        
         $find->update(['status' => '3']);
         if(isset($find->AjukanBatalPesanan->id)){
             $find->AjukanBatalPesanan()->update(['disetujui_oleh' => Auth::user()->name, 'status' => '1']);
@@ -349,19 +380,19 @@ class TransaksiController extends Controller
         }
        
         
-        $itemTransaksi = $find->ItemTransaksi;
-        foreach ($itemTransaksi as $key ) {
-            $find = Item::findOrFail($key['item_id']);
-            $newStock = $find->stock + $key['jumlah'];
-            $update = $find->update(['stock' => $newStock]);
+        // $itemTransaksi = $find->ItemTransaksi;
+        // foreach ($itemTransaksi as $key ) {
+        //     $find = Item::findOrFail($key['item_id']);
+        //     $newStock = $find->stock + $key['jumlah'];
+        //     $update = $find->update(['stock' => $newStock]);
 
-            DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->decrement('penjualan_toko', $key['jumlah']);
+        //     DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->decrement('penjualan_toko', $key['jumlah']);
                 
-            DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->decrement('total_penjualan', $key['jumlah']);
+        //     DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->decrement('total_penjualan', $key['jumlah']);
                 
-            DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('sisa_stock', $key['jumlah']);
-        }
-
+        //     DB::table('produksi')->where('item_id', $key['item_id'])->orderBy('id','DESC')->take(1)->increment('sisa_stock', $key['jumlah']);
+        // }
+        
         $this->setKunciTransaksi($penerima_id);
         SendNotif::SendNotPesan('5',['jenisNotif' => '3']);
         $dnotif =
@@ -478,5 +509,13 @@ class TransaksiController extends Controller
         return redirect()->back()->with("success","Berhasil Konfir Pembayaran");
 
 
+    }
+
+    public function destroy($id)
+    {
+      $find = Transaksi::findOrFail($id);
+      $hapus = $find->delete();
+
+      return response()->json(['success' => '1']);
     }
 }
