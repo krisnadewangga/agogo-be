@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\DemoCron::class,
+        Commands\autoBatal::class
     ];
 
     /**
@@ -27,7 +28,10 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')
         //          ->hourly();
         
-        $schedule->command('demo:cron')
+        $schedule->command(['demo:cron','autoBatal:cron'])
+                 ->everyMinute();
+
+        $schedule->command('autoBatal:class')
                  ->everyMinute();
                  
     }
