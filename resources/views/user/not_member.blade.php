@@ -11,7 +11,7 @@
 				{{ session('success') }}
 			@endcomponent
 		@endif
-
+		
         <div class="card" style="margin-top: 0px;">
 
         	<div class="row " style="margin-left:-5px;">
@@ -23,6 +23,11 @@
         		<div class="col-md-3 col-sm-4 col-xs-4 col-lg-3" style="padding:5px; ">
         			<label class="btn btn-block btn-social btn-success">
 		                <i class="fa fa-users"></i> {{ $total_user_aktif }} Konsumen Aktif
+		             </label>
+        		</div>	
+        		<div class="col-md-3 col-sm-4 col-xs-4 col-lg-3" style="padding:5px; ">
+        			<label class="btn btn-block btn-social btn-warning">
+		                <i class="fa fa-users"></i> {{ $total_user_menunggu_aktifasi }} Konsumen Menunggu Aktifasi
 		             </label>
         		</div>	
         		<div class="col-md-3 col-sm-4 col-xs-4 col-lg-3" style="padding:5px;">
@@ -52,23 +57,31 @@
 						@foreach($user as $key)
 							<tr>
 								<td align="center"></td>
-								<td class="nowrap">{{ $key->email_verified_at->format('d M Y H:i A') }}</td>
+								<td class="nowrap">{{ $key->created_at->format('d M Y H:i A') }}</td>
 								<td class="nowrap">{{$key->name}}</td>
 								<td align="right" class="nowrap">Rp {{ number_format($key->DetailKonsumen->saldo,'0','','.') }}</td>
 								<td align="center" class="nowrap">{{ $key->total_belanja }}</td>
 								<td align="center" class="nowrap">{{ $key->batal_belanja }}</td>
 								<td align="center" class="nowrap">
-									@if($key->status_aktif == '1')
+									@if($key->status_aktif == '1' && $key->email_verified_at != '')
 										<label class="label label-success">Aktif</label>
-									@else
+									@elseif($key->status_aktif == '0' && $key->email_verified_at != '')
 										<label class="label label-danger">Diblokir</label>
+									@else
+										<label class="label label-warning">Menunggu Aktifasi</label>
 									@endif
 								</td>
 								<td align="center" class="nowrap">
-									<button class="btn btn-sm btn-success" onclick="modal_pesan('{{$key->id}}','{{$key->name}}')"><i class="fa fa-envelope"></i></button>
-									<a href="{{ route('detail_user', ['id' => $key->id,'status_member' => $key->DetailKonsumen->status_member]) }}">
-										<button class="btn btn-warning btn-sm"><i class="fa fa-search"></i></button>
-									</a>
+									@if($key->email_verified_at != '')
+										<button class="btn btn-sm btn-success" onclick="modal_pesan('{{$key->id}}','{{$key->name}}')"><i class="fa fa-envelope"></i></button>
+										<a href="{{ route('detail_user', ['id' => $key->id,'status_member' => $key->DetailKonsumen->status_member]) }}">
+											<button class="btn btn-warning btn-sm"><i class="fa fa-search"></i></button>
+										</a>
+									@else
+										<a href="{{ route('aktifasi_manual',$key->id) }}" onclick="return confirm('Apakah Anda Yakin ?') "><button class="btn btn-sm btn-success" >
+											<i class="fa fa-power-off"></i></button>
+										</button></a>
+									@endif
 									<form method="post" action="{{ route('hapus_user', $key['id'] ) }}"  style="display: inline">
 			       						{{ csrf_field() }}
 			       						<input type="hidden" name="_method" value="delete" />

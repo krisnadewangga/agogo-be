@@ -301,17 +301,31 @@ class LaporanController extends Controller
                                    (SELECT count(transaksi.id) from transaksi where transaksi.user_id=users.id and transaksi.status != '3') as total_belanja,
                                    (SELECT count(transaksi.id) from transaksi where transaksi.user_id=users.id and transaksi.status = '3') as batal_belanja
                                  ")
-                       ->where('email_verified_at','!=','')
-                       ->whereIn('id',function($q){
-                          $q->from('detail_konsumen')
-                            ->select('user_id')
-                            ->where('status_member','0');
+                       
+                       ->where(function($a){
+                          return $a->where('email_verified_at','!=','')
+                                   ->whereIn('id',function($q){
+                                        $q->from('detail_konsumen')
+                                          ->select('user_id')
+                                          ->where('status_member','0');
 
-                          return $q;
+                                        return $q;
+                                    });
                        })
+                       ->orWhere(function($b){
+                          return $b->where('email_verified_at','=',NULL)
+                                   ->whereIn('id',function($q){
+                                        $q->from('detail_konsumen')
+                                          ->select('user_id')
+                                          ->where('status_member','0');
+
+                                        return $q;
+                                    });
+                       })
+                       
                        ->orderBy('users.id','DESC')
                        ->get();
-
+          
           $total_user = $user->count();
           $total_user_diblokir =  User::where([ 
                                                   ['email_verified_at','!=',''],
@@ -336,9 +350,21 @@ class LaporanController extends Controller
 
                                             return $q;
                                          })->count();
+
+           $total_user_menunggu_aktifasi =  User::where([ 
+                                                  ['email_verified_at','=',NULL],
+                                                  ['status_aktif','=','0']
+                                              ])
+                                        ->whereIn('id',function($q){
+                                            $q->from('detail_konsumen')
+                                              ->select('user_id')
+                                              ->where('status_member','0');
+
+                                            return $q;
+                                         })->count();
         
           $menu_active = "user|not_member|0";
-          return view("user.not_member",compact('menu_active','user', 'total_user','total_user_diblokir','total_user_aktif'));
+          return view("user.not_member",compact('menu_active','user', 'total_user','total_user_diblokir','total_user_aktif','total_user_menunggu_aktifasi'));
         }else{
           abort('404','Halaman Tidak Ditemukan');
         }
@@ -391,6 +417,14 @@ class LaporanController extends Controller
           abort('404','Halaman Tidak Ditemukan');
         }
 
+    }
+
+    public function AktifasiManual($id)
+    {
+      $user = User::where('id',$id)
+                  ->update(['status_aktif' => '1','email_verified_at' => date('Y-m-d H:i:s')]);
+
+      return redirect()->back()->with("success","Berhasil Mengaktifkan User");
     }
 
     public function HapusUser($id,$stat = '1')
