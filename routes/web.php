@@ -51,6 +51,7 @@ Route::post('/set_ongkir','KurirController@SetOngkir')->name('set_ongkir');
 Route::get('/member','LaporanController@Member')->name('member');
 Route::get('/not_member','LaporanController@NotMember')->name('not_member');
 Route::get('/detail_user','LaporanController@DetailUser')->name('detail_user');
+Route::get('/aktifasi_manual/{id}','LaporanController@AktifasiManual')->name('aktifasi_manual');
 
 Route::DELETE('/hapus_user/{id}','LaporanController@HapusUser')->name('hapus_user');
 
