@@ -89,97 +89,154 @@ public function index()
 public function store(Request $request)
 {
 
-  $req = $request->all();
 
-  if(!Auth::attempt(['name' => $req[0]['username_approval'], 'password' => $req[0]['pin_approval'] ]))
-    return response()->json([
-      'status' => 'failed',
-      'message' => 'Invalid Username / PIN'
-    ], 400);
-  $user = $request->user();
-  $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+   $req = $request->all();
 
-  if($role > 0){
 
-    if(!empty($request[0]['invoice']) ){            
+    
+    if(!Auth::attempt(['name' => $req[0]['username_approval'], 'password' => $req[0]['pin_approval'] ]))
+      return response()->json([
+        'status' => 'failed',
+        'message' => 'Invalid Username / PIN'
+      ], 400);
+    $user = $request->user();
+    $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+
+    if($role > 0){
+
+      
+      
+
+      // if(!empty($request[0]['invoice']) ){            
+        
+      // }else {
+      //   $no_transaksi = $this->generateInvoice('1');
+      // }
       $no_transaksi = $request[0]['invoice'] ;
+      $req_transaksi = ['user_id' => $req[0]['user_id'],
+            'no_transaksi' => $no_transaksi,
+            'total_transaksi' => $req[0]['subtotal'],
+            'total_bayar' => $req[0]['total'],
+            'status' => '1',
+            'jalur' => '2',
+            'jenis' => '2',
+            'biaya_pengiriman' => '0',
+            'biaya_pengiriman' => '0',
+            'jarak_tempuh' => '0',
+            'total_biaya_pengiriman' => '0',
+            'banyak_item' => count($req),
+            'lat' => '-',
+            'long' => '-',
+            // 'kasir_id' => $req[0]['user_id'],
+            'catatan' => $request[0]['catatan'],
+            'detail_alamat' => $request[0]['alamat'],
+            'metode_pembayaran' => '3',
+            'waktu_kirim' => date("Y-m-d H:i:s")
+          ];
+
+       
+
+          if(!empty( $request[0]['id']) ){ 
+            $req_transaksi['id'] = $request[0]['id'];
+          }
+
+
+          $cek = Transaksi::where('no_transaksi',$no_transaksi)->first();
+          if(empty($cek->id)){
+              $insertTransaksi = Transaksi::create($req_transaksi);
+              $find = Transaksi::findOrFail($insertTransaksi->id);
+
+              $insItem = [];
+              foreach ($req as $key) {
+                $array = [];
+                      // $array['transaksi_id'] =  $insertTransaksi->id;
+                $array['item_id'] = $key['product_id'];
+                $array['jumlah'] = $key['qty'];
+                $array['harga'] = $key['price'];
+                $array['margin'] = 0;
+                $array['total'] = $key['qty'] * $key['price'];
+
+                $insItem[] = $array;
+              }
+
+              $find->ItemTransaksi()->createMany($insItem);
+              $find->Preorder()->create([
+                'transaksi_id' => $insertTransaksi->id, 
+                'nama'          => $request[0]['nama'],
+                'tgl_pesan'     => $request[0]['tgl_pesan'],
+                'tgl_selesai'   => $request[0]['tgl_selesai'],
+                'waktu_selesai' => $request[0]['waktu_selesai'],
+                'telepon'       => $request[0]['telepon'],
+                'subtotal'      => $request[0]['subtotal'],
+                'discount'      => $request[0]['diskon'],
+                'add_fee'       => $request[0]['add_fee'],
+                'uang_muka'     => $request[0]['uang_muka'],
+                'total'         => $request[0]['total'],
+                'sisa_harus_bayar'  => $request[0]['sisa_harus_bayar'],
+                'sisa_bayar' => $request[0]['sisa_harus_bayar'],
+                'uang_dibayar'  => $request[0]['uang_dibayar'],
+                'uang_kembali'  => $request[0]['uang_kembali']]);
+
+
+              return response()->json([
+                'status' => 'success',
+                'message' => $no_transaksi,
+              ], 200);
+          }else{
+            if($cek->user_id != $req[0]['user_id']){
+                $req_transaksi['no_transaksi'] = $this->generateInvoice('1');
+
+                $insertTransaksi = Transaksi::create($req_transaksi);
+                $find = Transaksi::findOrFail($insertTransaksi->id);
+
+                $insItem = [];
+                foreach ($req as $key) {
+                  $array = [];
+                        // $array['transaksi_id'] =  $insertTransaksi->id;
+                  $array['item_id'] = $key['product_id'];
+                  $array['jumlah'] = $key['qty'];
+                  $array['harga'] = $key['price'];
+                  $array['margin'] = 0;
+                  $array['total'] = $key['qty'] * $key['price'];
+
+                  $insItem[] = $array;
+                }
+
+                $find->ItemTransaksi()->createMany($insItem);
+                $find->Preorder()->create([
+                  'transaksi_id' => $insertTransaksi->id, 
+                  'nama'          => $request[0]['nama'],
+                  'tgl_pesan'     => $request[0]['tgl_pesan'],
+                  'tgl_selesai'   => $request[0]['tgl_selesai'],
+                  'waktu_selesai' => $request[0]['waktu_selesai'],
+                  'telepon'       => $request[0]['telepon'],
+                  'subtotal'      => $request[0]['subtotal'],
+                  'discount'      => $request[0]['diskon'],
+                  'add_fee'       => $request[0]['add_fee'],
+                  'uang_muka'     => $request[0]['uang_muka'],
+                  'total'         => $request[0]['total'],
+                  'sisa_harus_bayar'  => $request[0]['sisa_harus_bayar'],
+                  'sisa_bayar' => $request[0]['sisa_harus_bayar'],
+                  'uang_dibayar'  => $request[0]['uang_dibayar'],
+                  'uang_kembali'  => $request[0]['uang_kembali']]);
+
+
+                return response()->json([
+                  'status' => 'success',
+                  'message' => $no_transaksi,
+                ], 200);
+            }
+          }
+
+        
+
+    }else{
+      return response()->json([
+        'status' => 'failed',
+        'message' => 'Invalid Username / PIN'
+      ], 400);
+
     }
-    else {
-      $no_transaksi = $this->generateInvoice('1');
-    }
-
-    $req_transaksi = ['user_id' => $req[0]['user_id'],
-    'no_transaksi' => $no_transaksi,
-    'total_transaksi' => $req[0]['subtotal'],
-    'total_bayar' => $req[0]['total'],
-    'status' => '1',
-    'jalur' => '2',
-    'jenis' => '2',
-    'biaya_pengiriman' => '0',
-    'biaya_pengiriman' => '0',
-    'jarak_tempuh' => '0',
-    'total_biaya_pengiriman' => '0',
-    'banyak_item' => count($req),
-    'lat' => '-',
-    'long' => '-',
-    // 'kasir_id' => $req[0]['user_id'],
-    'catatan' => $request[0]['catatan'],
-    'detail_alamat' => $request[0]['alamat'],
-    'metode_pembayaran' => '3',
-    'waktu_kirim' => date("Y-m-d H:i:s")
-  ];
-
-  if(!empty( $request[0]['id']) ){ 
-    $req_transaksi['id'] = $request[0]['id'];
-  }
-
-  $insertTransaksi = Transaksi::create($req_transaksi);
-  $find = Transaksi::findOrFail($insertTransaksi->id);
-
-  $insItem = [];
-  foreach ($req as $key) {
-    $array = [];
-          // $array['transaksi_id'] =  $insertTransaksi->id;
-    $array['item_id'] = $key['product_id'];
-    $array['jumlah'] = $key['qty'];
-    $array['harga'] = $key['price'];
-    $array['margin'] = 0;
-    $array['total'] = $key['qty'] * $key['price'];
-
-    $insItem[] = $array;
-  }
-
-  $find->ItemTransaksi()->createMany($insItem);
-  $find->Preorder()->create([
-    'transaksi_id' => $insertTransaksi->id, 
-    'nama'          => $request[0]['nama'],
-    'tgl_pesan'     => $request[0]['tgl_pesan'],
-    'tgl_selesai'   => $request[0]['tgl_selesai'],
-    'waktu_selesai' => $request[0]['waktu_selesai'],
-    'telepon'       => $request[0]['telepon'],
-    'subtotal'      => $request[0]['subtotal'],
-    'discount'      => $request[0]['diskon'],
-    'add_fee'       => $request[0]['add_fee'],
-    'uang_muka'     => $request[0]['uang_muka'],
-    'total'         => $request[0]['total'],
-    'sisa_harus_bayar'  => $request[0]['sisa_harus_bayar'],
-    'sisa_bayar' => $request[0]['sisa_harus_bayar'],
-    'uang_dibayar'  => $request[0]['uang_dibayar'],
-    'uang_kembali'  => $request[0]['uang_kembali']]);
-
-
-  return response()->json([
-    'status' => 'success',
-    'message' => $no_transaksi,
-  ], 200);
-
-}else{
-  return response()->json([
-    'status' => 'failed',
-    'message' => 'Invalid Username / PIN'
-  ], 400);
-
-}
 
 
 
