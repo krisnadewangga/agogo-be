@@ -337,29 +337,33 @@ public function postProduction(Request $request)
             })->all();
             // return response($result);
 
-            foreach ($result as $key => $row) {                
-                $production = Produksi::create([
-                    'item_id'               => $row['item_id'],
-                    'produksi1'             => $row['produksi1'],
-                    'produksi2'             => $row['produksi2'],
-                    'produksi3'             => $row['produksi3'],
-                    'total_produksi'        => $row['total_produksi'],
-                    'penjualan_toko'        => $row['penjualan_toko'],
-                    'penjualan_pemesanan'   => $row['penjualan_pemesanan'],
-                    'total_penjualan'       => $row['total_penjualan'],
-                    'ket_rusak'             => $row['ket_rusak'],
-                    'ket_lain'              => $row['ket_lain'],
-                    'total_lain'            => $row['total_lain'],
-                    'catatan'               => $row['catatan'],
-                    'stock_awal'            => $row['stock_awal'],
-                    'sisa_stock'            => $row['sisa_stock'],
-                    'created_at'            => $tgl_produksi,
-                ]);                
-                    // return response($row['product_id']);
-                //return response($getCount[0]['stock']);
+            foreach ($result as $key => $row) {     
+                if($row['produksi1'] > 0){           
+                    $production = Produksi::create([
+                        'item_id'               => $row['item_id'],
+                        'produksi1'             => $row['produksi1'],
+                        'produksi2'             => $row['produksi2'],
+                        'produksi3'             => $row['produksi3'],
+                        'total_produksi'        => $row['total_produksi'],
+                        'penjualan_toko'        => $row['penjualan_toko'],
+                        'penjualan_pemesanan'   => $row['penjualan_pemesanan'],
+                        'total_penjualan'       => $row['total_penjualan'],
+                        'ket_rusak'             => $row['ket_rusak'],
+                        'ket_lain'              => $row['ket_lain'],
+                        'total_lain'            => $row['total_lain'],
+                        'catatan'               => $row['catatan'],
+                        'stock_awal'            => $row['stock_awal'],
+                        'sisa_stock'            => $row['sisa_stock'],
+                        'created_at'            => $tgl_produksi,
+                    ]); 
+                    $sisa_stock = $request[0]['sisa_stock'];
+                    $products = DB::table('item')->where('id', $request[0]['product_id'])->update(['stock' => $sisa_stock]);
 
-                $sisa_stock = $request[0]['sisa_stock'];
-                $products = DB::table('item')->where('id', $request[0]['product_id'])->update(['stock' => $sisa_stock]);
+                }               
+                    // return response($row['product_id']);
+                    //return response($getCount[0]['stock']);
+
+                
 
 
             }
