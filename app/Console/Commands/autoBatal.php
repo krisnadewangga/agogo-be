@@ -56,7 +56,8 @@ class autoBatal extends Command
                         return $a->where([
                                             ['status', '=' , '1'],
                                             ['waktu_kirim', '<' , Carbon::now()->format('Y-m-d H:i:s')],
-                                            ['metode_pembayaran','=','3']
+                                            ['metode_pembayaran','=','3'],
+                                            ['jalur','=','1']
                                         ]);
                     })->get();
         $loadNot = 0;
