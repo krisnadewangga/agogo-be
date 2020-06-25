@@ -49,7 +49,8 @@
 						<th rowspan="2" class="nowrap">TGL Produksi</th>
 						<th colspan='3'  class="text-center">Produksi</th>
 						<th class="nowrap" rowspan="2">Total Produksi</th>
-						<th class="nowrap" rowspan="2">Pesanan Diambil</th>
+						<th class="nowrap" rowspan="2">Toko</th>
+						<th class="nowrap" rowspan="2">Pemesanan</th>
 						<th class="nowrap" rowspan="2">Total Penjualan</th>
 						<th class="nowrap" rowspan="2">Rusak</th>
 						<th class="nowrap" rowspan="2">Lain-Lain</th>
@@ -75,8 +76,9 @@
 								<td align="center">{{ number_format($key->produksi2,'0','','.') }}</td>
 								<td align="center">{{ number_format($key->produksi3,'0','','.') }}</td>
 								<td align="center">{{ number_format($key->total_produksi,'0','','.') }}</td>
-								<td align="center">{{ number_format($key->penjualan_pemesanan,'0','','.') }}</td>
 								<td align="center">{{ number_format($key->penjualan_toko,'0','','.') }}</td>
+								<td align="center">{{ number_format($key->penjualan_pemesanan,'0','','.') }}</td>
+								<td align="center">{{ number_format($key->total_penjualan,'0','','.') }}</td>
 								<td align="center">{{ number_format($key->ket_rusak,'0','','.') }}</td>
 								<td align="center">{{ number_format($key->ket_lain,'0','','.') }}</td>
 								<td align="center">{{ number_format($key->sisa_stock,'0','','.') }}</td>
