@@ -97,7 +97,8 @@
                         <th rowspan="2">Nama Menu</th>
                         <th colspan="3">Produksi</th>
                         <th rowspan="2">Total Produksi</th>
-                        <th rowspan="2">Pesanan diambil</th>
+                        <th rowspan="2">Toko</th>
+                        <th rowspan="2">Pemesanan</th>
                         <th rowspan="2">Total Penjualan</th>
                         <th rowspan="2">Rusak</th>
                         <th rowspan="2">Lain - lain</th>
@@ -122,8 +123,9 @@
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->produksi2,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->produksi3,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->total_produksi,'0','','.') }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->penjualan_pemesanan,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->penjualan_toko,'0','','.') }}</td>
+                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->penjualan_pemesanan,'0','','.') }}</td>
+                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->total_penjualan,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->ket_rusak,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->ket_lain,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->sisa_stock,'0','','.') }}</td>
