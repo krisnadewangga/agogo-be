@@ -920,7 +920,6 @@ class LaporanController extends Controller
        $dates = [$mt, $st];
        $result = $this->SetDataPemesanan($dates);
 
-
        
        $input = ['mulai_tanggal' => $req['mulai_tanggal'], 'sampai_tanggal' => $req['sampai_tanggal'] ];
        $menu_active = "laporan|pemesanan|0";
@@ -951,6 +950,7 @@ class LaporanController extends Controller
 
     public function SetDataPemesanan($dates)
     {
+
 
       if($dates[0] == $dates[1]){
           $select = Transaksi::leftJoin('preorders as a', 'transaksi.id','=','a.transaksi_id')
@@ -986,21 +986,27 @@ class LaporanController extends Controller
                             return $q->where('transaksi.jenis','2')
                                      ->whereIn('transaksi.status',['1','5'])
                                      ->where('for_ps','1')
-                                     ->whereBetween('transaksi.created_at',$dates);
+                                     ->where('transaksi.created_at','>=', $dates[0]." 00:00:00")
+                                     ->where('transaksi.created_at','<=', $dates[1]." 23:59:59");
+                                     // ->whereBetween('transaksi.created_at',$dates);
                           })
                           ->orWhere(function($b) use($dates){
                             return $b->where('transaksi.jenis','1')
                                      ->whereIn('transaksi.metode_pembayaran',['1','2'])
                                      ->whereIn('transaksi.status',['1','2','5'])
                                      ->where('for_ps','1')
-                                     ->whereBetween('transaksi.created_at',$dates);
+                                     // ->whereBetween('transaksi.created_at',$dates);
+                                     ->where('transaksi.created_at','>=',$dates[0]." 00:00:00")
+                                     ->where('transaksi.created_at','<=',$dates[1]." 23:59:59");
                           })
                           ->orWhere(function($c) use($dates){
                             return $c->where('transaksi.jenis','1')
                                      ->where('transaksi.metode_pembayaran','3')
                                      ->whereIn('transaksi.status',['1','5'])
                                      ->where('for_ps','1')
-                                     ->whereBetween('transaksi.created_at',$dates);
+                                     // ->whereBetween('transaksi.created_at',$dates);
+                                     ->where('transaksi.created_at','>=',$dates[0]." 00:00:00")
+                                     ->where('transaksi.created_at','<=',$dates[1]." 23:59:59");
                           });
            $data_cancel = Transaksi::where('status','3')->whereBetween('transaksi.created_at',$dates)->get();              
       }
