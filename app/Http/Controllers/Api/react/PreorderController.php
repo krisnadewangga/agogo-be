@@ -92,9 +92,14 @@ public function store(Request $request)
 
    $req = $request->all();
 
+   if(!empty($request[0]['alamat']) && !empty($request[0]['nama']) && !empty($request[0]['tgl_pesan']) && !empty($request[0]['tgl_selesai']) && !empty($request[0]['waktu_selesai']) && !empty($request[0]['telepon'])) 
 
-    
-    if(!Auth::attempt(['name' => $req[0]['username_approval'], 'password' => $req[0]['pin_approval'] ]))
+
+
+
+    {
+
+      if(!Auth::attempt(['name' => $req[0]['username_approval'], 'password' => $req[0]['pin_approval'] ]))
       return response()->json([
         'status' => 'failed',
         'message' => 'Invalid Username / PIN'
@@ -239,6 +244,23 @@ public function store(Request $request)
     }
 
 
+
+   }
+ // $request[0]['alamat']
+ // $request[0]['nama'],
+ // $request[0]['tgl_pesan'],
+ // $request[0]['tgl_selesai'],
+ // $request[0]['waktu_selesai'],
+ // $request[0]['telepon'],
+
+   else{
+    return response()->json([
+        'status' => 'failed',
+        'message' => 'nama, tgl , jam selesai, telepon,alamat tidak bisa kosong'
+      ], 400);  
+   }
+    
+      
 
 
 
