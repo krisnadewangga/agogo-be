@@ -338,7 +338,7 @@ public function postProduction(Request $request)
             // return response($result);
 
             foreach ($result as $key => $row) {     
-                if($row['produksi1'] > 0){           
+                if($row['produksi1'] > 0 || $row['ket_rusak'] > 0 || $row['ket_lain'] > 0 ){           
                     $production = Produksi::create([
                         'item_id'               => $row['item_id'],
                         'produksi1'             => $row['produksi1'],
@@ -358,8 +358,9 @@ public function postProduction(Request $request)
                     ]); 
                     $sisa_stock = $request[0]['sisa_stock'];
                     $products = DB::table('item')->where('id', $request[0]['product_id'])->update(['stock' => $sisa_stock]);
+                } 
 
-                }               
+               
                     // return response($row['product_id']);
                     //return response($getCount[0]['stock']);
 
