@@ -102,6 +102,7 @@ public function store(Request $request)
       if(!Auth::attempt(['name' => $req[0]['username_approval'], 'password' => $req[0]['pin_approval'] ]))
       return response()->json([
         'status' => 'failed',
+        'status1' => '0',
         'message' => 'Invalid Username / PIN'
       ], 400);
     $user = $request->user();
@@ -185,10 +186,13 @@ public function store(Request $request)
 
               return response()->json([
                 'status' => 'success',
+                'status1' => '1',
                 'message' => $no_transaksi,
               ], 200);
           }else{
             if($cek->user_id != $req[0]['user_id']){
+
+
                 $req_transaksi['no_transaksi'] = $this->generateInvoice('1');
 
                 $insertTransaksi = Transaksi::create($req_transaksi);
@@ -228,6 +232,7 @@ public function store(Request $request)
 
                 return response()->json([
                   'status' => 'success',
+                  'status1' => '1',
                   'message' => $no_transaksi,
                 ], 200);
             }
@@ -238,6 +243,7 @@ public function store(Request $request)
     }else{
       return response()->json([
         'status' => 'failed',
+        'status1' => '0',
         'message' => 'Invalid Username / PIN'
       ], 400);
 
