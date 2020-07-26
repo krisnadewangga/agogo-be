@@ -10,6 +10,8 @@ use App\Item;
 use App\Promo;
 use App\Pesan;
 use App\User;
+use App\Versi;
+
 use Validator;
 
 class MasterController extends Controller
@@ -253,51 +255,82 @@ class MasterController extends Controller
 
   public function listPromo(Request $request)
   {
-        $req = $request->all();
-        $messsages = ['dataPerpage.required' => 'dataPerpage Tidak Bisa Kosong',
-                      'page.required' => 'page Tidak Bisa Kosong'];
-        $rules = ['page' => 'required', 'dataPerpage' => 'required'];
+    $req = $request->all();
+    $messsages = ['dataPerpage.required' => 'dataPerpage Tidak Bisa Kosong',
+                  'page.required' => 'page Tidak Bisa Kosong'];
+    $rules = ['page' => 'required', 'dataPerpage' => 'required'];
 
-        $validator = Validator::make($req, $rules,$messsages);
-        if($validator->fails()){
-              $success = 0;
-              $msg = $validator->messages()->all();
-              $kr = 400;
-              $pageSaatIni = 0;
-              $tampilPS = 0;
-         }else{
-          $page = $req['page'];
-            $dataPerpage = $req['dataPerpage'];
-            $offset = ($page - 1) * $dataPerpage;
+    $validator = Validator::make($req, $rules,$messsages);
+    if($validator->fails()){
+          $success = 0;
+          $msg = $validator->messages()->all();
+          $kr = 400;
+          $pageSaatIni = 0;
+          $tampilPS = 0;
+     }else{
+      $page = $req['page'];
+        $dataPerpage = $req['dataPerpage'];
+        $offset = ($page - 1) * $dataPerpage;
 
-            $promo = Promo::where('status','1')
-                    ->orderBy('id','DESC')
-                    ->limit($dataPerpage)
-                    ->offset($offset)->get();
-            $promo->map(function($promo){
-              return $promo['batas_promo'] = $promo->berlaku_sampai->format('Y-m-d');
-              
-            });
+        $promo = Promo::where('status','1')
+                ->orderBy('id','DESC')
+                ->limit($dataPerpage)
+                ->offset($offset)->get();
+        $promo->map(function($promo){
+          return $promo['batas_promo'] = $promo->berlaku_sampai->format('Y-m-d');
+          
+        });
 
-          $jumdat = Promo::where('status','1')->count();
+      $jumdat = Promo::where('status','1')->count();
 
-          $jumHal = ceil($jumdat / $dataPerpage);
-          $pageSaatIni = (int) $page;
-          $pageSelanjutnya = $page+1;
-          if( ($pageSaatIni == $jumHal) || ($jumHal == 0) ){
-             $tampilPS = 0;
-          }else{
-             $tampilPS = $pageSelanjutnya;
-          }
+      $jumHal = ceil($jumdat / $dataPerpage);
+      $pageSaatIni = (int) $page;
+      $pageSelanjutnya = $page+1;
+      if( ($pageSaatIni == $jumHal) || ($jumHal == 0) ){
+         $tampilPS = 0;
+      }else{
+         $tampilPS = $pageSelanjutnya;
+      }
 
-          $success = 1;
-          $msg = $promo;
-          $kr = 200;
+      $success = 1;
+      $msg = $promo;
+      $kr = 200;
 
     }
-        return response()->json(['success' => $success,'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'msg' => $msg], $kr);
+    return response()->json(['success' => $success,'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'msg' => $msg], $kr);
   }
 
+  public function CekVersi(Request $request)
+  {
+      $req = $request->all();
+      $messsages = ['versi.required' => 'Versi Tidak Bisa Kosong'];
+      $rules = ['versi' => 'required'];
+
+      $validator = Validator::make($req, $rules,$messsages);
+      if($validator->fails()){
+        $success = 0;
+        $msg = $validator->messages()->all();
+        $kr = 400;
+      }else{
+        $versi = Versi::first();
+        if(isset($versi->id)){
+          if($req['versi'] == $versi->versi){
+            $success = 0;
+          }else{
+            $success = 1;
+          }
+
+          $msg = $versi->versi;  
+        }else{
+          $success = 0;
+          $msg = "Versi Masih Kosong";
+        }
+        
+        $kr = 200;
+
+      }
+      return response()->json(['success' => $success, 'msg' => $msg], $kr);
+  }
 
 
   // cek kas
