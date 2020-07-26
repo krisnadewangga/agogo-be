@@ -38,6 +38,8 @@ Route::resource('level','LevelController');
 Route::resource('administrator','AdministratorController');
 Route::resource('kategori','KategoriController');
 Route::resource('item','ItemController');
+Route::resource('/versi','VersiController');
+
 Route::POST('/store_gambarItem','ItemController@store_gambarItem')->name('store_gambarItem');
 Route::GET('/ganti_gambar_utama/{id}','ItemController@ganti_gambar_utama')->name('ganti_gambar_utama');
 Route::DELETE('/hapus_gambar_item/{id}','ItemController@hapus_gambar_item')->name('hapus_gambar_item');
@@ -116,6 +118,8 @@ Route::get('/get_jum_pesan','PesanController@getJumPesan')->name('get_jum_pesan'
 Route::get('/baca_pesan/{id}','PesanController@bacaPesan')->name('baca_pesan');
 
 Route::post('/get_pesanan','TransaksiController@filterTransaksi')->name('get_pesanan');
+
+
 
 Route::get('/tes_event',function(){
 	$message = ['user_id' => 21, 'name' => 'Fajrin Ismail', 'waktu' => '2020-01-01', 'jumPesan' => 0];
