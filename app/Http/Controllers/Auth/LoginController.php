@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Validation\ValidationException;
+use App\User;
+use App\Role;
 
 class LoginController extends Controller
 {
@@ -46,12 +49,24 @@ class LoginController extends Controller
      */
     protected function attemptLogin(Request $request)
     {
-        $request->merge(['status_aktif' => '1', 'level_id' => ['1','2','7'] ]);
-
-        
-        return $this->guard()->attempt(
-            $this->credentials($request), $request->filled('remember')
-        );
+        $email = $request->email;
+        $user = User::where('email',$email)
+                    ->whereIn('id', function($q){
+                        return $q->select('user_id')
+                                 ->from('roles')
+                                 ->whereIn('level_id',['1','2','7']);
+                    })
+                    ->first();
+        if(isset($user->id)){
+            $request->merge(['status_aktif' => '1']);
+            return $this->guard()->attempt(
+                $this->credentials($request), $request->filled('remember')
+            );
+        }else{
+            throw ValidationException::withMessages([
+                $this->username() => [trans('auth.failed')],
+            ]);
+        }
     }
 
     /**
@@ -62,6 +77,7 @@ class LoginController extends Controller
      */
     protected function credentials(Request $request)
     {
+
         return $request->only($this->username(), 'password','status_aktif','level_id');
     }
 }
