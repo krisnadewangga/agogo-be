@@ -51,13 +51,11 @@ Route::post('ajukan_batal_pesanan','Api\TransaksiController@AjukanBatalPesanan')
 Route::get('list_notifikasi', 'Api\NotifikasiController@tampilNotifikasi');
 Route::POST('read_notifiikasi', 'Api\NotifikasiController@readNotifikasi');
 
+Route::get('cek_versi','Api\MasterController@CekVersi');
 
 
 //get user
 Route::get('users','Api\react\UserController@getUser');
-
-
-
 
 //Auth API
 Route::group([
@@ -144,3 +142,4 @@ Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
     return "Cache is cleared";
 });
+
