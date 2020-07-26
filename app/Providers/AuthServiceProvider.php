@@ -53,5 +53,12 @@ class AuthServiceProvider extends ServiceProvider
             }
             return false;
         });
+
+        Gate::define('manage-versi',function($user){
+            if( ($user->level_id == "1" || $user->level_id == '2' ) && $user->status_aktif == "1"){
+                return true;
+            }
+            return false;
+        });
     }
 }
