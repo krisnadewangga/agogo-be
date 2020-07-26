@@ -29,7 +29,7 @@ class AdministratorController extends Controller
     
     public function index()
     {
-       $administrator = User::whereNotIn('level_id',['1','6'])->get();
+       $administrator = User::whereNotIn('level_id',['6'])->get();
        
        $administrator->map(function($administrator){
          $sel_role = Role::where(['user_id' => $administrator->id])->pluck('level_id');
@@ -42,7 +42,8 @@ class AdministratorController extends Controller
        });  
 
     
-       $levels = Level::whereNotIn('id',['1','6'])->get();
+       $levels = Level::whereNotIn('id',['6'])->get();
+  
 
        $menu_active = "user|admin|0";
        return view('user.administrator', compact('administrator','menu_active','levels'));
