@@ -49,7 +49,8 @@ class DemoCron extends Command
 
         if($count > 0){
             foreach($select as $key){
-                $email_body = "<div style='padding:10px;'>
+                if($key->Transaksi->metode_pembayaran == '2'){
+                    $email_body = "<div style='padding:10px;'>
                                         <div>
                                             Anda Belum Melakukan Pembayaran Untuk Pemesanan 
                                             Dengan No Transaksi <b class='fg-red'>".$key->Transaksi->no_transaksi."</b> Dan List Pemesanan Sebagai Berikut
@@ -111,40 +112,73 @@ class DemoCron extends Command
                                         <hr />
                                        </div>
                                       ";
+                    $subject = "Invoice Pembayaran";
 
+                    $dnotif = ['pengirim_id' => '1',
+                                'penerima_id' => $key->Transaksi->user_id,
+                                'judul_id' => $key->transaksi_id,
+                                'judul' => 'Pembayaran Pesanan '.$key->Transaksi->no_transaksi,
+                                'isi' => 'Anda Belum Melakukan Pembayaran Untuk Pesanan Nomor Transaksi '.$key->Transaksi->no_transaksi.' Segera Lakukan Pembayaran. Batas Waktu Pembayaran '.$key->Transaksi->waktu_kirim->format('d/m/Y h:i A').' Pesanan Akan Dibatalkan Apabila Sampai Dengan Batas Waktu Yang Telah Ditentukan Anda Belum Melakukan Transfer Pembayaran',
+                                'jenis_notif' => 9,
+                                'dibaca' => '0'
+                               ];
+                }else{
+                    $email_body = "<div style='padding:10px;'>
+                                        <div>
+                                            Anda Baru Saja Melakukan Pemesanan Di Agogobakery.com <br/>
+                                            Dengan No Transaksi <b class='fg-red'>".$key->Transaksi->no_transaksi."</b> Dan List Pemesanan Sebagai Berikut
+                                        </div>
+
+                                        <table class='blueTable' style='margin-top:10px; margin-bottom:10px;'>
+                                            <thead>
+                                                <th style='width:10px;'>No</th>
+                                                <th>Item</th>
+                                                <th>Jumlah</th>
+                                                <th>Harga</th>
+                                                <th>Total</th>
+                                            </thead>
+                                            <tbody>
+                                                ".$key->item."
+                                            </tbody>
+                                        </table>
+                                    
+                                        <div syle='margin-top:10px; '>
+                                            Batas Pengambilan Pesanan Sampai : 
+                                            <h2 style='margin-top:3px; margin-bottom:3px;'>".$key->Transaksi->waktu_kirim->format('d/m/Y h:i A')."</h2>
+                                            <i style='font-size:12px;'>*) Pesanan Akan Dibatalkan Apabila Sampai Dengan Batas Waktu Yang Telah Ditentukan Anda Belum Mengambil Pesanan </i>
+                                        </div>
+                                    
+                                        <hr />
+                                       </div>
+                                      ";
+                    $subject = "Pesanan Agogobakery.com";
+
+                    $dnotif =[
+                                'pengirim_id' => '1',
+                                'penerima_id' => $key->Transaksi->user_id,
+                                'judul_id' => $key->transaksi_id,
+                                'judul' => 'Pesanan No '.$key->Transaksi->no_transaksi,
+                                'isi' => 'Anda Telah Melakukan Pesanan Dengan Nomor Transaksi '.$key->Transaksi->no_transaksi.' Dengan Metode Pembayaran Bayar Di Toko . Batas Waktu Pengambilan Pesanan '.$key->Transaksi->waktu_kirim->format('d/m/Y h:i A').' Pesanan Akan Dibatalkan Apabila Sampai Dengan Batas Waktu Yang Telah Ditentukan Anda Belum Mengambil Pesanan',
+                                'jenis_notif' => 1,
+                                'dibaca' => '0'
+                                ];
+                }
+                
                 $email = $key->email;
                 $data = ['name' => $key->Transaksi->User->name, 
                          'email_body' => $email_body
                         ];
 
-                $subject = "Invoice Pembayaran";
-                
-                $dnotif =
-                [
-                'pengirim_id' => '1',
-                'penerima_id' => $key->Transaksi->user_id,
-                'judul_id' => $key->transaksi_id,
-                'judul' => 'Pembayaran Pesanan '.$key->Transaksi->no_transaksi,
-                'isi' => 'Anda Belum Melakukan Pembayaran Untuk Pesanan Nomor Transaksi '.$key->Transaksi->no_transaksi.' Segera Lakukan Pembayaran. Batas Waktu Pembayaran '.$key->Transaksi->waktu_kirim->format('d/m/Y h:i A'),
-                'jenis_notif' => 9,
-                'dibaca' => '0'
-                ];
                 $notif = Notifikasi::create($dnotif);
-
                 $sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pembayaran Pesanan', $notif->judul_id);
                 $kirim_email = SendNotif::kirimEmail($email,$data,$subject);
 
+                $update = NotifExpired::where('id', $key->id)->update(['status' => '1']);
 
-           
-                     $update = NotifExpired::where('id', $key->id)->update(['status' => '1']);
-               
-               
                 \Log::info("Successfully Send Email No Transaksi ".$key->Transaksi->no_transaksi);
             }
         }
         // \Log::info("Successfully Send Email No Transaksi ");
         $this->info('Demo:Cron Cummand Run successfully!');
-      
-        
     }
 }

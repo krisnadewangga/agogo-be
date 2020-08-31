@@ -93,7 +93,7 @@ class AdministratorController extends Controller
         $req['password'] = bcrypt($request->password);
         
         if(isset($req['foto'])){
-            $uploadFoto = KompresFoto::UbahUkuran($req['foto'],'user');
+            $uploadFoto = KompresFoto::Upload($req['foto'],'user');
             $req['foto'] = $uploadFoto;
         }
 
@@ -142,6 +142,8 @@ class AdministratorController extends Controller
     public function update(Request $request, $id)
     {
         $req = $request->all();
+       
+
         $req_roles = $request->only(['roles']);
 
         $rules = ['name' => 'required', 'email' => 'required', 'status_aktif' => 'required', 
@@ -167,6 +169,7 @@ class AdministratorController extends Controller
             $req['password'] = bcrypt($request->password);
         }
 
+       
 
         $find = User::findOrFail($req['id']);
 
@@ -187,7 +190,7 @@ class AdministratorController extends Controller
                 $hapusFoto = KompresFoto::HapusFoto($find->foto); 
             }
             
-            $uploadFoto = KompresFoto::UbahUkuran($req['foto'],'user');
+            $uploadFoto = KompresFoto::Upload($req['foto'],'user');
             $req['foto'] = $uploadFoto;
         }
 
