@@ -15,14 +15,16 @@ class CreateTableKurir extends Migration
     {
         Schema::create('kurir', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('nama');
-            $table->string('no_hp');
+            $table->unsignedBigInteger('user_id');
+            // $table->string('nama');
+            // $table->string('no_hp');
             $table->enum('jenis_kendaraan',['Motor','Mobil']);
             $table->string('merek');
             $table->string('no_polisi');
-            $table->string('foto');
-            $table->enum('status_aktif',['0','1'])->default('1');
+            // $table->string('foto');
+            // $table->enum('status_aktif',['0','1'])->default('1');
             $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

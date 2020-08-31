@@ -261,6 +261,8 @@ public function GetLastDate()
 public function postProduction(Request $request)
 {
 
+    return $request;
+
     $ubah_tanggal = null;
     $ubah_tanggal = $request[0]['ubah_tanggal'];
 
@@ -270,7 +272,9 @@ public function postProduction(Request $request)
           'message' => 'Invalid Username / PIN'
       ], 400);
     $user = $request->user();
-    $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+    $role = Role::where('user_id',$user->id)
+                 ->whereIn('level_id',['1','2'])
+                 ->count();
 
     if($role > 0){
 
@@ -382,13 +386,13 @@ public function postProduction(Request $request)
                 'message' => $e->getMessage()
             ], 400);
         }
-    }
-    else {
+    }else {
         return response()->json([
             'status' => 'failed',
             'message' => 'Invalid Username / PIN'
         ], 400);
     }
+
 
 
 }

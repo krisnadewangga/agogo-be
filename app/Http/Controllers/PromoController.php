@@ -47,7 +47,7 @@ class PromoController extends Controller
         $pisah_berlaku_sampai = explode("/", $req['berlaku_sampai']);
         $req['berlaku_sampai'] = $pisah_berlaku_sampai['2']."-".$pisah_berlaku_sampai['1']."-".$pisah_berlaku_sampai['0'];
 
-        $req['gambar'] = KompresFoto::UbahUkuran($req['gambar'],'promo');
+        $req['gambar'] = KompresFoto::Upload($req['gambar'],'promo');
         $req['status'] = "1";
 
         $req['dibuat_oleh'] = Auth::User()->name;
@@ -83,7 +83,7 @@ class PromoController extends Controller
                 $hapusFoto = KompresFoto::HapusFoto($find->gambar); 
             }
             
-            $uploadFoto = KompresFoto::UbahUkuran($req['gambar'],'promo');
+            $uploadFoto = KompresFoto::Upload($req['gambar'],'promo');
             $req['gambar'] = $uploadFoto;
         }else{
             $req = $request->except(['gambar']);

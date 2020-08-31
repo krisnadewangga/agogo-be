@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use App\Helpers\KompresFoto;
 use App\Kurir;
 use App\Ongkir;
+use App\User;
 use Auth;
 
 class KurirController extends Controller
@@ -27,7 +29,11 @@ class KurirController extends Controller
 
     public function index()
     {
-        $kurir = Kurir::all();
+        $kurir = Kurir::whereIn('user_id',function($query){
+            return $query->select('id')
+                         ->from('users')
+                         ->whereNull('deleted_at');
+        })->get();
         $ongkir = Ongkir::first();
         $menu_active = "user|kurir|0";
         return view('pengiriman.kurir', compact('kurir','menu_active','ongkir'));
@@ -52,20 +58,43 @@ class KurirController extends Controller
     public function store(Request $request)
     {
         $req = $request->all();
-        $validator = \Validator::make($req,['nama' => 'required|unique:kurir',
-                                            'no_hp' => 'required|unique:kurir',
+        $validator = \Validator::make($req,['name' => 'required',
+                                            'name' => Rule::unique('users')->where(function ($query) {
+                                                        return $query->where('level_id','8')
+                                                                     ->whereNull('deleted_at');
+                                                        
+                                                      }),
+                                            'no_hp' => 'required',
+                                            'no_hp' => Rule::unique('users')->where(function ($query) {
+                                                        return $query->where('level_id','8')
+                                                                     ->whereNull('deleted_at');
+                                                        
+                                                      }),
+                                            'email' => 'required|email',
+                                            'email' => Rule::unique('users')->where(function ($query) {
+                                                        return $query->where('level_id','8')
+                                                                     ->whereNull('deleted_at');
+                                                        
+                                                      }),
+                                            'password' => 'required',
                                             'jenis_kendaraan' => 'required',
                                             'merek' => 'required',
                                             'no_polisi' => 'required',
                                             'foto' => 'required|image|mimes:jpeg,png,jpg,JPG,PNG,JPEG']);
        
-
         if($validator->fails()){
             return redirect()->back()->withErrors($validator)->withInput()->with('gagal','simpan');
         }
 
-        $req['foto'] = KompresFoto::UbahUkuran($req['foto'],'kurir');
-        $insert = Kurir::create($req);
+        $dataKurir = $request->except('name','email','no_hp','foto','password');
+        $dataUser = $request->only('name','email','no_hp','foto','password');
+        $dataUser['foto'] = KompresFoto::Upload($req['foto'],'kurir');
+        $dataUser['level_id'] = '8';
+        $dataUser['password'] = bcrypt($request->password);
+
+        $insert = User::create($dataUser);
+        $dataKurir['user_id'] = $insert->id;
+        $insertK = Kurir::create($dataKurir);
 
         return redirect()->back()->with('success','Berhasil Input Kurir');
 
@@ -124,39 +153,71 @@ class KurirController extends Controller
     public function update(Request $request, $id)
     {
         $req = $request->all();
-        if(isset($req['foto'])){
-            $data_validator = [  'nama' => 'required',
-                                 'no_hp' => 'required',
-                                 'jenis_kendaraan' => 'required',
-                                 'merek' => 'required',
-                                 'no_polisi' => 'required',
-                                 'foto' => 'required|image|mimes:jpeg,png,jpg,JPG,PNG,JPEG'];
-        }else{
-            $data_validator = [  'nama' => 'required',
-                                 'no_hp' => 'required',
-                                 'jenis_kendaraan' => 'required',
-                                 'merek' => 'required',
-                                 'no_polisi' => 'required'];
+        $data_validator = ['jenis_kendaraan' => 'required',
+                           'merek' => 'required',
+                           'no_polisi' => 'required'];
+
+        $find = User::findOrFail($req['id']);
+        if($find->email != $req['email']){
+            $data_validator['email'] = 'required';
+            $data_validator['email'] = Rule::unique('users')->where(function ($query) {
+                                                        return $query->where('level_id','8')
+                                                                     ->whereNull('deleted_at');
+                                                                     
+                                                      });
+
         }
 
+        if($find->no_hp != $req['no_hp']){
+            $data_validator['no_hp'] = 'required';
+            $data_validator['no_hp'] = Rule::unique('users')->where(function ($query) {
+                                                        return $query->where('level_id','8')
+                                                                     ->whereNull('deleted_at');
+                                                      });
+        }
+        if($find->name != $req['name']){
+            $data_validator['name'] = 'required';
+            $data_validator['name'] = Rule::unique('users')->where(function ($query) {
+                                                        return $query->where('level_id','8')
+                                                                     ->whereNull('deleted_at');
+                                                      });
+        }
+
+        if(isset($req['password'])){
+            $data_validator['password'] = 'required|min:6';
+        }
+
+        if(isset($req['foto'])){
+            $data_validator['foto'] = 'required|image|mimes:jpeg,png,jpg,JPG,PNG,JPEG';
+        }
+        
         $validator = \Validator::make($req,$data_validator);
         if($validator->fails()){
             return redirect()->back()->withErrors($validator,'edit')->withInput()->with('gagal','update');
         }
 
-        $find = Kurir::findOrFail($req['id']);
+        
+        $dataUser = ['name' => $req['name'], 'no_hp' => $req['no_hp'],'email' => $req['email'], 'status_aktif' => $req['status_aktif'] ];
+        $dataKurir = ['jenis_kendaraan' => $req['jenis_kendaraan'],'merek' => $req['merek'], 'no_polisi' => $req['no_polisi']];
+
+        if(isset($req['password'])){
+           $dataUser['password'] = bcrypt($request->password);
+        }
+
         if(isset($req['foto'])){
             if(!empty($find->foto)){
                 $hapusFoto = KompresFoto::HapusFoto($find->foto); 
             }
-            
-            $uploadFoto = KompresFoto::UbahUkuran($req['foto'],'kurir');
-            $req['foto'] = $uploadFoto;
-        }else{
-            $req = $request->except(['foto']);
+
+            $uploadFoto = KompresFoto::Upload($req['foto'],'kurir');
+            $dataUser['foto'] = $uploadFoto;
         }
 
-        $find->update($req);
+      
+
+        $find->Update($dataUser);
+        $find->Kurir()->Update($dataKurir);
+
         return redirect()->back()->with('success','Berhasil Update Kurir');
     }
 
@@ -168,7 +229,9 @@ class KurirController extends Controller
      */
     public function destroy($id)
     {
-        $find = Kurir::findOrFail($id);
+        $find = User::findOrFail($id);
+       
+
         $hapusFoto = KompresFoto::HapusFoto($find->foto);
         $find->delete();
 

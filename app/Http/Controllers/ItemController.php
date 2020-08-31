@@ -28,7 +28,7 @@ class ItemController extends Controller
      */
     public function index()
     {
-        $item = Item::where('status_aktif','1')->orderBy('id','DESC')->get();
+        $item = Item::orderBy('id','DESC')->get();
         $menu_active = "item|item|0";
         return view('item.item', compact('item','menu_active') );
     }
@@ -75,7 +75,7 @@ class ItemController extends Controller
         $insertItem = Item::create($req);
 
         $gambarUtama = $request->gambar;
-        $upload = KompresFoto::UbahUkuran($gambarUtama,'item');
+        $upload = KompresFoto::Upload($gambarUtama,'item');
         $insertUpload = GambarItem::create(['item_id' => $insertItem->id, 'gambar' => $upload, 'utama' => '1']);
 
         if($req['stock'] > 0){
@@ -97,7 +97,7 @@ class ItemController extends Controller
             return redirect()->back()->withErrors($validator)->withInput()->with('gagal','gambar');
         }
 
-        $upload = KompresFoto::UbahUkuran($req['gambar'],'item');
+        $upload = KompresFoto::Upload($req['gambar'],'item');
         $Insert = GambarItem::create(['gambar' => $upload, 'utama' => '0', 'item_id' => $req['item_id'] ]);
 
         return redirect()->back()->with('success_al_gambar','Berhasil Input Gambar')->with('success_tab','gambar');
@@ -135,14 +135,15 @@ class ItemController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
+    {   
+        $kategori = Kategori::where('status_aktif','1')->get();
         $item = Item::findOrFail($id);
         $gambarUtama = $item->GambarItem()->where('utama','1')->first();
         $stocker = Stocker::where('item_id',$id)->orderBy('created_at','DESC')->get();
         $listGambarItem = GambarItem::where(['item_id' => $id])->orderBy('utama','DESC')->get();
         
         $menu_active = "item|item|1";
-        return view('item.show_item',compact('item','gambarUtama', 'listGambarItem','stocker','menu_active'));
+        return view('item.show_item',compact('item','gambarUtama', 'listGambarItem','stocker','menu_active','kategori'));
     }
 
 
@@ -172,13 +173,16 @@ class ItemController extends Controller
             'harga' => 'required|numeric',
             'margin' => 'required|numeric',
             'deskripsi' => 'required',
-            'kode_item' => 'required'
+            'kode_item' => 'required',
+            'kategori' => 'required'
         ]);
+
         if($validator->fails()){
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
         $req['code'] = $req['kode_item'];
+        $req['kategori_id'] = $req['kategori'];
         
         $find = Item::findOrFail($id);
         $find->update($req);

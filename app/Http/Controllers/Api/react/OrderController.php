@@ -124,7 +124,7 @@ public function postOrder(Request $request)
     $insItem[] = $array;
 
     $getCount = Item::where(['id' => $key['product_id']])->get();
-    if ($getCount[0]['stock'] >= $key['qty']) {
+    // if ($getCount[0]['stock'] >= $key['qty']) {
         DB::table('item')->where('id', $key['product_id'])
             ->decrement('stock', $key['qty']);  
       
@@ -135,9 +135,9 @@ public function postOrder(Request $request)
         
         DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['qty']);
 
-    }else {
-        throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
-    }
+    // }else {
+    //     throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
+    // }
 
   }
 
@@ -274,13 +274,22 @@ public function getTransaksi($no_transaksi)
    $waktu_kirim = $transaksi1->waktu_kirim;
    $waktu_sekarang = date('Y-m-d H:i:s');
 
-   if($waktu_kirim > $waktu_sekarang){
+   if($transaksi1->jenis == '1'){
+     if($waktu_kirim > $waktu_sekarang){
+        $transaksi1['item_transaksi'] = $item_transaksi; 
+        $success = '1';
+        $message = $transaksi1;
+     }else{
+        $success = '0';
+        $message = 'Pesanan Dengan No Transaksi '.$no_transaksi.' Telah Expire';
+     }
+   }elseif($transaksi1->jenis == '2'){
       $transaksi1['item_transaksi'] = $item_transaksi; 
       $success = '1';
       $message = $transaksi1;
    }else{
       $success = '0';
-      $message = 'Pesanan Dengan No Transaksi '.$no_transaksi.' Telah Expire';
+      $message = "No Transaksi ".$no_transaksi." Tidak Ditemukan";
    }
    
  }else{
@@ -476,7 +485,7 @@ public function keepOrder(Request $request)
           'message' => 'Invalid Username / PIN'
         ], 400);
        $user = $request->user();
-       $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+       $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
 
 
        if($role > 0){

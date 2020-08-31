@@ -56,7 +56,7 @@ class KategoriController extends Controller
          return redirect()->back()->withErrors($validator)->with('gagal','simpan')->withInput();
        }
 
-       $req['gambar'] = KompresFoto::UbahUkuran($req['gambar'],'kategori');
+       $req['gambar'] = KompresFoto::Upload($req['gambar'],'kategori');
        $insert = Kategori::create($req);
         
        return redirect()->back()->with('success','Berhasil Input Kategori');
@@ -114,7 +114,7 @@ class KategoriController extends Controller
                 $hapusFoto = KompresFoto::HapusFoto($find->gambar); 
             }
             
-            $uploadFoto = KompresFoto::UbahUkuran($req['gambar'],'kategori');
+            $uploadFoto = KompresFoto::Upload($req['gambar'],'kategori');
             $req['gambar'] = $uploadFoto;
         }else{
             $req = $request->except(['gambar']);

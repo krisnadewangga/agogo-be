@@ -34,7 +34,7 @@
 								<td align="center"></td>
 								<td>{{ $key->kategori }}</td>
 								<td align="center">
-									<a href="upload/images-700/{{ $key->gambar }}" target="_blank" title="Lihat Gambar"><button class="btn-warning btn btn-sm" ><i class="fa fa-image"></i></button></a>
+									<a href="{{ $key->gambar }}" target="_blank" title="Lihat Gambar"><button class="btn-warning btn btn-sm" ><i class="fa fa-image"></i></button></a>
 								</td>
 								<td align="center">
 									@if($key['status_aktif'] == 1)

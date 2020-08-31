@@ -66,10 +66,25 @@
 			                		@csrf
 			                		<input type="hidden" name="_method" value="PUT">
 			                		
-				                	
-				                	<div class="form-group">
+				    
+									<div class="form-group @error('kategori') has-error @enderror">
 										<label>Kategori</label>
-										<input type="text" value="{{$item->Kategori->kategori}}" class="form-control" disabled>
+						                <select id="select2Kat" class="form-control " style="width: 100%;" name="kategori" >
+						                  <option></option>
+						                  @foreach($kategori as $keyKategori)
+						                  	@if($keyKategori->id == $item->kategori_id)
+						                  		<option value="{{ $keyKategori->id }}" selected>{{ $keyKategori->kategori }}</option>
+						                  	@else 
+						                  		<option value="{{ $keyKategori->id }}" >{{ $keyKategori->kategori }}</option>
+						                  	@endif
+						                  	
+						                  @endforeach
+						                </select>
+						                @error('kategori')
+								            <label class="control-label" for="inputError">
+						                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
+						                	</label>    
+								        @enderror 
 									</div>
 
 									<div class="form-group @error('kode_item') has-error @enderror">
@@ -157,6 +172,19 @@
 								        @enderror 
 									</div>
 
+									<div class="form-group">
+							        	<label>Status Aktif</label>
+							        	<select class="form-control" name="status_aktif" id="status_aktif">
+							        	@if($item->status_aktif == "1")
+							        		<option value="1" selected>Aktif</option>
+							        		<option value="0">T.Aktif</option>
+							        	@else
+							        		<option value="1" >Aktif</option>
+							        		<option value="0" selected>T.Aktif</option>
+							        	@endif	
+							        	</select>
+							        </div>
+
 									<button class="btn btn-primary">Simpan</button>
 			                	</form>
 			                	
@@ -169,7 +197,7 @@
 			              		<table class="table-galeri" style="margin-top: 10px;">
 			              			<tr>
 			              				<td rowspan="4">
-			              					<img src="{{ asset('upload/images-400/'.$gambarUtama->gambar ) }}" height="100">
+			              					<img src="{{ asset($gambarUtama->gambar ) }}" height="100">
 			              				</td>
 			              			</tr>
 			              			<tr>
@@ -199,7 +227,7 @@
 			              					@foreach($listGambarItem as $keyGambar)
 			              						<td>
 			              							<div>
-				                						<img src="{{ asset('upload/images-400/'.$keyGambar->gambar ) }}" height="150">
+				                						<img src="{{ asset($keyGambar->gambar ) }}" height="150">
 				                					</div>
 				                					<div style="margin-top: 5px;">
 					                					<div class="row">
@@ -250,6 +278,7 @@
     	<script type="text/javascript">
 			$(function (){
 				CKEDITOR.replace('deskripsi');
+				$('#select2Kat').select2({allowClear:false, placeholder: "Pilih Kategori"});
 
 				@if(Session::get('gagal') == 'gambar' )
  					$("#modal_input_gambar").modal('show');
