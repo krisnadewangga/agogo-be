@@ -55,9 +55,12 @@ class KasController extends Controller
 			return response()->json([
 				'status' => 'failed',
 				'message' => 'Invalid Username / PIN'
-			], 400);
+			], 200);
 		$user = $request->user();
-		$role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+		$role = Role::where('user_id',$user->id)
+                    ->whereIn('level_id',['1','2'])->count();
+
+        
 
 		if($role > 0){
 
@@ -87,12 +90,11 @@ class KasController extends Controller
 				], 400);
 			}
 
-		}
-		else {
+		}else {
 			return response()->json([
 				'status' => 'failed',
 				'message' => 'Invalid Username / PIN'
-			], 400);
+			], 200);
 		}
         // return $users;
 
@@ -197,28 +199,26 @@ class KasController extends Controller
 
     public function CheckApproval(Request $request)
     {
-        
 
         if(!Auth::attempt(['name' => $request[0]['username_approval'], 'password' => $request[0]['pin_approval'] ]))
 			return response()->json([
 				'status' => 'failed',
 				'message' => 'Invalid Username / PIN'
-			], 400);
+			], 200);
 		$user = $request->user();
-		$role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+		$role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
 
 		if($role > 0){
-        return response()->json([
-                'status' => 'success',
-                'message' => 'user approve',
-        ], 200);        
+            return response()->json([
+                    'status' => 'success',
+                    'message' => 'user approve',
+            ], 200);        
 
-        }
-        else {
+        }else {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'user not approve'
-            ], 400);
+            ], 200);
         }
     }
 
@@ -229,9 +229,9 @@ class KasController extends Controller
 			return response()->json([
 				'status' => 'failed',
 				'message' => 'Invalid Username / PIN'
-			], 400);
+			], 200);
 		$user = $request->user();
-		$role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+		$role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
 
 		if($role > 0){
         
@@ -266,7 +266,7 @@ class KasController extends Controller
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Invalid Username / PIN'
-            ], 400);
+            ], 200);
         }
         // return $users;
         

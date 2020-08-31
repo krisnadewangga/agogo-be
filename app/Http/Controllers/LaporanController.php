@@ -1023,7 +1023,13 @@ class LaporanController extends Controller
           $data['total'] = $data->Preorder->total;
           $data['uang_muka'] = $data->Preorder->uang_muka;
           $data['sisa_bayar'] = $data->Preorder->sisa_bayar;
-          $data['pencatat'] = $data->User->name;
+          if($data->Preorder->pencatat_entri == '-'){
+             $data['pencatat'] = $data->User->name;
+           }else{
+             $data['pencatat'] = $data->Preorder->pencatat_entri;
+           }
+         
+          $data['pencatat_finish'] = $data->Preorder->pencatat_pengambilan;
         }else{
           $data['nama'] = $data->User->name;
           if($data->status == '5'){
@@ -1039,6 +1045,7 @@ class LaporanController extends Controller
           $data['sisa_bayar'] = 0;
           $data['pencatat'] = '';
           $data['tgl_pesan'] = $data->created_at->format('d/m/Y');
+          $data['pencatat_finish'] = '';
         }
       });
 

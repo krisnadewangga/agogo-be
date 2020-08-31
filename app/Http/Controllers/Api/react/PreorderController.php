@@ -106,18 +106,15 @@ public function store(Request $request)
         'message' => 'Invalid Username / PIN'
       ], 400);
     $user = $request->user();
-    $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+    $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
 
     if($role > 0){
-
-      
-      
-
       // if(!empty($request[0]['invoice']) ){            
         
       // }else {
       //   $no_transaksi = $this->generateInvoice('1');
       // }
+      $kasir = User::findOrFail($req[0]['user_id']);
       $no_transaksi = $request[0]['invoice'] ;
       $req_transaksi = ['user_id' => $req[0]['user_id'],
             'no_transaksi' => $no_transaksi,
@@ -181,7 +178,9 @@ public function store(Request $request)
                 'sisa_harus_bayar'  => $request[0]['sisa_harus_bayar'],
                 'sisa_bayar' => $request[0]['sisa_harus_bayar'],
                 'uang_dibayar'  => $request[0]['uang_dibayar'],
-                'uang_kembali'  => $request[0]['uang_kembali']]);
+                'uang_kembali'  => $request[0]['uang_kembali'],
+                'pencatat_entri' => $kasir->name
+              ]);
 
 
               return response()->json([
@@ -284,7 +283,7 @@ public function editPreorder(Request $request)
       'message' => 'Invalid Username / PIN'
     ], 400);
   $user = $request->user();
-  $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+  $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
 
   if($role > 0){
 
@@ -426,17 +425,18 @@ public function bayarPreorder(Request $request)
     'message' => 'Invalid Username / PIN'
   ], 400);
  $user = $request->user();
- $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+ $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
 
  if($role > 0){
-
+   $kasir = User::findOrFail($request[0]['user_id']);
    $db = Transaksi::find((string)$request[0]['preorder_id']);
    $db->Preorder()->update([
-    'tgl_selesai'   => $request[0]['tgl_selesai'],
-    'waktu_selesai' => $request[0]['waktu_selesai'],
+    'tgl_selesai'   => date('Y-m-d'),
+    'waktu_selesai' => date('H:i'),
     'sisa_harus_bayar'  => $request[0]['sisa_harus_bayar'],
     'uang_dibayar'  => $request[0]['uang_dibayar'],
-    'uang_kembali'  => $request[0]['uang_kembali']
+    'uang_kembali'  => $request[0]['uang_kembali'],
+    'pencatat_pengambilan' => $kasir->name
   ]);        
 
 
@@ -504,7 +504,7 @@ public function cancelPreorder(Request $request,$id)
     'message' => 'Invalid Username / PIN'
   ], 400);
  $user = $request->user();
- $role = Role::where('user_id',$user->id)->where('level_id',1)->orWhere('level_id',2)->count();
+ $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
 
  if($role > 0){
 

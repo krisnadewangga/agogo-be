@@ -27,6 +27,7 @@
 						<th>Deskripsi</th>
 						<th>Harga Jual</th>
 						<th>stock</th>
+						<th style="width: 100px; text-align: center;">Status</th>
 						<th style="width: 100px; text-align: center;">Aksi</th>
 						</tr>
 					</thead>
@@ -40,6 +41,13 @@
 								<td>{!! $key->deskripsi !!}</td>
 								<td>Rp. {{ number_format($key->harga,'0','','.') }}</td>
 								<td>{{ $key->stock }}</td>
+								<td align="center">
+									@if($key['status_aktif'] == 1)
+		       							<span class="label label-success ">Aktif</span>
+			       					@else
+			       						<span class="label label-danger">T.Aktif</span>
+			       					@endif
+								</td>
 								<td align="center">
 									<a href="item/{{$key->id}}"><button  class='btn btn-sm btn-primary ' >
 		       							<i class='fa fa-pencil'  ></i></button></a>
