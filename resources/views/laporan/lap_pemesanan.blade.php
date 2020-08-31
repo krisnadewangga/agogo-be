@@ -73,6 +73,7 @@
 							<th class="nowrap">Status Order</th>
 							<th class="nowrap">Metode Pembayaran</th>
 							<th class="nowrap">Pencatat</th>
+							<th class="nowrap">Pengambilan</th>
 							<th class="nowrap">Total Harga</th>
 							<th class="nowrap">DP</th>
 							<th class="nowrap">Sisa</th>
@@ -122,6 +123,9 @@
 								<td class="nowrap">
 									{{ $key->pencatat }}
 								</td>
+								<td class="nowrap">
+									{{ $key->pencatat_finish }}
+								</td>
 								<td class="nowrap">Rp. {{ number_format($key->total,'0','','.') }}</td>
 								<td class="nowrap">Rp. {{ number_format($key->uang_muka,'0','','.') }}</td>
 								<td class="nowrap">Rp. {{ number_format($key->sisa_bayar,'0','','.') }}</td>
@@ -134,7 +138,7 @@
 					</tbody>
 					<tfoot>
 						 <tr>
-                            <th colspan="8" style="text-align:right"></th>                
+                            <th colspan="9" style="text-align:right"></th>                
                             <th class="nowrap" style="text-align:right">Grand Total :</th>
                             <th class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->grand_total_th }} </th>
                             <th class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->grand_total_dp }} </th>
@@ -142,14 +146,14 @@
 
                         </tr>
                         <tr>
-                                <th colspan="8" style="text-align:right"></th>
+                                <th colspan="9" style="text-align:right"></th>
                                 <th  class="nowrap" style="text-align:right">Pembatalan Transaksi : </th>
                                 <th  class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->pembatalan_transaksi_th }}</th>
                                 <th  class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->pembatalan_transaksi_dp }}</th>
                                 <th class="nowrap" style="text-align:right"></th>
                             </tr>
                             <tr>
-                                    <th colspan="8" style="text-align:right"></th>
+                                    <th colspan="9" style="text-align:right"></th>
                                     <th class="nowrap" style="text-align:right">Total Transaksi : </th>
                                     <th class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->total_transaksi_th }}</th>
                                     <th class="nowrap" style="text-align:left">Rp. {{ $result['tfoot']->total_transaksi_dp }}</th>

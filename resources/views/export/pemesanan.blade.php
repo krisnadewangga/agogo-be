@@ -92,13 +92,14 @@
                 <tr>
                     <th style="width: 5px;"><ceter>No</ceter></th>
                     <th ><center>Order</center></th>
+                    <th ><center>Pelanggan</center></th>
                     <th ><center>Tanggal</center></th>
                     <th ><center>Tanggal Selesai</center></th>
                     <th ><center>Jam</center></th>
                     <th ><center>Status</center></th>
                     <th ><center>Metode</center></th>
                     <th ><center>Pencatat</center></th>
-                    <th ><center>Pelanggan</center></th>
+                    <th ><center>Pengambilan</center></th>
                     <th style="text-align: right;">Total Harga</th>
                     <th style="text-align: right;">DP</th>
                     <th style="text-align: right;">Sisa</th>
@@ -112,6 +113,7 @@
                     <tr>
                         <td style="text-align:center;border-bottom:0px">{{ $no++ }}</td>
                         <td style="text-align:center;border-bottom:0px" >{{ $key->no_transaksi }}</td>
+                        <td style="text-align:center;border-bottom:0px">{{ $key->nama }}</td>
                         <td style="text-align:center;border-bottom:0px" >{{ $key->tgl_pesan }}</td>
                         <td style="text-align:center;border-bottom:0px" >{{ $key->tgl_selesai}}</td>
                         <td style="text-align:center;border-bottom:0px" >{{ $key->jam}}</td>
@@ -144,7 +146,8 @@
                             @endif
                         </td>
                         <td style="text-align:center;border-bottom:0px">{{ $key->pencatat }}</td>
-                        <td style="text-align:center;border-bottom:0px">{{ $key->nama }}</td>
+                        <td style="text-align:center;border-bottom:0px">{{ $key->pencatat_finish }}</td>
+              
                         <td style="text-align:right; border-bottom:0px">{{ number_format($key->total,'0','','.') }}</td>
                         <td style="text-align:right; border-bottom:0px">{{ number_format($key->uang_muka,'0','','.') }}</td>
                         <td style="text-align:right; border-bottom:0px">{{ number_format($key->sisa_bayar,'0','','.') }}</td>
@@ -153,7 +156,7 @@
             </tbody>
             <tfoot>
                     <tr>
-                        <td colspan="8" style="text-align:right;border-bottom:0px;border-top: 1px solid black;"></td>                
+                        <td colspan="9" style="text-align:right;border-bottom:0px;border-top: 1px solid black;"></td>                
                         <td style="text-align:right; border-bottom:0px; border-top: 1px solid black;">Grand Total :</td>
                         <td style="text-align:right;border-bottom:0px;border-top: 1px solid black;" >
                             {{ $data['tfoot']->grand_total_th }} </td>
@@ -162,14 +165,14 @@
 
                     </tr>
                     <tr>
-                        <td colspan="8" style="text-align:right;border-bottom:0px"></td>
+                        <td colspan="9" style="text-align:right;border-bottom:0px"></td>
                         <td  style="text-align:right;border-bottom:0px">Pembatalan Transaksi : </td>
                         <td  style="text-align:right;border-bottom:0px" >{{ $data['tfoot']->pembatalan_transaksi_th }}</td>
                         <td  style="text-align:right;border-bottom:0px">{{ $data['tfoot']->pembatalan_transaksi_dp }}</td>
                         <td  style="text-align:right;border-bottom:0px"></td>
                     </tr>
                     <tr>
-                        <td colspan="8"  style="text-align:right;border-bottom:0px"></td>
+                        <td colspan="9"  style="text-align:right;border-bottom:0px"></td>
                         <td  style="text-align:right;border-bottom:0px">Total Transaksi : </td>
                         <td  style="text-align:right;border-bottom:0px" >{{ $data['tfoot']->total_transaksi_th }}</td>
                         <td  style="text-align:right;border-bottom:0px" >{{ $data['tfoot']->total_transaksi_dp }}</td>

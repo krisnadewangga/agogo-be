@@ -34,7 +34,7 @@
 								<td>{{ $key->Transaksi->no_transaksi }}</td>
 								<td>{{ $key->Transaksi->User->name }}</td>
 								<td align="center">{{ $key->Transaksi->ItemTransaksi()->count() }} Item</td>
-								<td align="center">{{ $key->Kurir->nama}}</td>
+								<td align="center">{{ $key->Kurir->User->name}}</td>
 								<td align="center">
 									@if($key->Transaksi->metode_pembayaran == 1)
 		       							<span class="label label-warning ">TopUp</span>
