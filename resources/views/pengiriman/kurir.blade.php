@@ -24,6 +24,7 @@
 						<th style="width: 5px;">No</th>
 						<th>Nama</th>
 						<th>No Hp</th>
+						<th>Email</th>
 						<th>Jenis Kendaraan</th>
 						<th>Merek Kendaraan</th>
 						<th>No Polisi</th>
@@ -36,33 +37,35 @@
 						@foreach($kurir as $key)
 							<tr>
 								<td align="center"></td>
-								<td>{{ $key->nama }}</td>
-								<td>{{ $key->no_hp }}</td>
-								<td>{{ $key->jenis_kendaraan }}</td>
-								<td>{{ $key->merek }}</td>
-								<td>{{ $key->no_polisi }}</td>
-								<td align="center">
-									<a href="upload/images-700/{{ $key->foto }}" target="_blank" title="Lihat Gambar"><button class="btn-warning btn btn-sm" ><i class="fa fa-image"></i></button></a>
+								<td class="nowrap">{{ $key->User->name }}</td>
+								<td class="nowrap">{{ $key->User->no_hp }}</td>
+								<td class="nowrap">{{ $key->User->email }}</td>
+								<td class="nowrap">{{ $key->jenis_kendaraan }}</td>
+								<td class="nowrap">{{ $key->merek }}</td>
+								<td class="nowrap">{{ $key->no_polisi }}</td>
+								<td class="nowrap" align="center">
+									<a href="{{ $key->User->foto }}" target="_blank" title="Lihat Gambar"><button class="btn-warning btn btn-sm" ><i class="fa fa-image"></i></button></a>
 								</td>
-								<td align="center">
-									@if($key['status_aktif'] == 1)
+								<td class="nowrap" align="center">
+									@if($key->User->status_aktif == 1)
 		       							<span class="label label-success ">Aktif</span>
 			       					@else
 			       						<span class="label label-danger">T.Aktif</span>
 			       					@endif
 			       				</td>
-								<td align="center">
-									<button onclick="edit('{{ $key->id }}',
-														  '{{ $key->nama }}',
-														  '{{ $key->no_hp }}',
+								<td class="nowrap" align="center">
+									<button onclick="edit('{{ $key->User->id }}',
+														  '{{ $key->User->name }}',
+														  '{{ $key->User->no_hp }}',
+														  '{{ $key->User->email }}',
 														  '{{ $key->jenis_kendaraan }}',
 														  '{{ $key->merek }}',
 														  '{{ $key->no_polisi }}',
-														  '{{ $key->status_aktif }}'
+														  '{{ $key->User->status_aktif }}'
 														  )" class='btn btn-sm btn-primary ' >
 		       							<i class='fa fa-pencil'  ></i></button>
 			       					
-			       					<form method="post" action="{{ route('kurir.destroy', $key['id'] ) }}"  style="display: inline">
+			       					<form method="post" action="{{ route('kurir.destroy', $key->User->id ) }}"  style="display: inline">
 			       						{{ csrf_field() }}
 			       						<input type="hidden" name="_method" value="delete" />
 			       						<button onclick="return confirm('apa anda yakin ?')" class=' btn btn-danger btn-sm'><i class='fa fa-trash'  ></i></button>
@@ -93,7 +96,7 @@
  		});
  	
 
-     	function edit(id,nama,no_hp,jenis_kendaraan,merek,no_polisi,status_aktif){
+     	function edit(id,nama,no_hp,email,jenis_kendaraan,merek,no_polisi,status_aktif){
      		$("#kurir_id").val(id);
      		$("#nama_edit").val(nama);
      		$("#no_hp_edit").val(no_hp);
@@ -101,6 +104,7 @@
      		$("#merek_edit").val(merek);
      		$("#no_polisi_edit").val(no_polisi);
      		$("#status_aktif").val(status_aktif);
+     		$("#email_edit").val(email);
      		$("#modal_edit").modal('show');
      	}
      </script>
@@ -109,10 +113,10 @@
 		<form method="POST" action="{{ route('kurir.store') }}" enctype="multipart/form-data">
 			@csrf
 
-			<div class="form-group @error('nama') has-error @enderror ">
+			<div class="form-group @error('name') has-error @enderror ">
 		        <label>Nama</label>
-		        <input id="nama" type="text" class="form-control " value="{{ old('nama') }}" name="nama" autocomplete>
-		        @error('nama')
+		        <input id="name" type="text" class="form-control " value="{{ old('name') }}" name="name" autocomplete>
+		        @error('name')
 		            <label class="control-label" for="inputError">
                     	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
                 	</label>    
@@ -125,6 +129,30 @@
 		        <input id="no_hp" type="text" class="form-control " value="{{ old('no_hp') }}" name="no_hp" >
 		        
 		        @error('no_hp')
+		            <label class="control-label" for="inputError">
+                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
+                	</label>    
+		        @enderror 
+	        	
+	        </div>
+
+	        <div class="form-group @error('email') has-error @enderror ">
+		        <label>Email</label>
+		        <input id="email" type="text" class="form-control " value="{{ old('email') }}" name="email" >
+		        
+		        @error('email')
+		            <label class="control-label" for="inputError">
+                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
+                	</label>    
+		        @enderror 
+	        	
+	        </div>
+
+	        <div class="form-group @error('password') has-error @enderror ">
+		        <label>Password</label>
+		        <input id="password" type="text" class="form-control " value="{{ old('password') }}" name="password" >
+		        
+		        @error('password')
 		            <label class="control-label" for="inputError">
                     	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
                 	</label>    
@@ -228,15 +256,14 @@
 			<input type="hidden" name="id" readonly id="kurir_id" value="{{ old('id') }}">
 
 
-			<div class="form-group  {{ $errors->edit->has('nama') ? 'has-error' : '' }} ">
+			<div class="form-group  {{ $errors->edit->has('name') ? 'has-error' : '' }} ">
 		        <label>Nama</label>
-		        <input id="nama_edit" type="text" class="form-control " value="{{ old('nama') }}" name="nama" autocomplete>
-		        @if($errors->edit->has('nama'))
+		        <input id="nama_edit" type="text" class="form-control " value="{{ old('name') }}" name="name" autocomplete>
+		        @if($errors->edit->has('name'))
 		            <label class="control-label" for="inputError">
-                    	<i class="fa fa-times-circle-o"></i> <strong> {{ $errors->edit->first('nama') }} </strong>
+                    	<i class="fa fa-times-circle-o"></i> <strong> {{ $errors->edit->first('name') }} </strong>
                 	</label>    
 		        @endif 
-	        	
 	        </div>
 
 	        <div class="form-group {{ $errors->edit->has('no_hp') ? 'has-error' : '' }} ">
@@ -250,6 +277,26 @@
 		        @endif 
 	        </div>
 
+	        <div class="form-group {{ $errors->edit->has('email') ? 'has-error' : '' }} ">
+		        <label>Email</label>
+		        <input id="email_edit" type="text" class="form-control " value="{{ old('email') }}" name="email" >
+		        
+		        @if($errors->edit->has('email'))
+		            <label class="control-label" for="inputError">
+                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $errors->edit->first('email') }}</strong>
+                	</label>    
+		        @endif 
+	        </div>
+
+	        <div class="form-group {{ $errors->edit->has('password') ? 'has-error' : '' }}">
+		        <label >Password</label>&nbsp;<label class="label label-warning"><i class="fa fa-warning"></i> Kosongkan Jika Tidak Ingin Mengganti Password</label>
+		        <input id="password_edit" type="password" class="form-control " value="{{ old('password') }}" name="password" >
+		        @if($errors->edit->has('password'))
+		            <label class="control-label" for="inputError">
+                    	<i class="fa fa-times-circle-o"></i> <strong> {{ $errors->edit->first('password') }} </strong>
+                	</label>    
+		        @endif 
+	        </div>
 
 	        <div class="form-group {{ $errors->edit->has('jenis_kendaraan') ? 'has-error' : '' }}  ">
 		        <label>Jenis Kendaraan</label>
@@ -310,9 +357,11 @@
 	        		<option value="0">T.Aktif</option>
 	        	</select>
 	        </div>
+
 	        <div class="text-right">
 	        	 <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
 	        </div>
+
 		</form>
 	@endcomponent
 

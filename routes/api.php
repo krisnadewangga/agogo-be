@@ -46,6 +46,7 @@ Route::get('list_transaksi','Api\TransaksiController@ListTransaksi');
 Route::get('detail_transaksi','Api\TransaksiController@DetailTransaksi');
 Route::get('get_ongkir','Api\TransaksiController@GetOngkir');
 Route::post('ajukan_batal_pesanan','Api\TransaksiController@AjukanBatalPesanan');
+Route::get('list_penggunaan_saldo','Api\TransaksiController@ListPenggunaanSaldo');
 
 //notifikasi
 Route::get('list_notifikasi', 'Api\NotifikasiController@tampilNotifikasi');
@@ -135,8 +136,15 @@ Route::post('/postProduction', 'Api\react\ProduksiController@postProduction');
 Route::post('/ubahTanggal', 'Api\react\ProduksiController@ubahTanggal');
 //Route::put('/updateStock/{id}', 'Api\react\ProduksiController@updateStock');
 
-
 Route::get('coba','Api\react\OrderController@Coba');
+
+
+// Kurir Api
+Route::post('login_kurir','Api\KurirController@login');
+Route::get('detail_kurir','Api\KurirController@DetailKurir');
+Route::get('job_now','Api\KurirController@JobNow');
+Route::get('list_job','Api\KurirController@ListJob');
+Route::post('selesaikan_job','Api\KurirController@SelesaikanJob');
 
 Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');

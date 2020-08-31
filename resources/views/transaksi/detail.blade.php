@@ -585,11 +585,11 @@
 				              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 	          				  <span aria-hidden="true">&times;</span></button>
 				              
-				              <h3 class="widget-user-username">{{ $transaksi->Pengiriman->Kurir->nama }}</h3>
+				              <h3 class="widget-user-username">{{ $transaksi->Pengiriman->Kurir->User->name }}</h3>
 				              <h5 class="widget-user-desc">Kurir</h5>
 				            </div>
 				            <div class="widget-user-image ">
-				              <img class="img-circle" src="{{ asset('upload/images-100/'.$transaksi->Pengiriman->Kurir->foto) }}" alt="User Avatar">
+				              <img class="img-circle" src="{{ asset($transaksi->Pengiriman->Kurir->User->foto) }}" alt="User Avatar">
 				            </div>
 				            <div class="box-footer" style="padding-top:40px;">
 				              <div class="row">
@@ -611,7 +611,7 @@
 				                <!-- /.col -->
 				                <div class="col-sm-4">
 				                  <div class="description-block">
-				                    <h5 class="description-header">{{ $transaksi->Pengiriman->Kurir->no_hp }}</h5>
+				                    <h5 class="description-header">{{ $transaksi->Pengiriman->Kurir->User->no_hp }}</h5>
 				                    <span class="description-text">NO HP</span>
 				                  </div>
 				                  <!-- /.description-block -->

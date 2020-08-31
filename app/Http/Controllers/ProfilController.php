@@ -56,7 +56,7 @@ class ProfilController extends Controller
         	KompresFoto::HapusFoto($find->foto);
         }
         
-        $upload = KompresFoto::UbahUkuran($req['gambar'],'user');
+        $upload = KompresFoto::Upload($req['gambar'],'user');
         $update = $find->update(['foto' => $upload ]);
 
         return redirect()->back()->with('success_ganti_fp','Ganti Foto Profil');

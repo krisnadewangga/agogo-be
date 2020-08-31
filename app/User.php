@@ -111,5 +111,9 @@ class User extends Authenticatable
       return $this->hasMany(Kas::class);
     }
 
+    public function Kurir()
+    {
+      return $this->hasOne(Kurir::class);
+    }
     
 }
