@@ -53,16 +53,14 @@ class MasterController extends Controller
                      item.deskripsi")
 
 					->where([
-						['item.status_aktif','=','1'],
-						['item.stock','>','0']
+						['item.status_aktif','=','1']
 					])
 					->orderBy('item.kategori_id')
 					->limit($dataPerpage)
 					->offset($offset)->get();
 
 			$jumdat = Item::where([
-									['item.status_aktif','=','1'],
-									['item.stock','>','0']
+									['item.status_aktif','=','1']
 								 ])
                           ->count();
 
@@ -116,7 +114,6 @@ class MasterController extends Controller
                      item.deskripsi")
 					->where([
 						['item.status_aktif','=','1'],
-						['item.stock','>','0'],
 						['kategori_id','=', $req['kategori_id'] ]
 					])
 					->orderBy('item.nama_item','ASC')
@@ -125,7 +122,6 @@ class MasterController extends Controller
 
 			$jumdat = Item::where([
 									['item.status_aktif','=','1'],
-									['item.stock','>','0'],
 									['kategori_id','=', $req['kategori_id'] ]
 								 ])
                           ->count();
@@ -208,7 +204,6 @@ class MasterController extends Controller
                  item.deskripsi")
               ->where([
                 ['item.status_aktif','=','1'],
-                ['item.stock','>','0'],
                 ['nama_item','like','%'.$req['nama_item'].'%']
               ])
               ->orderBy('item.nama_item','ASC')
@@ -217,7 +212,6 @@ class MasterController extends Controller
 
         $jumdat = Item::where([
                               ['item.status_aktif','=','1'],
-                              ['item.stock','>','0'],
                               ['nama_item','like','%'.$req['nama_item'].'%']
                            ])
                       ->count();
