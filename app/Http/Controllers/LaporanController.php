@@ -11,7 +11,9 @@ use App\ItemTransaksi;
 use App\Preorders;
 use App\Kas;
 use App\Produksi;
+use App\Opname;
 use Carbon\Carbon;
+use App\Kategori;
 use PDF;
 use Auth;
 use DB;
@@ -1355,6 +1357,174 @@ class LaporanController extends Controller
       
       $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.pendapatan_harian', compact('data', 'start_tanggal'));
       return $pdf->stream('laporan-pendapatan-harian-'.$start_tanggal.'.pdf');
+
+    }
+
+    // OPNAME
+
+    public function Opname()
+    {
+      $input = ['tanggal' => Carbon::now()->format('d/m/Y') ];
+      $menu_active = "laporan|opname|0";
+
+      $dates = [Carbon::now()->format('Y-m-d')];
+      $item = $this->SetDataOpname($dates);
+
+      return view('laporan.lap_opname', compact('menu_active','input','item'));
+    }
+
+    public function CariOpname(Request $request)
+    {
+      $req = $request->all();
+
+      $validator = \Validator::make($req,['tanggal' => 'required|date_format:d/m/Y']);
+      if($validator->fails()){
+       return redirect()->back()->withErrors($validator)->with('gagal','simpan')->withInput();
+      }
+
+      $explode = explode('/',$req['tanggal']);
+      $dates = [$explode[2]."-".$explode[1]."-".$explode[0]];
+
+      $item = $this->SetDataOpname($dates);
+     
+      $input = ['tanggal' => $req['tanggal']];
+      $menu_active = "laporan|opname|0";
+      return view('laporan.lap_opname', compact('menu_active','input','item'));
+    }
+
+
+    public function ExportOpname(Request $request)
+    {
+      $req = $request->all();
+      $dates = [$req['tanggal']];
+      $data = $this->SetDataOpname($dates);
+
+      $explode = explode("-", $request->tanggal);
+      $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
+
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.opname', compact('data', 'start_tanggal'));
+      return $pdf->stream('laporan-opname-'.$start_tanggal.'.pdf');
+      // return View('export.produksi', compact('data', 'start_tanggal'));
+    } 
+
+    public function PostOpname(Request $request)
+    {
+      $req = $request->all();
+
+      $validator = \Validator::make($req,['total_stock_toko' => 'required']);
+      
+      if($validator->fails()){
+        return redirect()->back()->withErrors($validator)->with('gagal','simpan')->withInput();
+      }
+
+      $select = Opname::whereDate('created_at',$req['tanggal'])
+                       ->where('item_id',$req['id'])->first();
+      if(isset($select->id)){
+        $select->update(['stock_masuk' => $req['total_stock_masuk'],
+                         'stock_akhir' => $req['total_stock_akhir'],
+                         'stock_toko' => $req['total_stock_toko']]);
+      }else{
+        $entri = Opname::create(['item_id'=>$req['id'],
+                                 'stock_masuk' => $req['total_stock_masuk'],
+                                 'stock_akhir' => $req['total_stock_akhir'],
+                                 'stock_toko' => $req['total_stock_toko']
+                                ]);
+      }
+
+      return redirect()->back()->with('success','Berhasil Set Opname '.$req['nama_item']);
+
+    }
+
+    public function SetDataOpname($dates)
+    {
+      $item = Item::all();
+
+      $item->map(function($item) use ($dates){
+        $query = Produksi::where('item_id',$item->id)
+                          ->whereDate('created_at',$dates[0])
+                           ->sum('total_produksi');
+
+        $opname = Opname::where('item_id',$item->id)
+                        ->whereDate('created_at',$dates[0])
+                        ->first();
+
+        $stock_akhir = Produksi::where('item_id',$item->id)
+                          ->whereDate('created_at',$dates[0])
+                          ->orderBy('id','DESC')
+                          ->first();
+
+        $item['stock_masuk'] = $query;
+
+        if(isset($stock_akhir->id)){
+          $item['stock_akhir'] = $stock_akhir->sisa_stock;
+        }else{
+          $item['stock_akhir'] = 0;
+        }
+        
+        if(isset($opname->stock_akhir)){
+          $item['stock_toko'] = $opname->stock_toko;
+        }else{
+           $item['stock_toko'] = '-';
+        }
+
+      });
+
+      return $item;
+
+    } 
+
+    public function SetTanggal(Request $request)
+    {
+      $tgl_skrang = Carbon::now()->format('Y-m-d');
+      $cek = Produksi::whereDate('created_at',$tgl_skrang)->count();
+        
+      if($cek == 0){
+        $item = Item::select('id','stock as sisa_stock')->where('status_aktif','1')->get();
+        
+        $item->map(function($item){
+          $item['produksi1'] = 0;
+          $item['produksi2'] = 0;
+          $item['produksi3'] = 0;
+          $item['total_produksi'] = 0;
+          $item['penjualan_toko'] = 0;
+          $item['penjualan_pemesanan'] = 0;
+          $item['total_penjualan'] = 0;
+          $item['ket_rusak'] = 0;
+          $item['ket_lain'] = 0;
+          $item['total_lain'] = 0;
+          $item['catatan'] = 'tidak ada catatan';
+          $item['stock_awal'] = $item->sisa_stock;
+
+          return $item;
+        });
+          
+
+        foreach ($item as $key ) {
+          $array = ['item_id' => $key['id'],
+                     'produksi1' => 0,
+                     'produksi2' => 0,
+                     'produksi3' => 0,
+                     'total_produksi' => 0,
+                     'penjualan_toko' => 0,
+                     'penjualan_pemesanan' => 0,
+                     'total_penjualan' => 0,
+                     'ket_rusak' => 0,
+                     'ket_lain' => 0,
+                     'total_lain' => 0,
+                     'catatan' => 'tidak ada catatan',
+                     'stock_awal' => $key['sisa_stock'],
+                     'sisa_stock' => $key['sisa_stock']
+                   ];
+
+          Produksi::create($array);
+        }
+
+        return redirect()->back()->with('success','Berhasil Set Tanggal Produksi '.Carbon::now()->format('d/m/Y'));
+      }else{
+         return redirect()->back()->with('error','Tanggal '.Carbon::now()->format('d/m/Y').' Sudah Di Set Terlebih Dahulu');
+      }
+
+
 
     }
 }
