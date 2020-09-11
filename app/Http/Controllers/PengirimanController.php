@@ -104,7 +104,6 @@ class PengirimanController extends Controller
         $sel = Transaksi::where('no_transaksi',$no_transaksi)->first();
         $itemTransaksi = $sel->ItemTransaksi;
 
-
         foreach ($itemTransaksi as $key ) {
            $find = Item::findOrFail($key['item_id']);
            $newStock = $find->stock - $key['jumlah'];
