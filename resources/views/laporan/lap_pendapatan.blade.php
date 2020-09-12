@@ -51,7 +51,7 @@
         		<h4><u><b>{{ $kop }}</b></u></h4>
         	</div>
         	<div class="table-responsive" style="margin-top: 10px;">
-				<table class="dataTables table  table-bordered">
+				<table class="dataTables table  table-bordered" >
 					<thead style=" font-size:14px;">
 						<tr>
 						<th style="width: 5px;">No</th>
