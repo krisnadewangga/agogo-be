@@ -1214,7 +1214,7 @@ class LaporanController extends Controller
       $dates = [Carbon::now()->format('Y-m-d')];
       $data = $this->SetDataPenjualanPerItem($dates);
 
-      $input = ['tanggal' => Carbon::now()->format('d/m/Y') ];
+      $input = ['tanggal' => Carbon::now()->format('d/m/Y'), 'sampai_tanggal' =>  Carbon::now()->format('d/m/Y')];
       $menu_active = "laporan|penjualan_item|0";
 
       return view('laporan.lap_penjualan_item',compact('menu_active','input','data'));    
@@ -1442,7 +1442,8 @@ class LaporanController extends Controller
       $item->map(function($item) use ($dates){
         $query = Produksi::where('item_id',$item->id)
                           ->whereDate('created_at',$dates[0])
-                           ->sum('total_produksi');
+                          ->orderBy('id','DESC')
+                          ->first();
 
         $opname = Opname::where('item_id',$item->id)
                         ->whereDate('created_at',$dates[0])
@@ -1453,7 +1454,7 @@ class LaporanController extends Controller
                           ->orderBy('id','DESC')
                           ->first();
 
-        $item['stock_masuk'] = $query;
+        $item['stock_masuk'] = $query->produksi1;
 
         if(isset($stock_akhir->id)){
           $item['stock_akhir'] = $stock_akhir->sisa_stock;
