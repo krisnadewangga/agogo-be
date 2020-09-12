@@ -181,6 +181,7 @@
         		 });
         	});
 
+        
         	function export_pdf()
         	{
         		var tanggal = $("#mt").val();

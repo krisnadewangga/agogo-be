@@ -81,6 +81,8 @@
 		           format: 'dd/mm/yyyy',
 		           autoclose: true
 		        });
+
+        		
         	});
 
         	function export_pdf()

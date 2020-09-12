@@ -104,6 +104,12 @@ Route::get('/set_grafik_penjualan','LaporanController@setGrafikPenjualan')->name
 Route::get('/dataPenjualan','LaporanController@showDataPenjualan')->name('data_penjualan');
 Route::get('/set_data_penjualan','LaporanController@setDataPenjualan')->name('set_data_penjualan');
 
+Route::get('/opname','LaporanController@Opname')->name('opname');
+Route::post('/post_opname','LaporanController@PostOpname')->name('post_opname');
+Route::post('/cari_opname','LaporanController@CariOpname')->name('cari_opname');
+Route::get('/export_opname','LaporanController@ExportOpname')->name('export_opname');
+Route::get('/set_tanggal','LaporanController@SetTanggal')->name('set_tanggal');
+
 Route::get('/list_promo_selesai', 'PromoController@listPromoSelesai')->name('list_promo_selesai');
 Route::resource('/setup_promo','PromoController');
 
@@ -118,8 +124,6 @@ Route::get('/get_jum_pesan','PesanController@getJumPesan')->name('get_jum_pesan'
 Route::get('/baca_pesan/{id}','PesanController@bacaPesan')->name('baca_pesan');
 
 Route::post('/get_pesanan','TransaksiController@filterTransaksi')->name('get_pesanan');
-
-
 
 Route::get('/tes_event',function(){
 	$message = ['user_id' => 21, 'name' => 'Fajrin Ismail', 'waktu' => '2020-01-01', 'jumPesan' => 0];
