@@ -104,13 +104,32 @@
         		
         	});
 
+        	// function export_pdf()
+        	// {
+        	// 	var tanggal = $("#mt").val();
+        	// 	var pisah = tanggal.split('/');
+        	// 	var kt = pisah[2]+"-"+pisah[1]+"-"+pisah[0];
+        	// 	// document.location.href('export_kas');
+        	// 	window.open('export_penjualan_per_item?tanggal='+kt, '_blank');
+        	// }
+
         	function export_pdf()
         	{
         		var tanggal = $("#mt").val();
-        		var pisah = tanggal.split('/');
-        		var kt = pisah[2]+"-"+pisah[1]+"-"+pisah[0];
-        		// document.location.href('export_kas');
-        		window.open('export_penjualan_per_item?tanggal='+kt, '_blank');
+        		var tanggal1 = $("#st").val();
+
+        		if(tanggal != "" || tanggal1 != ""){
+        			var pisah = tanggal.split('/');
+	        		var pisah1 = tanggal1.split('/');
+
+	        		var mt = pisah[2]+"-"+pisah[1]+"-"+pisah[0];
+	        		var st = pisah1[2]+"-"+pisah1[1]+"-"+pisah1[0];
+	        		// document.location.href('export_kas');
+	        		window.open('export_penjualan_per_item?tanggal='+mt+'&sampai_tanggal='+st, '_blank');
+        		}else{
+        			alert("Maaf! Pastikan Mulai Tanggal & Sampat Tanggal Tidak Kosong");
+        		}
+        		
         	}
         </script>
     @endcomponent
