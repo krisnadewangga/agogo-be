@@ -255,14 +255,8 @@ public function GetLastDate()
 // }
 
 
-
-
-
 public function postProduction(Request $request)
 {
-
-    
-
     $ubah_tanggal = null;
     $ubah_tanggal = $request[0]['ubah_tanggal'];
 
@@ -392,10 +386,8 @@ public function postProduction(Request $request)
             'message' => 'Invalid Username / PIN'
         ], 400);
     }
-
-
-
 }
+
 
 public function ubahTanggal(Request $request)
 {
