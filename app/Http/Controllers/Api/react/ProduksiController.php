@@ -255,14 +255,8 @@ public function GetLastDate()
 // }
 
 
-
-
-
 public function postProduction(Request $request)
 {
-
-    return $request;
-
     $ubah_tanggal = null;
     $ubah_tanggal = $request[0]['ubah_tanggal'];
 
@@ -344,10 +338,10 @@ public function postProduction(Request $request)
             foreach ($result as $key => $row) {     
                 if($row['produksi1'] > 0 || $row['ket_rusak'] > 0 || $row['ket_lain'] > 0 ){           
                     $production = Produksi::create([
-                        'item_id'               => $row['item_id'],
+                        'item_id'               => $row['item_id'] ,
                         'produksi1'             => $row['produksi1'],
-                        'produksi2'             => $row['produksi2'],
-                        'produksi3'             => $row['produksi3'],
+                        'produksi2'             => 0,
+                        'produksi3'             => 0,
                         'total_produksi'        => $row['total_produksi'],
                         'penjualan_toko'        => $row['penjualan_toko'],
                         'penjualan_pemesanan'   => $row['penjualan_pemesanan'],
@@ -392,10 +386,8 @@ public function postProduction(Request $request)
             'message' => 'Invalid Username / PIN'
         ], 400);
     }
-
-
-
 }
+
 
 public function ubahTanggal(Request $request)
 {
