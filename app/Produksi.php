@@ -11,6 +11,7 @@ class Produksi extends Model
 
 	protected $fillable = [
 	
+	
 		'item_id',
 		'produksi1',
 		'produksi2',
