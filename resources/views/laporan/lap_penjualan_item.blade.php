@@ -10,7 +10,7 @@
         	<form method="POST" action="{{ route('cari_laporan_penjualan_per_item') }}">
 	        	@csrf
 	        	<div class="row">
-	        		<div class="col-md-12">
+	        		<div class="col-md-6">
 	        			<div class="form-group  @error('tanggal') has-error @enderror">
 			                <label>Pilih Tanggal</label>
 			                   @error('tanggal')
@@ -28,6 +28,25 @@
 			                <!-- /.input group -->
 	              		</div>
 	        		</div>
+	        		<div class="col-md-6">
+	        			<div class="form-group  @error('sampai_tanggal') has-error @enderror">
+			                <label>Sampai Tanggal</label>
+			                 @error('sampai_tanggal')
+						            <label class="control-label" for="inputError">
+				                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
+				                	</label>    
+						     @enderror 
+			                <div class="input-group date">
+			                  <div class="input-group-addon">
+			                    <i class="fa fa-calendar"></i>
+			                  </div>
+			                  <input type="text" class="form-control pull-right datepicker" id="st" name="sampai_tanggal" autocomplete="off" value="{{ $input['sampai_tanggal'] }}" >
+
+			                </div>
+			                <!-- /.input group -->
+	              		</div>
+	        		</div>
+	        		
 	        	</div>
 	        	<div style="margin-top: 5px;">
 	        		<button class="btn btn-primary">Cari</button>
