@@ -1211,7 +1211,7 @@ class LaporanController extends Controller
     //penjualan per item
     public function LaporanPenjualanPerItem()
     {
-      $dates = [Carbon::now()->format('Y-m-d')];
+      $dates = [Carbon::now()->format('Y-m-d'),Carbon::now()->format('Y-m-d') ];
       $data = $this->SetDataPenjualanPerItem($dates);
 
       $input = ['tanggal' => Carbon::now()->format('d/m/Y'), 'sampai_tanggal' =>  Carbon::now()->format('d/m/Y')];
@@ -1224,33 +1224,61 @@ class LaporanController extends Controller
     {
       
       $req = $request->all();
-      $validator = \Validator::make($req,['tanggal' => 'required|date_format:d/m/Y']);
+      $req['mulai_tanggal'] = $req['tanggal'];
+      $validator = \Validator::make($req,['mulai_tanggal' => 'required|date_format:d/m/Y', 
+                                           'sampai_tanggal' => 'required|date_format:d/m/Y']);
+
       if($validator->fails()){
-       return redirect()->back()->withErrors($validator)->with('gagal','simpan')->withInput();
+        return redirect()->back()->withErrors($validator)->with('gagal','simpan')->withInput();
       }
 
-      $explode = explode('/',$req['tanggal']);
-      $dates = [$explode[2]."-".$explode[1]."-".$explode[0]];
-      $data = $this->SetDataPenjualanPerItem($dates);
+      $explode = explode('/',$req['mulai_tanggal']);
+      $explode1 = explode('/',$req['sampai_tanggal']);
 
-      $input = ['tanggal' => $req['tanggal']];
+      $mt = $explode[2]."-".$explode[1]."-".$explode[0];
+      $st = $explode1[2]."-".$explode1[1]."-".$explode1[0];
+       
+      $dates = [$mt, $st];
+      $data = $this->SetDataPenjualanPerItem($dates);
+    
+
+      $input = ['tanggal' => $req['mulai_tanggal'], 'sampai_tanggal' => $req['sampai_tanggal'] ];
+
       $menu_active = "laporan|penjualan_item|0";
       return view('laporan.lap_penjualan_item',compact('menu_active','input','data')); 
     }
 
     public function SetDataPenjualanPerItem($dates)
     {
-      $transaksi = ItemTransaksi::selectRaw("item_transaksi.item_id,
-                                            (SELECT nama_item FROM item where id = item_transaksi.item_id ) as nama_item,
-                                            (SELECT code FROM item where id = item_transaksi.item_id ) as kode_menu,
-                                            sum(jumlah) as qty,
-                                            sum(total) as total ")
-                                  ->whereIn('transaksi_id',function($q) use ($dates){
-                                    return $q->from('transaksi')
-                                              ->select('id')
-                                              ->where('status','5')
-                                              ->whereDate('updated_at',$dates[0]);
-                                  })->groupBy('item_transaksi.item_id')->get();
+      if($dates[0] == $dates[1]){
+
+        $transaksi = ItemTransaksi::selectRaw("item_transaksi.item_id,
+                                                (SELECT nama_item FROM item where id = item_transaksi.item_id ) as nama_item,
+                                                (SELECT code FROM item where id = item_transaksi.item_id ) as kode_menu,
+                                                sum(jumlah) as qty,
+                                                sum(total) as total ")
+                                      ->whereIn('transaksi_id',function($q) use ($dates){
+                                        return $q->from('transaksi')
+                                                  ->select('id')
+                                                  ->where('status','5')
+                                                  ->whereDate('updated_at',$dates[0]);
+                                      })->groupBy('item_transaksi.item_id')->get();
+      }else{
+         $transaksi = ItemTransaksi::selectRaw("item_transaksi.item_id,
+                                                (SELECT nama_item FROM item where id = item_transaksi.item_id ) as nama_item,
+                                                (SELECT code FROM item where id = item_transaksi.item_id ) as kode_menu,
+                                                sum(jumlah) as qty,
+                                                sum(total) as total ")
+                                      ->whereIn('transaksi_id',function($q) use ($dates){
+                                        return $q->from('transaksi')
+                                                  ->select('id')
+                                                  ->where('status','5')
+                                                  ->where('updated_at','>=', $dates[0]." 00:00:00")
+                                                  ->where('updated_at','<=', $dates[1]." 23:59:59");
+                                      })->groupBy('item_transaksi.item_id')->get();
+       
+      }
+
       $transaksi->map(function($transaksi){
         $transaksi['tampil_total'] = number_format($transaksi->total,'0','','.');
       });
@@ -1264,14 +1292,28 @@ class LaporanController extends Controller
     public function ExportPenjualanPerItem(Request $request)
     {
       $req = $request->all();
-      $dates = [$req['tanggal']];
+
+      $dates = [$req['tanggal'], $req['sampai_tanggal']];
       $data = $this->SetDataPenjualanPerItem($dates);
       
-      $explode = explode("-", $request->tanggal);
-      $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
 
-      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.penjualan_per_item', compact('data', 'start_tanggal'));
-      return $pdf->stream('laporan-penjualan-per-item'.$start_tanggal.'.pdf');
+      $explode = explode('-',$req['tanggal']);
+      $explode1 = explode('-',$req['sampai_tanggal']);
+
+      $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
+      $end_tanggal = $explode1[2]."/".$explode1[1]."/".$explode1[0];
+
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.penjualan_per_item', compact('data', 'start_tanggal','end_tanggal'));
+         return $pdf->stream('laporan-pemesanan-'.$start_tanggal.'-'.$end_tanggal.'.pdf');
+
+      // $dates = [$req['tanggal']];
+      // $data = $this->SetDataPenjualanPerItem($dates);
+      
+      // $explode = explode("-", $request->tanggal);
+      // $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
+
+      // $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.penjualan_per_item', compact('data', 'start_tanggal'));
+      // return $pdf->stream('laporan-penjualan-per-item'.$start_tanggal.'.pdf');
       // return "Oke";
     } 
 
@@ -1454,7 +1496,12 @@ class LaporanController extends Controller
                           ->orderBy('id','DESC')
                           ->first();
 
-        $item['stock_masuk'] = $query->produksi1;
+        if(isset($query->id)){
+           $item['stock_masuk'] = $query->produksi1;
+        }else{
+           $item['stock_masuk'] = 0;
+        }
+       
 
         if(isset($stock_akhir->id)){
           $item['stock_akhir'] = $stock_akhir->sisa_stock;

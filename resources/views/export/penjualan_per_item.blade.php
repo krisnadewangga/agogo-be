@@ -80,7 +80,7 @@
             </td>
             <td  style="width: 70%; text-align: right;">
                 <h4 style="">LAPORAN TOTAL PENJUALAN PER ITEM</h4>
-                <p >Tanggal Transaksi : {{ $start_tanggal }}</p>
+                <p>Tanggal Transaksi : {{$start_tanggal}} - {{ $end_tanggal }}</p>
             </td>
         </tr>
     </table>
