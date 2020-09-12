@@ -24,7 +24,8 @@ class Produksi extends Model
 		'total_lain',
 		'catatan',
 		'stock_awal',
-		'sisa_stock'];
+		'sisa_stock',
+		'created_at'];
 
 
 
