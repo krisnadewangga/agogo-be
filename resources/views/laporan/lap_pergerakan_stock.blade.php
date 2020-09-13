@@ -10,7 +10,7 @@
         	<form method="POST" action="{{ route('cari_laporan_pergerakan_stock') }}">
 	        	@csrf
 	        	<div class="row">
-	        		<div class="col-md-12">
+	        		<div class="col-md-4">
 	        			<div class="form-group  @error('tanggal') has-error @enderror">
 			                <label>Pilih Tanggal</label>
 			                   @error('tanggal')
@@ -28,6 +28,116 @@
 			                <!-- /.input group -->
 	              		</div>
 	        		</div>
+	        		<div class="col-md-4">
+                        <div class="form-group">
+                            <label>Sort By</label>
+                            <select name="sort_by" class="form-control" id="sort_by">
+                                @if($input['sort_by'] == '1')
+                                    <option value="1" selected>Kode Item</option>
+                                    <option value="2">Nama Item</option>
+                                    <option value="3">Produksi</option>
+                                    <option value="4">Toko</option>
+                                    <option value="5">Pemesanan</option>
+                                    <option value="6">Total Penjualan</option>
+                                    <option value="7">Rusak</option>
+                                    <option value="8">Lain Lain</option>
+                                    <option value="9">Sisa Stock</option>
+                                @elseif($input['sort_by'] == '2')
+                                   <option value="1" >Kode Item</option>
+                                    <option value="2" selected>Nama Item</option>
+                                    <option value="3">Produksi</option>
+                                    <option value="4">Toko</option>
+                                    <option value="5">Pemesanan</option>
+                                    <option value="6">Total Penjualan</option>
+                                    <option value="7">Rusak</option>
+                                    <option value="8">Lain Lain</option>
+                                    <option value="9">Sisa Stock</option>
+                                @elseif($input['sort_by'] == '3')
+                                    <option value="1" >Kode Item</option>
+                                    <option value="2">Nama Item</option>
+                                    <option value="3" selected>Produksi</option>
+                                    <option value="4">Toko</option>
+                                    <option value="5">Pemesanan</option>
+                                    <option value="6">Total Penjualan</option>
+                                    <option value="7">Rusak</option>
+                                    <option value="8">Lain Lain</option>
+                                    <option value="9">Sisa Stock</option>
+                                @elseif($input['sort_by'] == '4')
+                                    <option value="1" >Kode Item</option>
+                                    <option value="2">Nama Item</option>
+                                    <option value="3">Produksi</option>
+                                    <option value="4" selected>Toko</option>
+                                    <option value="5">Pemesanan</option>
+                                    <option value="6">Total Penjualan</option>
+                                    <option value="7">Rusak</option>
+                                    <option value="8">Lain Lain</option>
+                                    <option value="9">Sisa Stock</option>
+                                @elseif($input['sort_by'] == '5')
+                                    <option value="1" >Kode Item</option>
+                                    <option value="2">Nama Item</option>
+                                    <option value="3">Produksi</option>
+                                    <option value="4">Toko</option>
+                                    <option value="5" selected>Pemesanan</option>
+                                    <option value="6">Total Penjualan</option>
+                                    <option value="7">Rusak</option>
+                                    <option value="8">Lain Lain</option>
+                                    <option value="9">Sisa Stock</option>
+                                @elseif($input['sort_by'] == '6')
+                                 	<option value="1" >Kode Item</option>
+                                    <option value="2">Nama Item</option>
+                                    <option value="3">Produksi</option>
+                                    <option value="4">Toko</option>
+                                    <option value="5" >Pemesanan</option>
+                                    <option value="6" selected>Total Penjualan</option>
+                                    <option value="7">Rusak</option>
+                                    <option value="8">Lain Lain</option>
+                                    <option value="9">Sisa Stock</option>
+                                @elseif($input['sort_by'] == '7')
+                                 	<option value="1" >Kode Item</option>
+                                    <option value="2">Nama Item</option>
+                                    <option value="3">Produksi</option>
+                                    <option value="4">Toko</option>
+                                    <option value="5" >Pemesanan</option>
+                                    <option value="6">Total Penjualan</option>
+                                    <option value="7" selected>Rusak</option>
+                                    <option value="8">Lain Lain</option>
+                                    <option value="9">Sisa Stock</option>
+                                @elseif($input['sort_by'] == '8')
+                                 	<option value="1" >Kode Item</option>
+                                    <option value="2">Nama Item</option>
+                                    <option value="3">Produksi</option>
+                                    <option value="4">Toko</option>
+                                    <option value="5" >Pemesanan</option>
+                                    <option value="6">Total Penjualan</option>
+                                    <option value="7">Rusak</option>
+                                    <option value="8" selected>Lain Lain</option>
+                                    <option value="9">Sisa Stock</option>
+                                @elseif($input['sort_by'] == '9')
+                                 	<option value="1" >Kode Item</option>
+                                    <option value="2">Nama Item</option>
+                                    <option value="3">Produksi</option>
+                                    <option value="4">Toko</option>
+                                    <option value="5" >Pemesanan</option>
+                                    <option value="6">Total Penjualan</option>
+                                    <option value="7">Rusak</option>
+                                    <option value="8">Lain Lain</option>
+                                    <option value="9" selected>Sisa Stock</option>
+                                @endif
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                         <label>Opsi Sort</label>
+                         <select name="opsi_sort" class="form-control" id="opsi_sort">
+                            @if($input['opsi_sort'] == '1')
+                                <option value="1" selected>Kecil Ke Besar</option>
+                                <option value="2" >Besar Ke Kecil</option>
+                            @elseif($input['opsi_sort'] == '2')
+                                <option value="1" >Kecil Ke Besar</option>
+                                <option value="2" selected >Besar Ke Kecil</option>
+                            @endif
+                         </select>
+                    </div>
 	        	</div>
 	        	<div style="margin-top: 5px;">
 	        		<button class="btn btn-primary">Cari</button>
@@ -40,29 +150,20 @@
         <div class="card" style="margin-top: 10px;">
         	
         	<div class="table-responsive" style="margin-top: 10px;">
-				<table class="dataTables table  table-bordered">
+				<table class=" table  table-bordered" id="table_pergerakan_stock">
 					<thead style=" font-size:14px;">
 						<tr>
-						<th rowspan="2" style="width: 5px;">No</th>
-						<th rowspan="2" class="nowrap">Kode Item</th>
-						<th rowspan="2" class="nowrap">Nama Item</th>
-						<th rowspan="2" class="nowrap">TGL Produksi</th>
-						<th colspan='3'  class="text-center">Produksi</th>
-						<th class="nowrap" rowspan="2">Total Produksi</th>
-						<th class="nowrap" rowspan="2">Toko</th>
-						<th class="nowrap" rowspan="2">Pemesanan</th>
-						<th class="nowrap" rowspan="2">Total Penjualan</th>
-						<th class="nowrap" rowspan="2">Rusak</th>
-						<th class="nowrap" rowspan="2">Lain-Lain</th>
-						<th class="nowrap" rowspan="2">Sisa Stock</th>
-						</tr>
-						<tr>
-							<th class="nowrap" class="text-align-center">1</th>
-							<th class="nowrap" class="text-align-center">2</th>
-							<th class="nowrap" class="text-align-center">3</th>
-						</tr>
-						
-						
+							<th  style="width: 5px;">No</th>
+							<th  class="nowrap">Kode Item</th>
+							<th  class="nowrap">Nama Item</th>
+							<th  class="nowrap">TGL Produksi</th>
+							<th  class="text-center">Produksi</th>
+							<th class="nowrap" >Toko</th>
+							<th class="nowrap" >Pemesanan</th>
+							<th class="nowrap" >Total Penjualan</th>
+							<th class="nowrap" >Rusak</th>
+							<th class="nowrap" >Lain-Lain</th>
+							<th class="nowrap" >Sisa Stock</th>
 						</tr>
 					</thead>
 					<tbody style=" font-size:14px;">
@@ -73,9 +174,6 @@
 								<td >{{ $key->Item->nama_item }}</td>
 								<td align="center">{{ $key->created_at->format('d/m/Y') }}</td>
 								<td align="center">{{ number_format($key->produksi1,'0','','.') }}</td>
-								<td align="center">{{ number_format($key->produksi2,'0','','.') }}</td>
-								<td align="center">{{ number_format($key->produksi3,'0','','.') }}</td>
-								<td align="center">{{ number_format($key->total_produksi,'0','','.') }}</td>
 								<td align="center">{{ number_format($key->penjualan_toko,'0','','.') }}</td>
 								<td align="center">{{ number_format($key->penjualan_pemesanan,'0','','.') }}</td>
 								<td align="center">{{ number_format($key->total_penjualan,'0','','.') }}</td>
@@ -96,8 +194,18 @@
         	$(function(){
         		 $('.datepicker').datepicker({
 		           format: 'dd/mm/yyyy',
-		           autoclose: true
+		           autoclose: true,
+		           endDate: '+0d'
 		        });
+
+        		var table_pergerakan_stock = $("#table_pergerakan_stock").DataTable({
+				    "ordering": false
+				});
+        		table_pergerakan_stock.on( 'order.dt search.dt', function () {
+		            table_pergerakan_stock.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+		                cell.innerHTML = i+1;
+		            } );
+		        } ).draw();
         	});
 
         	function export_pdf()
@@ -105,8 +213,10 @@
         		var tanggal = $("#mt").val();
         		var pisah = tanggal.split('/');
         		var kt = pisah[2]+"-"+pisah[1]+"-"+pisah[0];
+        		var sort_by = $("#sort_by").val();
+                var opsi_sort = $("#opsi_sort").val();
         		// document.location.href('export_kas');
-        		window.open('export_pergerakan_stock?tanggal='+kt, '_blank');
+        		window.open('export_pergerakan_stock?tanggal='+kt+'&sort_by='+sort_by+'&opsi_sort='+opsi_sort, '_blank');
         	}
         </script>
     @endcomponent
