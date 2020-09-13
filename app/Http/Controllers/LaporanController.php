@@ -893,12 +893,15 @@ class LaporanController extends Controller
     public function LapPemesanan()
     {
 
-      $dates = [ Carbon::now()->format('Y-m-d'), Carbon::now()->format('Y-m-d')];
+      $dates = [ Carbon::now()->format('Y-m-d'), Carbon::now()->format('Y-m-d'),'1','1'];
 
       $result = $this->SetDataPemesanan($dates);
        // return $result;
 
-      $input = ['mulai_tanggal' => Carbon::now()->format('d/m/Y'), 'sampai_tanggal' => Carbon::now()->format('d/m/Y') ];
+      $input = ['mulai_tanggal' => Carbon::now()->format('d/m/Y'), 
+                'sampai_tanggal' => Carbon::now()->format('d/m/Y'),
+                'sort_by' => '1',
+                'opsi_sort' => '1' ];
       $menu_active = "laporan|pemesanan|0";
 
       return view('laporan.lap_pemesanan',compact('menu_active','input','result') );
@@ -919,11 +922,15 @@ class LaporanController extends Controller
        $mt = $explode[2]."-".$explode[1]."-".$explode[0];
        $st = $explode1[2]."-".$explode1[1]."-".$explode1[0];
        
-       $dates = [$mt, $st];
+       $dates = [$mt, $st, $req['sort_by'], $req['opsi_sort']];
        $result = $this->SetDataPemesanan($dates);
-
+     
        
-       $input = ['mulai_tanggal' => $req['mulai_tanggal'], 'sampai_tanggal' => $req['sampai_tanggal'] ];
+       $input = ['mulai_tanggal' => $req['mulai_tanggal'], 
+                 'sampai_tanggal' => $req['sampai_tanggal'],
+                 'opsi_sort' => $req['opsi_sort'],
+                 'sort_by' => $req['sort_by']
+                ];
        $menu_active = "laporan|pemesanan|0";
 
        return view('laporan.lap_pemesanan',compact('menu_active','input','result') );
@@ -933,9 +940,8 @@ class LaporanController extends Controller
     {
        $req = $request->all();
         
-       $dates = [$req['mulai_tanggal'], $req['sampai_tanggal']];
+       $dates = [$req['mulai_tanggal'], $req['sampai_tanggal'], $req['sort_by'], $req['opsi_sort']];
        $data = $this->SetDataPemesanan($dates);
-
 
        $explode = explode('-',$req['mulai_tanggal']);
        $explode1 = explode('-',$req['sampai_tanggal']);
@@ -950,67 +956,80 @@ class LaporanController extends Controller
      
     }
 
-    public function SetDataPemesanan($dates)
+    public function SetDataPemesanan($data1)
     {
 
+      $sort_by = ['1' => 'no_transaksi',
+                  '2' => 'nama',
+                  '3' => 'tgl_pesan',
+                  '4' => 'tgl_selesai',
+                  '5' => 'jam',
+                  '6' => 'status_order',
+                  '7' => 'tampil_metode_pembayaran',
+                  '8' => 'pencatat',
+                  '9' => 'pencatat_finish',
+                  '10' => 'total',
+                  '11' => 'uang_muka',
+                  '12' => 'sisa_bayar'
 
-      if($dates[0] == $dates[1]){
+                 ];
+      if($data1[0] == $data1[1]){
           $select = Transaksi::leftJoin('preorders as a', 'transaksi.id','=','a.transaksi_id')
                           ->select('transaksi.*')
                           
-                          ->where(function($q) use($dates){
+                          ->where(function($q) use($data1){
                             return $q->where('transaksi.jenis','2')
                                      ->whereIn('transaksi.status',['1','5'])
                                      ->where('for_ps','1')
-                                     ->whereDate('transaksi.created_at',$dates[0]);
+                                     ->whereDate('transaksi.created_at',$data1[0]);
                           })
-                          ->orWhere(function($b) use($dates){
+                          ->orWhere(function($b) use($data1){
                             return $b->where('transaksi.jenis','1')
                                      ->whereIn('transaksi.metode_pembayaran',['1','2'])
                                      ->whereIn('transaksi.status',['1','2','5'])
                                      ->where('for_ps','1')
-                                     ->whereDate('transaksi.created_at',$dates[0]);
+                                     ->whereDate('transaksi.created_at',$data1[0]);
                           })
-                          ->orWhere(function($c) use($dates){
+                          ->orWhere(function($c) use($data1){
                             return $c->where('transaksi.jenis','1')
                                      ->where('transaksi.metode_pembayaran','3')
                                      ->whereIn('transaksi.status',['1','5'])
                                      ->where('for_ps','1')
-                                     ->whereDate('transaksi.created_at',$dates[0]);
+                                     ->whereDate('transaksi.created_at',$data1[0]);
                           });
-           $data_cancel = Transaksi::where('status','3') ->whereDate('transaksi.created_at',$dates[0])->get();
+           $data_cancel = Transaksi::where('status','3') ->whereDate('transaksi.created_at',$data1[0])->get();
                           
                  
       }else{
           $select = Transaksi::leftJoin('preorders as a', 'transaksi.id','=','a.transaksi_id')
                           ->select('transaksi.*')
-                          ->where(function($q) use($dates){
+                          ->where(function($q) use($data1){
                             return $q->where('transaksi.jenis','2')
                                      ->whereIn('transaksi.status',['1','5'])
                                      ->where('for_ps','1')
-                                     ->where('transaksi.created_at','>=', $dates[0]." 00:00:00")
-                                     ->where('transaksi.created_at','<=', $dates[1]." 23:59:59");
-                                     // ->whereBetween('transaksi.created_at',$dates);
+                                     ->where('transaksi.created_at','>=', $data1[0]." 00:00:00")
+                                     ->where('transaksi.created_at','<=', $data1[1]." 23:59:59");
+                                     // ->whereBetween('transaksi.created_at',$data1);
                           })
-                          ->orWhere(function($b) use($dates){
+                          ->orWhere(function($b) use($data1){
                             return $b->where('transaksi.jenis','1')
                                      ->whereIn('transaksi.metode_pembayaran',['1','2'])
                                      ->whereIn('transaksi.status',['1','2','5'])
                                      ->where('for_ps','1')
-                                     // ->whereBetween('transaksi.created_at',$dates);
-                                     ->where('transaksi.created_at','>=',$dates[0]." 00:00:00")
-                                     ->where('transaksi.created_at','<=',$dates[1]." 23:59:59");
+                                     // ->whereBetween('transaksi.created_at',$data1);
+                                     ->where('transaksi.created_at','>=',$data1[0]." 00:00:00")
+                                     ->where('transaksi.created_at','<=',$data1[1]." 23:59:59");
                           })
-                          ->orWhere(function($c) use($dates){
+                          ->orWhere(function($c) use($data1){
                             return $c->where('transaksi.jenis','1')
                                      ->where('transaksi.metode_pembayaran','3')
                                      ->whereIn('transaksi.status',['1','5'])
                                      ->where('for_ps','1')
-                                     // ->whereBetween('transaksi.created_at',$dates);
-                                     ->where('transaksi.created_at','>=',$dates[0]." 00:00:00")
-                                     ->where('transaksi.created_at','<=',$dates[1]." 23:59:59");
+                                     // ->whereBetween('transaksi.created_at',$data1);
+                                     ->where('transaksi.created_at','>=',$data1[0]." 00:00:00")
+                                     ->where('transaksi.created_at','<=',$data1[1]." 23:59:59");
                           });
-           $data_cancel = Transaksi::where('status','3')->whereBetween('transaksi.created_at',$dates)->get();              
+           $data_cancel = Transaksi::where('status','3')->whereBetween('transaksi.created_at',$data1)->get();              
       }
 
       $data = $select->get();
@@ -1032,6 +1051,7 @@ class LaporanController extends Controller
            }
          
           $data['pencatat_finish'] = $data->Preorder->pencatat_pengambilan;
+          $data['tampil_metode_pembayaran'] = 'Pemesanan';
         }else{
           $data['nama'] = $data->User->name;
           if($data->status == '5'){
@@ -1048,10 +1068,31 @@ class LaporanController extends Controller
           $data['pencatat'] = '';
           $data['tgl_pesan'] = $data->created_at->format('d/m/Y');
           $data['pencatat_finish'] = '';
+          if($data->metode_pembayaran == '1'){
+            $data['tampil_metode_pembayaran'] = 'TopUp';
+          }elseif($data->metode_pembayaran == '2'){
+            $data['tampil_metode_pembayaran'] = 'Bank Transfer';
+          }elseif($data->metode_pembayaran == '3'){
+            $data['tampil_metode_pembayaran'] = 'Bayar Ditoko';
+          }
         }
+
+        if($data->status == "5"){
+          if($data->metode_pembayaran == "1" || $data->metode_pembayaran == "2"){
+            $data['status_order'] = 'Sudah Diterima';
+          }else{
+            $data['status_order'] = 'Sudah Diambil';
+          }
+        }else{
+          if($data->metode_pembayaran == "1" || $data->metode_pembayaran == "2"){
+            $data['status_order'] = 'Belum Diterima';
+          }else{
+            $data['status_order'] = 'Belum Diambil';
+          }
+        }
+
       });
 
-      
       $grand_total_th = number_format($data->sum('total'),'0','','.');
       $grand_total_dp = number_format($data->sum('uang_muka'),'0','','.');
       $grand_total_sisa = number_format($data->sum('sisa_bayar'),'0','','.');
@@ -1084,21 +1125,31 @@ class LaporanController extends Controller
                         'total_transaksi_dp' => $total_transaksi_dp
                        ];
 
+
+     if($data1[3] == '1'){
+          return ['data' => $data->sortBy($sort_by[$data1[2]])->values()->all(), 
+                    'tfoot' => $tfoot];
+
+         // return $data->sortBy($sort_by[$data1[2]])->values()->all();
+     }elseif($data1[3] == '2'){
+          return ['data' => $data->sortByDesc($sort_by[$data1[2]])->values()->all(), 
+                    'tfoot' => $tfoot];
+         // return $data->sortByDesc($sort_by[$data1[2]])->values()->all();
+     }
+      
      
-     $result = ['data' => $data, 'tfoot' => $tfoot];
-     return $result;
+     
+     // return $result;
     }
     // END Lap Pemesanan
 
     // Lap Kas
     public function LapKas()
     {
-      
-      $dates = [Carbon::now()->format('Y-m-d')];
+      $dates = [Carbon::now()->format('Y-m-d'),'1','1'];
       $data = $this->SetDataKas($dates);
 
-
-      $input = ['tanggal' => Carbon::now()->format('d/m/Y') ];
+      $input = ['tanggal' => Carbon::now()->format('d/m/Y'),'sort_by' => '1','opsi_sort' => '1' ];
       $menu_active = "laporan|kas|0";
       return view('laporan.lap_kas',compact('menu_active','input','data'));
     } 
@@ -1113,20 +1164,20 @@ class LaporanController extends Controller
 
       $explode = explode('/',$req['tanggal']);
 
-      $dates = [$explode[2]."-".$explode[1]."-".$explode[0]];
+      $dates = [$explode[2]."-".$explode[1]."-".$explode[0], $req['sort_by'],$req['opsi_sort']];
       $data = $this->SetDataKas($dates);
 
-      $input = ['tanggal' => $req['tanggal']];
+      $input = ['tanggal' => $req['tanggal'], 'sort_by' => $req['sort_by'],'opsi_sort' => $req['opsi_sort']];
       $menu_active = "laporan|kas|0";
       return view('laporan.lap_kas',compact('menu_active','input','data'));
-
     }
 
     public function ExportKas(Request $request)
     {
- 
-      $dates = [$request->tanggal];
+
+      $dates = [$request->tanggal, $request->sort_by, $request->opsi_sort];
       $data = $this->SetDataKas($dates);
+
       $data->map(function($data){
         $data['total_pendapatan'] = $data->transaksi - $data->total_refund;
         $data['kas_tersedia'] = $data->saldo_awal +  $data->transaksi - $data->total_refund;
@@ -1142,9 +1193,23 @@ class LaporanController extends Controller
 
     }
 
-    public function SetDataKas($dates)
+    public function SetDataKas($data)
     { 
-      $kas = Kas::whereDate('created_at',$dates[0])->get();
+      $sort_by = ['1' => 'nama_kasir',
+                  '2' => 'created_at',
+                  '3' => 'saldo_awal',
+                  '4' => 'transaksi',
+                  '5' => 'total_refund',
+                  '6' => 'saldo_akhir'
+                 ];
+      $opsi_sort = ['1' => 'ASC','2' => 'DESC'];
+
+      $kas = Kas::selectRaw('kas.*,
+                             (select name from users where id = kas.user_id) as nama_kasir
+                            ')
+                 ->whereDate('created_at',$data[0])
+                 ->orderBy($sort_by[$data[1]], $opsi_sort[$data[2]])
+                 ->get();
       return $kas ; 
     }
     //END LAP KAS
@@ -1153,10 +1218,10 @@ class LaporanController extends Controller
 
     public function LapPergerakanStock()
     {
-      $dates = [Carbon::now()->format('Y-m-d')];
+      $dates = [Carbon::now()->format('Y-m-d'),'1','1'];
       $data = $this->SetDataPergerakanStock($dates);
 
-      $input = ['tanggal' => Carbon::now()->format('d/m/Y') ];
+      $input = ['tanggal' => Carbon::now()->format('d/m/Y'),'sort_by' => '1', 'opsi_sort' => '1' ];
       $menu_active = "laporan|pergerakan_stock|0";
       return view('laporan.lap_pergerakan_stock',compact('menu_active','input','data'));
     }
@@ -1170,10 +1235,10 @@ class LaporanController extends Controller
       }
 
       $explode = explode('/',$req['tanggal']);
-      $dates = [$explode[2]."-".$explode[1]."-".$explode[0]];
+      $dates = [$explode[2]."-".$explode[1]."-".$explode[0], $req['sort_by'], $req['opsi_sort'] ];
       $data = $this->SetDataPergerakanStock($dates);
 
-      $input = ['tanggal' => $req['tanggal']];
+      $input = ['tanggal' => $req['tanggal'], 'sort_by' => $req['sort_by'], 'opsi_sort' => $req['opsi_sort'] ];
       $menu_active = "laporan|pergerakan_stock|0";
       return view('laporan.lap_pergerakan_stock',compact('menu_active','input','data'));
     }
@@ -1181,7 +1246,7 @@ class LaporanController extends Controller
     public function ExportProduksi(Request $request)
     {
       $req = $request->all();
-      $dates = [$req['tanggal']];
+      $dates = [$req['tanggal'], $req['sort_by'], $req['opsi_sort'] ];
       $data = $this->SetDataPergerakanStock($dates);
 
       $explode = explode("-", $request->tanggal);
@@ -1194,16 +1259,33 @@ class LaporanController extends Controller
 
     } 
 
-    public function SetDataPergerakanStock($dates)
+    public function SetDataPergerakanStock($data)
     {
-       $data = Produksi::whereIn('id',function($q) use ($dates){
-                                     $q->from('produksi')
-                                     ->selectRaw('max(produksi.id)')
-                                     ->whereDate('produksi.created_at',$dates[0])
-                                     ->groupBy('produksi.item_id');
+       $sort_by = ['1' => 'code',
+                   '2' => 'nama_item',
+                   '3' => 'produksi1',
+                   '4' => 'penjualan_toko',
+                   '5' => 'penjualan_pemesanan',
+                   '6' => 'total_penjualan',
+                   '7' => 'ket_rusak',
+                   '8' => 'ket_lain',
+                   '9' => 'sisa_stock'
+                  ];
+       $opsi_sort = ['1' => 'ASC', '2' => 'DESC'];
 
-                                     return $q;
-                                  })->get();
+       $data = Produksi::selectRaw('produksi.*,
+                                   (select code from item where id = produksi.item_id) as code,
+                                   (select nama_item from item where id = produksi.item_id) as nama_item
+                                  ')
+                        ->whereIn('id',function($q) use ($data){
+                           $q->from('produksi')
+                           ->selectRaw('max(produksi.id)')
+                           ->whereDate('produksi.created_at',$data[0])
+                           ->groupBy('produksi.item_id');
+
+                           return $q;
+                        })
+                        ->orderBy($sort_by[$data[1]],$opsi_sort[$data[2]])->get();
 
         return $data;
     } 
@@ -1211,10 +1293,17 @@ class LaporanController extends Controller
     //penjualan per item
     public function LaporanPenjualanPerItem()
     {
-      $dates = [Carbon::now()->format('Y-m-d'),Carbon::now()->format('Y-m-d') ];
+      $dates = [Carbon::now()->format('Y-m-d'),
+                Carbon::now()->format('Y-m-d'),
+                '1','1'
+               ];
       $data = $this->SetDataPenjualanPerItem($dates);
 
-      $input = ['tanggal' => Carbon::now()->format('d/m/Y'), 'sampai_tanggal' =>  Carbon::now()->format('d/m/Y')];
+      $input = ['tanggal' => Carbon::now()->format('d/m/Y'), 
+                'sampai_tanggal' =>  Carbon::now()->format('d/m/Y'),
+                'sort_by' => '1',
+                'opsi_sort' => '1'
+               ];
       $menu_active = "laporan|penjualan_item|0";
 
       return view('laporan.lap_penjualan_item',compact('menu_active','input','data'));    
@@ -1222,7 +1311,6 @@ class LaporanController extends Controller
 
     public function CariPenjualanPerItem(Request $request)
     {
-      
       $req = $request->all();
       $req['mulai_tanggal'] = $req['tanggal'];
       $validator = \Validator::make($req,['mulai_tanggal' => 'required|date_format:d/m/Y', 
@@ -1238,44 +1326,58 @@ class LaporanController extends Controller
       $mt = $explode[2]."-".$explode[1]."-".$explode[0];
       $st = $explode1[2]."-".$explode1[1]."-".$explode1[0];
        
-      $dates = [$mt, $st];
-      $data = $this->SetDataPenjualanPerItem($dates);
-    
+      $dates = [$mt, $st, $req['sort_by'], $req['opsi_sort']];
 
-      $input = ['tanggal' => $req['mulai_tanggal'], 'sampai_tanggal' => $req['sampai_tanggal'] ];
+      $data = $this->SetDataPenjualanPerItem($dates);
+     
+      $input = ['tanggal' => $req['mulai_tanggal'], 
+                'sampai_tanggal' => $req['sampai_tanggal'],
+                'sort_by' => $req['sort_by'],
+                'opsi_sort' => $req['opsi_sort'] ];
 
       $menu_active = "laporan|penjualan_item|0";
       return view('laporan.lap_penjualan_item',compact('menu_active','input','data')); 
     }
 
-    public function SetDataPenjualanPerItem($dates)
+    public function SetDataPenjualanPerItem($data)
     {
-      if($dates[0] == $dates[1]){
+      $sort = ['1' => 'kode_menu',
+               '2' => 'nama_item',
+               '3' => 'qty',
+               '4' => 'total'
+              ];
+      $opsi = ['1' => 'ASC','2' => 'DESC'];
 
+  
+      if($data[0] == $data[1]){
         $transaksi = ItemTransaksi::selectRaw("item_transaksi.item_id,
                                                 (SELECT nama_item FROM item where id = item_transaksi.item_id ) as nama_item,
                                                 (SELECT code FROM item where id = item_transaksi.item_id ) as kode_menu,
                                                 sum(jumlah) as qty,
                                                 sum(total) as total ")
-                                      ->whereIn('transaksi_id',function($q) use ($dates){
+                                      ->whereIn('transaksi_id',function($q) use ($data){
                                         return $q->from('transaksi')
                                                   ->select('id')
                                                   ->where('status','5')
-                                                  ->whereDate('updated_at',$dates[0]);
-                                      })->groupBy('item_transaksi.item_id')->get();
+                                                  ->whereDate('updated_at',$data[0]);
+                                      })->groupBy('item_transaksi.item_id')
+                                      ->orderBy($sort[$data[2]], $opsi[$data[3]])
+                                      ->get();
       }else{
          $transaksi = ItemTransaksi::selectRaw("item_transaksi.item_id,
                                                 (SELECT nama_item FROM item where id = item_transaksi.item_id ) as nama_item,
                                                 (SELECT code FROM item where id = item_transaksi.item_id ) as kode_menu,
                                                 sum(jumlah) as qty,
                                                 sum(total) as total ")
-                                      ->whereIn('transaksi_id',function($q) use ($dates){
+                                      ->whereIn('transaksi_id',function($q) use ($data){
                                         return $q->from('transaksi')
                                                   ->select('id')
                                                   ->where('status','5')
-                                                  ->where('updated_at','>=', $dates[0]." 00:00:00")
-                                                  ->where('updated_at','<=', $dates[1]." 23:59:59");
-                                      })->groupBy('item_transaksi.item_id')->get();
+                                                  ->where('updated_at','>=', $data[0]." 00:00:00")
+                                                  ->where('updated_at','<=', $data[1]." 23:59:59");
+                                      })->groupBy('item_transaksi.item_id')
+                                      ->orderBy($sort[$data[2]], $opsi[$data[3]])
+                                      ->get();
        
       }
 
@@ -1293,7 +1395,7 @@ class LaporanController extends Controller
     {
       $req = $request->all();
 
-      $dates = [$req['tanggal'], $req['sampai_tanggal']];
+      $dates = [$req['tanggal'], $req['sampai_tanggal'], $req['sort_by'], $req['opsi_sort'] ];
       $data = $this->SetDataPenjualanPerItem($dates);
       
 
@@ -1319,12 +1421,17 @@ class LaporanController extends Controller
 
     public function LaporanPendapatanHarian()
     {
-      $dates = [Carbon::now()->startOfMonth()->format('Y-m-d'), Carbon::now()->endOfMonth()->format('Y-m-d')];
+      $dates = [Carbon::now()->startOfMonth()->format('Y-m-d'), 
+                Carbon::now()->endOfMonth()->format('Y-m-d'),
+                '1','1'];
+
       $data = $this->SetDataPendapatanHarian($dates);
      
-      $input = ['mt' => Carbon::now()->startOfMonth()->format('d/m/Y') , 'st' => Carbon::now()->endOfMonth()->format('d/m/Y')];
-      $menu_active = "laporan|pendapatan_harian|0";
+      $input = ['mt' => Carbon::now()->startOfMonth()->format('d/m/Y') , 
+                'st' => Carbon::now()->endOfMonth()->format('d/m/Y'), 
+                'sort_by' => '1', 'opsi_sort' => '1'];
 
+      $menu_active = "laporan|pendapatan_harian|0";
       return view('laporan.lap_pendapatan_harian',compact('menu_active','input','data'));   
     }
 
@@ -1345,22 +1452,34 @@ class LaporanController extends Controller
         $st = $explode1[2].'-'.$explode1[1].'-'.$explode1[0];
       }
 
-      $dates = [$mt." 00:00:00", $st." 23:59:00"];
+      $dates = [$mt." 00:00:00", $st." 23:59:00", $req['sort_by'], $req['opsi_sort']];
       $data = $this->SetDataPendapatanHarian($dates);
 
-      $input = ['mt' => Carbon::parse($mt)->format('d/m/Y') , 'st' => Carbon::parse($st)->format('d/m/Y')];
+      $input = ['mt' => Carbon::parse($mt)->format('d/m/Y') , 
+                'st' => Carbon::parse($st)->format('d/m/Y'),
+                'sort_by' => $req['sort_by'],
+                'opsi_sort' => $req['opsi_sort']
+               ];
+
       $menu_active = "laporan|pendapatan_harian|0";
 
       return view('laporan.lap_pendapatan_harian',compact('menu_active','input','data'));  
     }
 
-    public function SetDataPendapatanHarian($dates)
+    public function SetDataPendapatanHarian($data)
     {
+      $sort = ['1' => 'tgl',
+               '2' => 'total_transaksi',
+               '3' => 'total_diskon',
+               '4' => 'transaksi'
+              ];
+      $opsi = ['1' => 'ASC','2' => 'DESC'];
 
       $transaksi = Kas::selectRaw("date(updated_at) as tgl, sum(transaksi) as total_transaksi, sum(diskon) as total_diskon, 
                                    (sum(transaksi) + sum(diskon) ) as transaksi ")
-                        ->whereBetween('updated_at',$dates)          
+                        ->whereBetween('updated_at',$data)          
                         ->groupBy(DB::raw('date(updated_at)'))
+                        ->orderBy($sort[$data[2]], $opsi[$data[3]])
                         ->get();
 
 
@@ -1392,7 +1511,7 @@ class LaporanController extends Controller
         $st = $explode1[2].'-'.$explode1[1].'-'.$explode1[0];
       }
 
-      $dates = [$mt." 00:00:00", $st." 23:59:00"];
+      $dates = [$mt." 00:00:00", $st." 23:59:00", $req['sort_by'], $req['opsi_sort']];
       $data = $this->SetDataPendapatanHarian($dates);
 
       $start_tanggal = Carbon::parse($mt)->format('d/m/Y')." - ".Carbon::parse($st)->format('d/m/Y');
@@ -1403,14 +1522,36 @@ class LaporanController extends Controller
     }
 
     // OPNAME
-
-    public function Opname()
+    public function Opname(Request $request)
     {
-      $input = ['tanggal' => Carbon::now()->format('d/m/Y') ];
+      $req = $request->all();
+
+      if(isset($req['tanggal'])){
+        $tanggal = $req['tanggal'];
+      }else{
+        $tanggal = Carbon::now()->format('d/m/Y');
+      }
+
+      if(isset($req['sort_by'])){
+        $sort_by = $req['sort_by'];
+      }else{
+        $sort_by = '1';
+      }
+
+      if(isset($req['opsi_sort'])){
+        $opsi_sort = $req['opsi_sort'];
+      }else{
+        $opsi_sort = '1';
+      }
+
+      $input = ['tanggal' => $tanggal ,'sort_by' => $sort_by, 'opsi_sort' => $opsi_sort];
       $menu_active = "laporan|opname|0";
 
-      $dates = [Carbon::now()->format('Y-m-d')];
+      $explode = explode('/',$tanggal);
+      $dates = [$explode[2]."-".$explode[1]."-".$explode[0],$sort_by,$opsi_sort];
+
       $item = $this->SetDataOpname($dates);
+ 
 
       return view('laporan.lap_opname', compact('menu_active','input','item'));
     }
@@ -1421,24 +1562,17 @@ class LaporanController extends Controller
 
       $validator = \Validator::make($req,['tanggal' => 'required|date_format:d/m/Y']);
       if($validator->fails()){
-       return redirect()->back()->withErrors($validator)->with('gagal','simpan')->withInput();
+        return redirect()->back()->withErrors($validator)->with('gagal','simpan')->withInput();
       }
 
-      $explode = explode('/',$req['tanggal']);
-      $dates = [$explode[2]."-".$explode[1]."-".$explode[0]];
-
-      $item = $this->SetDataOpname($dates);
-     
-      $input = ['tanggal' => $req['tanggal']];
-      $menu_active = "laporan|opname|0";
-      return view('laporan.lap_opname', compact('menu_active','input','item'));
+      return redirect()->route('opname', ['tanggal' => $req['tanggal'],'sort_by' => $req['sort_by'], 'opsi_sort' => $req['opsi_sort']]);
     }
 
 
     public function ExportOpname(Request $request)
     {
       $req = $request->all();
-      $dates = [$req['tanggal']];
+      $dates = [$req['tanggal'], $req['sort_by'], $req['opsi_sort']];
       $data = $this->SetDataOpname($dates);
 
       $explode = explode("-", $request->tanggal);
@@ -1452,15 +1586,16 @@ class LaporanController extends Controller
     public function PostOpname(Request $request)
     {
       $req = $request->all();
-
+      
       $validator = \Validator::make($req,['total_stock_toko' => 'required']);
       
       if($validator->fails()){
-        return redirect()->back()->withErrors($validator)->with('gagal','simpan')->withInput();
+        return redirect()->back()->withErrors($validator)->with('gagal_modal','simpan')->withInput();
       }
 
-      $select = Opname::whereDate('created_at',$req['tanggal'])
+      $select = Opname::whereDate('tanggal',$req['tanggal'])
                        ->where('item_id',$req['id'])->first();
+  
       if(isset($select->id)){
         $select->update(['stock_masuk' => $req['total_stock_masuk'],
                          'stock_akhir' => $req['total_stock_akhir'],
@@ -1469,30 +1604,37 @@ class LaporanController extends Controller
         $entri = Opname::create(['item_id'=>$req['id'],
                                  'stock_masuk' => $req['total_stock_masuk'],
                                  'stock_akhir' => $req['total_stock_akhir'],
-                                 'stock_toko' => $req['total_stock_toko']
+                                 'stock_toko' => $req['total_stock_toko'],
+                                 'tanggal' => $req['tanggal']
                                 ]);
       }
 
-      return redirect()->back()->with('success','Berhasil Set Opname '.$req['nama_item']);
+      return redirect()->route('opname',['tanggal' => $req['tampil_tanggal'], 'sort_by' => '1', 'opsi_sort' => '1' ])->with('success','Berhasil Set Opname '.$req['nama_item'])->withInput();
 
     }
 
-    public function SetDataOpname($dates)
+    public function SetDataOpname($data)
     {
-      $item = Item::all();
+      $sort_by = ['1' => 'code',
+                  '2' => 'nama_item',
+                  '3' => 'stock_masuk',
+                  '4' => 'stock_akhir',
+                  '5' => 'stock_toko'
+                 ];
 
-      $item->map(function($item) use ($dates){
+      $item = Item::get();
+      $item->map(function($item) use ($data){
         $query = Produksi::where('item_id',$item->id)
-                          ->whereDate('created_at',$dates[0])
+                          ->whereDate('created_at',$data[0])
                           ->orderBy('id','DESC')
                           ->first();
 
         $opname = Opname::where('item_id',$item->id)
-                        ->whereDate('created_at',$dates[0])
+                        ->whereDate('tanggal',$data[0])
                         ->first();
 
         $stock_akhir = Produksi::where('item_id',$item->id)
-                          ->whereDate('created_at',$dates[0])
+                          ->whereDate('created_at',$data[0])
                           ->orderBy('id','DESC')
                           ->first();
 
@@ -1502,27 +1644,31 @@ class LaporanController extends Controller
            $item['stock_masuk'] = 0;
         }
        
-
         if(isset($stock_akhir->id)){
           $item['stock_akhir'] = $stock_akhir->sisa_stock;
         }else{
           $item['stock_akhir'] = 0;
         }
         
-        if(isset($opname->stock_akhir)){
+        if(isset($opname->id)){
           $item['stock_toko'] = $opname->stock_toko;
         }else{
-           $item['stock_toko'] = '-';
+          $item['stock_toko'] = 'belum';
         }
 
       });
 
-      return $item;
+      if($data[2] == '1'){
+         return $item->sortBy($sort_by[$data[1]])->values()->all();
+      }elseif($data[2] == '2'){
+         return $item->sortByDesc($sort_by[$data[1]])->values()->all();
+      }
 
     } 
 
-    public function SetTanggal(Request $request)
+    public function SetTanggalProduksi()
     {
+
       $tgl_skrang = Carbon::now()->format('Y-m-d');
       $cek = Produksi::whereDate('created_at',$tgl_skrang)->count();
         
@@ -1567,12 +1713,11 @@ class LaporanController extends Controller
           Produksi::create($array);
         }
 
-        return redirect()->back()->with('success','Berhasil Set Tanggal Produksi '.Carbon::now()->format('d/m/Y'));
+        return redirect()->route('opname')->with('success','Berhasil Set Tanggal Produksi '.Carbon::now()->format('d/m/Y'));
       }else{
-         return redirect()->back()->with('error','Tanggal '.Carbon::now()->format('d/m/Y').' Sudah Di Set Terlebih Dahulu');
+        return redirect()->route('opname')->with('error','Tanggal '.Carbon::now()->format('d/m/Y').' Sudah Di Set Sebelumnya');
       }
 
-
-
     }
+    
 }

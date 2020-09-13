@@ -92,23 +92,18 @@
             <table cellspacing="0" class="layout display responsive-table" style="border-bottom:0px">
                 <thead>
                     <tr>
-                        <th rowspan="2">No.</th>
-                        <th rowspan="2">Kode Menu</th>
-                        <th rowspan="2">Nama Menu</th>
-                        <th colspan="3">Produksi</th>
-                        <th rowspan="2">Total Produksi</th>
-                        <th rowspan="2">Toko</th>
-                        <th rowspan="2">Pemesanan</th>
-                        <th rowspan="2">Total Penjualan</th>
-                        <th rowspan="2">Rusak</th>
-                        <th rowspan="2">Lain - lain</th>
-                        <th rowspan="2">Sisa Stock</th>
+                        <th >No.</th>
+                        <th >Kode Menu</th>
+                        <th >Nama Menu</th>
+                        <th >Produksi</th>
+                        <th >Toko</th>
+                        <th >Pemesanan</th>
+                        <th >Total Penjualan</th>
+                        <th >Rusak</th>
+                        <th >Lain - lain</th>
+                        <th >Sisa Stock</th>
                     </tr>
-                    <tr>
-                        <th>1</th>
-                        <th>2</th>
-                        <th>3</th>
-                    </tr>
+                    
                   
                 </thead>
                 <tbody>
@@ -120,9 +115,6 @@
                             <td style="text-align:center;border-bottom:0px">{{ $key->Item->nama_item }}</td>
                 
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->produksi1,'0','','.') }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->produksi2,'0','','.') }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->produksi3,'0','','.') }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->total_produksi,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->penjualan_toko,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->penjualan_pemesanan,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->total_penjualan,'0','','.') }}</td>

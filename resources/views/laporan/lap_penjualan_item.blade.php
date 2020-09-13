@@ -10,9 +10,9 @@
         	<form method="POST" action="{{ route('cari_laporan_penjualan_per_item') }}">
 	        	@csrf
 	        	<div class="row">
-	        		<div class="col-md-6">
+	        		<div class="col-md-3">
 	        			<div class="form-group  @error('tanggal') has-error @enderror">
-			                <label>Pilih Tanggal</label>
+			                <label>Mulai Tanggal</label>
 			                   @error('tanggal')
 						            <label class="control-label" for="inputError">
 				                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
@@ -28,7 +28,7 @@
 			                <!-- /.input group -->
 	              		</div>
 	        		</div>
-	        		<div class="col-md-6">
+	        		<div class="col-md-3">
 	        			<div class="form-group  @error('sampai_tanggal') has-error @enderror">
 			                <label>Sampai Tanggal</label>
 			                 @error('sampai_tanggal')
@@ -46,6 +46,48 @@
 			                <!-- /.input group -->
 	              		</div>
 	        		</div>
+	        		<div class="col-md-3">
+	        			<div class="form-group">
+	        				<label>Sort By</label>
+		        			<select name="sort_by" class="form-control" id="sort_by">
+		        				@if($input['sort_by'] == '1')
+		        					<option value="1" selected>Kode Menu</option>
+		        					<option value="2">Nama Menu</option>
+			        				<option value="3">Quantity</option>
+			        				<option value="4">Total Harga</option>
+			        			@elseif($input['sort_by'] == '2')
+		        					<option value="1" >Kode Menu</option>
+		        					<option value="2" selected>Nama Menu</option>
+			        				<option value="3">Quantity</option>
+			        				<option value="4">Total Harga</option>
+		        				@elseif($input['sort_by'] == '3')
+		        					<option value="1" >Kode Menu</option>
+		        					<option value="2" >Nama Menu</option>
+			        				<option value="3" selected>Quantity</option>
+			        				<option value="4">Total Harga</option>
+		        				@elseif($input['sort_by'] == '4')
+		        					<option value="1" >Kode Menu</option>
+		        					<option value="2" >Nama Menu</option>
+			        				<option value="3" >Quantity</option>
+			        				<option value="4" selected>Total Harga</option>
+		        				@endif
+		        			</select>
+	        			</div>
+	        		</div>
+	        		<div class="col-md-3">
+	        			 <label>Opsi Sort</label>
+	        			 <select name="opsi_sort" class="form-control" id="opsi_sort">
+	        			 	@if($input['opsi_sort'] == '1')
+	        			 		<option value="1" selected>Kecil Ke Besar</option>
+	        					<option value="2" >Besar Ke Kecil</option>
+	        			 	@elseif($input['opsi_sort'] == '2')
+	        			 		<option value="1" >Kecil Ke Besar</option>
+	        					<option value="2" selected >Besar Ke Kecil</option>
+	        			 	@endif
+	        			 </select>
+	        		</div>
+	        	</div>
+	        	<div class="row">
 	        		
 	        	</div>
 	        	<div style="margin-top: 5px;">
@@ -53,13 +95,14 @@
 	        		<a href="{{ route('lap_penjualan_per_item') }}"><label class="btn btn-warning" >Reset</label></a>
 	        		<a href="javascript:export_pdf()"><label class="btn btn-success" >Export PDF</label></a>
 	        	</div>
+	        	
         	</form>
         </div>
 
         <div class="card" style="margin-top: 10px;">
         	
         	<div class="table-responsive" style="margin-top: 10px;">
-				<table class="dataTables table  table-bordered">
+				<table class="table  table-bordered" id="table_penjualan_item">
 					<thead style=" font-size:14px;">
 						<tr>
 						<th style="width: 5px;">No</th>
@@ -98,10 +141,18 @@
         	$(function(){
         		 $('.datepicker').datepicker({
 		           format: 'dd/mm/yyyy',
-		           autoclose: true
+		           autoclose: true,
+		           endDate: '+0d',
 		        });
 
-        		
+        		var table_penjualan = $("#table_penjualan_item").DataTable({
+				    "ordering": false
+				});
+        		table_penjualan.on( 'order.dt search.dt', function () {
+		            table_penjualan.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+		                cell.innerHTML = i+1;
+		            } );
+		        } ).draw();
         	});
 
         	// function export_pdf()
@@ -117,6 +168,8 @@
         	{
         		var tanggal = $("#mt").val();
         		var tanggal1 = $("#st").val();
+        		var sort_by = $("#sort_by").val();
+        		var opsi_sort = $("#opsi_sort").val();
 
         		if(tanggal != "" || tanggal1 != ""){
         			var pisah = tanggal.split('/');
@@ -125,7 +178,7 @@
 	        		var mt = pisah[2]+"-"+pisah[1]+"-"+pisah[0];
 	        		var st = pisah1[2]+"-"+pisah1[1]+"-"+pisah1[0];
 	        		// document.location.href('export_kas');
-	        		window.open('export_penjualan_per_item?tanggal='+mt+'&sampai_tanggal='+st, '_blank');
+	        		window.open('export_penjualan_per_item?tanggal='+mt+'&sampai_tanggal='+st+'&sort_by='+sort_by+'&opsi_sort='+opsi_sort, '_blank');
         		}else{
         			alert("Maaf! Pastikan Mulai Tanggal & Sampat Tanggal Tidak Kosong");
         		}
