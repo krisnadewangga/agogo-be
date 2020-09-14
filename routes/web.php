@@ -108,7 +108,7 @@ Route::get('/opname','LaporanController@Opname')->name('opname');
 Route::post('/post_opname','LaporanController@PostOpname')->name('post_opname');
 Route::post('/cari_opname','LaporanController@CariOpname')->name('cari_opname');
 Route::get('/export_opname','LaporanController@ExportOpname')->name('export_opname');
-Route::get('/set_tanggal','LaporanController@SetTanggal')->name('set_tanggal');
+Route::get('/set_tanggal_produksi','LaporanController@SetTanggalProduksi')->name('set_tanggal_produksi');
 
 Route::get('/list_promo_selesai', 'PromoController@listPromoSelesai')->name('list_promo_selesai');
 Route::resource('/setup_promo','PromoController');
