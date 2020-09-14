@@ -10,7 +10,7 @@
         	<form method="POST" action="{{ route('filter_laporan_pemesanan') }}">
 	        	@csrf
 	        	<div class="row">
-	        		<div class="col-md-6">
+	        		<div class="col-md-3">
 	        			<div class="form-group  @error('mulai_tanggal') has-error @enderror">
 			                <label>Mulai Tanggal</label>
 			                   @error('mulai_tanggal')
@@ -28,7 +28,7 @@
 			                <!-- /.input group -->
 	              		</div>
 	        		</div>
-	        		<div class="col-md-6">
+	        		<div class="col-md-3">
 	        			<div class="form-group  @error('sampai_tanggal') has-error @enderror">
 			                <label>Sampai Tanggal</label>
 			                 @error('sampai_tanggal')
@@ -46,7 +46,182 @@
 			                <!-- /.input group -->
 	              		</div>
 	        		</div>
-	        		
+	        		<div class="col-md-3">
+	        			<div class="form-group">
+	        				<label>Sort By</label>
+		        			<select name="sort_by" class="form-control" id="sort_by">
+		        				@if($input['sort_by'] == '1')
+		        					<option value="1" selected>Preorder ID</option>
+		        					<option value="2">Nama Pelanggan</option>
+			        				<option value="3">Tanggal Pesan</option>
+			        				<option value="4">Tanggal Selesai</option>
+			        				<option value="5">Jam Selesai</option>
+			        				<option value="6">Status Order</option>
+			        				<option value="7">Metode Pembayaran</option>
+			        				<option value="8">Pencatat</option>
+			        				<option value="9">Pengambilan</option>
+			        				<option value="10">Total Harga</option>
+			        				<option value="11">Dp</option>
+			        				<option value="12">Sisa</option>
+			        			@elseif($input['sort_by'] == '2')
+		        					<option value="1" >Preorder ID</option>
+		        					<option value="2" selected>Nama Pelanggan</option>
+			        				<option value="3">Tanggal Pesan</option>
+			        				<option value="4">Tanggal Selesai</option>
+			        				<option value="5">Jam Selesai</option>
+			        				<option value="6">Status Order</option>
+			        				<option value="7">Metode Pembayaran</option>
+			        				<option value="8">Pencatat</option>
+			        				<option value="9">Pengambilan</option>
+			        				<option value="10">Total Harga</option>
+			        				<option value="11">Dp</option>
+			        				<option value="12">Sisa</option>
+		        				@elseif($input['sort_by'] == '3')
+		        					<option value="1" >Preorder ID</option>
+		        					<option value="2">Nama Pelanggan</option>
+			        				<option value="3" selected>Tanggal Pesan</option>
+			        				<option value="4">Tanggal Selesai</option>
+			        				<option value="5">Jam Selesai</option>
+			        				<option value="6">Status Order</option>
+			        				<option value="7">Metode Pembayaran</option>
+			        				<option value="8">Pencatat</option>
+			        				<option value="9">Pengambilan</option>
+			        				<option value="10">Total Harga</option>
+			        				<option value="11">Dp</option>
+			        				<option value="12">Sisa</option>
+		        				@elseif($input['sort_by'] == '4')
+		        					<option value="1" >Preorder ID</option>
+		        					<option value="2">Nama Pelanggan</option>
+			        				<option value="3">Tanggal Pesan</option>
+			        				<option value="4" selected>Tanggal Selesai</option>
+			        				<option value="5">Jam Selesai</option>
+			        				<option value="6">Status Order</option>
+			        				<option value="7">Metode Pembayaran</option>
+			        				<option value="8">Pencatat</option>
+			        				<option value="9">Pengambilan</option>
+			        				<option value="10">Total Harga</option>
+			        				<option value="11">Dp</option>
+			        				<option value="12">Sisa</option>
+			        			@elseif($input['sort_by'] == '5')
+			        				<option value="1" >Preorder ID</option>
+		        					<option value="2">Nama Pelanggan</option>
+			        				<option value="3">Tanggal Pesan</option>
+			        				<option value="4">Tanggal Selesai</option>
+			        				<option value="5" selected>Jam Selesai</option>
+			        				<option value="6">Status Order</option>
+			        				<option value="7">Metode Pembayaran</option>
+			        				<option value="8">Pencatat</option>
+			        				<option value="9">Pengambilan</option>
+			        				<option value="10">Total Harga</option>
+			        				<option value="11">Dp</option>
+			        				<option value="12">Sisa</option>
+			        			@elseif($input['sort_by'] == '6')
+			        				<option value="1" >Preorder ID</option>
+		        					<option value="2">Nama Pelanggan</option>
+			        				<option value="3">Tanggal Pesan</option>
+			        				<option value="4">Tanggal Selesai</option>
+			        				<option value="5">Jam Selesai</option>
+			        				<option value="6" selected>Status Order</option>
+			        				<option value="7">Metode Pembayaran</option>
+			        				<option value="8">Pencatat</option>
+			        				<option value="9">Pengambilan</option>
+			        				<option value="10">Total Harga</option>
+			        				<option value="11">Dp</option>
+			        				<option value="12">Sisa</option>
+			        			@elseif($input['sort_by'] == '7')
+			        				<option value="1" >Preorder ID</option>
+		        					<option value="2">Nama Pelanggan</option>
+			        				<option value="3">Tanggal Pesan</option>
+			        				<option value="4">Tanggal Selesai</option>
+			        				<option value="5">Jam Selesai</option>
+			        				<option value="6">Status Order</option>
+			        				<option value="7" selected>Metode Pembayaran</option>
+			        				<option value="8">Pencatat</option>
+			        				<option value="9">Pengambilan</option>
+			        				<option value="10">Total Harga</option>
+			        				<option value="11">Dp</option>
+			        				<option value="12">Sisa</option>
+			        			@elseif($input['sort_by'] == '8')
+			        				<option value="1" >Preorder ID</option>
+		        					<option value="2">Nama Pelanggan</option>
+			        				<option value="3">Tanggal Pesan</option>
+			        				<option value="4">Tanggal Selesai</option>
+			        				<option value="5">Jam Selesai</option>
+			        				<option value="6">Status Order</option>
+			        				<option value="7">Metode Pembayaran</option>
+			        				<option value="8" selected>Pencatat</option>
+			        				<option value="9">Pengambilan</option>
+			        				<option value="10">Total Harga</option>
+			        				<option value="11">Dp</option>
+			        				<option value="12">Sisa</option>
+			        			@elseif($input['sort_by'] == '9')
+			        				<option value="1" >Preorder ID</option>
+		        					<option value="2">Nama Pelanggan</option>
+			        				<option value="3">Tanggal Pesan</option>
+			        				<option value="4">Tanggal Selesai</option>
+			        				<option value="5">Jam Selesai</option>
+			        				<option value="6">Status Order</option>
+			        				<option value="7">Metode Pembayaran</option>
+			        				<option value="8">Pencatat</option>
+			        				<option value="9" selected>Pengambilan</option>
+			        				<option value="10">Total Harga</option>
+			        				<option value="11">Dp</option>
+			        				<option value="12">Sisa</option>
+			        			@elseif($input['sort_by'] == '10')
+			        				<option value="1" >Preorder ID</option>
+		        					<option value="2">Nama Pelanggan</option>
+			        				<option value="3">Tanggal Pesan</option>
+			        				<option value="4">Tanggal Selesai</option>
+			        				<option value="5">Jam Selesai</option>
+			        				<option value="6">Status Order</option>
+			        				<option value="7">Metode Pembayaran</option>
+			        				<option value="8">Pencatat</option>
+			        				<option value="9">Pengambilan</option>
+			        				<option value="10" selected>Total Harga</option>
+			        				<option value="11">Dp</option>
+			        				<option value="12">Sisa</option>
+			        			@elseif($input['sort_by'] == '11')
+			        				<option value="1" >Preorder ID</option>
+		        					<option value="2">Nama Pelanggan</option>
+			        				<option value="3">Tanggal Pesan</option>
+			        				<option value="4">Tanggal Selesai</option>
+			        				<option value="5">Jam Selesai</option>
+			        				<option value="6">Status Order</option>
+			        				<option value="7">Metode Pembayaran</option>
+			        				<option value="8">Pencatat</option>
+			        				<option value="9">Pengambilan</option>
+			        				<option value="10">Total Harga</option>
+			        				<option value="11" selected>Dp</option>
+			        				<option value="12">Sisa</option>
+			        			@elseif($input['sort_by'] == '12')
+			        				<option value="1" >Preorder ID</option>
+		        					<option value="2">Nama Pelanggan</option>
+			        				<option value="3">Tanggal Pesan</option>
+			        				<option value="4">Tanggal Selesai</option>
+			        				<option value="5">Jam Selesai</option>
+			        				<option value="6">Status Order</option>
+			        				<option value="7">Metode Pembayaran</option>
+			        				<option value="8">Pencatat</option>
+			        				<option value="9">Pengambilan</option>
+			        				<option value="10">Total Harga</option>
+			        				<option value="11">Dp</option>
+			        				<option value="12" selected>Sisa</option>
+		        				@endif
+		        			</select>
+	        			</div>
+	        		</div>
+	        		<div class="col-md-3">
+	        			 <label>Opsi Sort</label>
+	        			 <select name="opsi_sort" class="form-control" id="opsi_sort">
+	        			 	@if($input['opsi_sort'] == '1')
+	        			 		<option value="1" selected>Kecil Ke Besar</option>
+	        					<option value="2" >Besar Ke Kecil</option>
+	        			 	@elseif($input['opsi_sort'] == '2')
+	        			 		<option value="1" >Kecil Ke Besar</option>
+	        					<option value="2" selected >Besar Ke Kecil</option>
+	        			 	@endif
+	        			 </select>
+	        		</div>
 	        	</div>
 	        	<div style="margin-top: 5px;">
 	        		<button class="btn btn-primary">Cari</button>
@@ -92,33 +267,11 @@
 								<td class="nowrap">{{ $key->jam}}</td>
 								<td class="nowrap">
 									
-									@if($key->status == "5")
-										@if($key->metode_pembayaran == "1" || $key->metode_pembayaran == "2")
-											Sudah Diterima
-										@else
-											Sudah Diambil
-										@endif
-									@else
-									    @if($key->metode_pembayaran == "1" || $key->metode_pembayaran == "2")
-											Belum Diterima
-										@else
-											Belum Diambil
-										@endif
-									@endif
+									{{ $key->status_order }}
 									
 								</td>
 								<td class="nowrap">
-									@if($key->jenis == "2")
-										Pemesanan
-									@else
-										@if($key->metode_pembayaran == "1")
-											TopUp
-										@elseif($key->metode_pembayaran == "2")
-											Bank Transfer
-										@else
-											Bayar Ditoko
-										@endif
-									@endif
+									{{ $key->tampil_metode_pembayaran }}
 								</td>
 								<td class="nowrap">
 									{{ $key->pencatat }}
@@ -171,7 +324,8 @@
         	$(function(){
         		 $('.datepicker').datepicker({
 		           format: 'dd/mm/yyyy',
-		           autoclose: true
+		           autoclose: true,
+		           endDate: '+0d'
 		        });
 
         		 $("#dataTables-preorder").DataTable({
@@ -190,11 +344,13 @@
         		if(tanggal != "" || tanggal1 != ""){
         			var pisah = tanggal.split('/');
 	        		var pisah1 = tanggal1.split('/');
+	        		var sort_by = $("#sort_by").val();
+                	var opsi_sort = $("#opsi_sort").val();
 
 	        		var mt = pisah[2]+"-"+pisah[1]+"-"+pisah[0];
 	        		var st = pisah1[2]+"-"+pisah1[1]+"-"+pisah1[0];
 	        		// document.location.href('export_kas');
-	        		window.open('export_pemesanan?mulai_tanggal='+mt+'&sampai_tanggal='+st, '_blank');
+	        		window.open('export_pemesanan?mulai_tanggal='+mt+'&sampai_tanggal='+st+'&sort_by='+sort_by+'&opsi_sort='+opsi_sort, '_blank');
         		}else{
         			alert("Maaf! Pastikan Mulai Tanggal & Sampat Tanggal Tidak Kosong");
         		}
