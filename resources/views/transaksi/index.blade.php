@@ -15,28 +15,32 @@
         		@csrf
 
     			<div class="row">
-    			<div class="col-md-5">
-    				<div class="form-group">
-    					<label>Jenis Transaksi</label>
-    					<select class="form-control" id="jenis_transaksi" name="jenis_transaksi" onchange="loadStatus()">
-    						<option value="0">Semua</option>
-    						<option value="1">Topup</option>
-    						<option value="2">Bank Transfer</option>
-    						<option value="3">Bayar Di Toko</option>
-    					</select>
+	    			<div class="col-md-6">
+	    				<div class="form-group">
+	    					<label>Jenis Transaksi</label>
+	    					<select class="form-control" id="jenis_transaksi" name="jenis_transaksi" onchange="loadStatus()">
+	    						<option value="0">Semua</option>
+	    						<option value="1">Topup</option>
+	    						<option value="2">Bank Transfer</option>
+	    						<option value="3">Bayar Di Toko</option>
+	    					</select>
+	    				</div>
+	    			</div>
+	    			<div class="col-md-6">
+	    				<div class="form-group">
+	    					<label>Status Transaksi</label>
+	    					<select class="form-control" id="status_transaksi" name="status_transaksi">
+	    						
+	    					</select>
+	    				</div>
+	    			</div>
+    			
+    			</div>
+    			<div class="row">
+    				<div class="col-md-12">
+    					<button class="btn btn-primary">Tampilkan</button>
+    					<label class="btn btn-success" onclick="maps()">Maps</button>
     				</div>
-    			</div>
-    			<div class="col-md-5">
-    				<div class="form-group">
-    					<label>Status Transaksi</label>
-    					<select class="form-control" id="status_transaksi" name="status_transaksi">
-    						
-    					</select>
-    				</div>
-    			</div>
-    			<div class="col-md-2">
-    				<button class="btn btn-primary" style="width: 100%; margin-top: 25px;">Tampilkan</button>
-    			</div>
     			</div>
     		</form>
         </div>
@@ -202,6 +206,15 @@
 	        			}	
 					});
 				}
+			}
+
+			function maps()
+			{
+                var jenis_transaksi = $("#jenis_transaksi").val();
+                var status_transaksi = $("#status_transaksi").val();
+
+                window.open('maps?jenis_transaksi='+jenis_transaksi+'&status_transaksi='+status_transaksi,'_blank');
+            
 			}
 		</script>                      
 	@endcomponent

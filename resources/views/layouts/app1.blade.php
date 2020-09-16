@@ -250,6 +250,7 @@
         $("#sm_"+pisah[1]).prop('class','active');
       }
     </script>
+    
    
 </head>
 <body class="hold-transition skin-blue sidebar-mini fixed">
