@@ -93,10 +93,6 @@ public function store(Request $request)
    $req = $request->all();
 
    if(!empty($request[0]['alamat']) && !empty($request[0]['nama']) && !empty($request[0]['tgl_pesan']) && !empty($request[0]['tgl_selesai']) && !empty($request[0]['waktu_selesai']) && !empty($request[0]['telepon'])) 
-
-
-
-
     {
 
       if(!Auth::attempt(['name' => $req[0]['username_approval'], 'password' => $req[0]['pin_approval'] ]))
@@ -179,7 +175,7 @@ public function store(Request $request)
                 'sisa_bayar' => $request[0]['sisa_harus_bayar'],
                 'uang_dibayar'  => $request[0]['uang_dibayar'],
                 'uang_kembali'  => $request[0]['uang_kembali'],
-                'pencatat_entri' => $kasir->name
+                'pencatat_entri' => $kasir->id
               ]);
 
 
@@ -226,7 +222,8 @@ public function store(Request $request)
                   'sisa_harus_bayar'  => $request[0]['sisa_harus_bayar'],
                   'sisa_bayar' => $request[0]['sisa_harus_bayar'],
                   'uang_dibayar'  => $request[0]['uang_dibayar'],
-                  'uang_kembali'  => $request[0]['uang_kembali']]);
+                  'uang_kembali'  => $request[0]['uang_kembali'],
+                  'pencatat_entri' => $kasir->id]);
 
 
                 return response()->json([
@@ -290,7 +287,7 @@ public function editPreorder(Request $request)
 
     DB::beginTransaction();
     try {
-
+      $kasir = User::findOrFail($req[0]['user_id']);
       $delPreorder = Preorders::where('transaksi_id',$request[0]['preorder_id']);
       $delPreorder->delete();
       ItemTransaksi::where('transaksi_id',$request[0]['preorder_id'])->delete();
@@ -310,7 +307,8 @@ public function editPreorder(Request $request)
         'sisa_harus_bayar'  => $request[0]['sisa_harus_bayar'],
         'uang_dibayar'  => $request[0]['uang_dibayar'],
         'uang_kembali'  => $request[0]['uang_kembali'],
-        'sisa_bayar' => $request[0]['sisa_harus_bayar']
+        'sisa_bayar' => $request[0]['sisa_harus_bayar'],
+        'pencatat_entri' => $kasir->id
       ));
 
       $update = Transaksi::where('id',$req[0]['preorder_id'])->update(['total_transaksi' =>$req[0]['subtotal'],
@@ -436,7 +434,7 @@ public function bayarPreorder(Request $request)
     'sisa_harus_bayar'  => $request[0]['sisa_harus_bayar'],
     'uang_dibayar'  => $request[0]['uang_dibayar'],
     'uang_kembali'  => $request[0]['uang_kembali'],
-    'pencatat_pengambilan' => $kasir->name
+    'pencatat_pengambilan' => $kasir->id
   ]);        
 
 

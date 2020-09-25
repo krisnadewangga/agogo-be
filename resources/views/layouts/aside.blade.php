@@ -54,6 +54,7 @@
                <li id="sm_topup"><a href="{{ route('topup_saldo.index') }}"><i class="fa fa-circle-o"></i> <span>TopUp Saldo</span></a></li>
                <li id="sm_promo"><a href="{{ route('setup_promo.index') }}"><i class="fa fa-circle-o"></i> <span>SetUp Promo</span></a></li>
                <li id="sm_versi"><a href="{{ route('versi.index') }}"><i class="fa fa-circle-o"></i> <span>Update Versi</span></a></li>
+               <li id="sm_st"><a href="{{ route('set_tanggal.index') }}"><i class="fa fa-circle-o"></i> <span>Set Tanggal Produksi</span></a></li>
                 
             </ul>
           </li>

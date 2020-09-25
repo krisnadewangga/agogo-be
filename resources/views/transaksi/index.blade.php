@@ -72,38 +72,39 @@
 				var html = `<option value="0">Aktif</option>`;
 				if(jenis_transaksi == "0"){
 					// <option value="7">Pesanan Expired</option>
+					// <option value="8">Menunggu Pengambilan</option>
 					html += `<option value="6">Menunggu Transfer</option>
-							 <option value="8">Menunggu Pengambilan</option>
-							 <option value="1">Menunggu Pengiriman</option>
-							 <option value="2">Sementara Pengiriman</option>
-							 <option value="4">Pengajuan Pembatalan Pesanan</option>
-							 
-							 <option value="5">Pesanan Diterima</option>
-							 <option value="3">Pesanan Yang Dibatalkan</option>`;
+							 <option value="1">Dikemas</option>
+							 <option value="2">Dikirim</option>
+							 <option value="5">Terima</option>
+							 <option value="4">Pengajuan Pembatalan</option>
+							 <option value="3">Dibatalkan</option>`;
 				}else if(jenis_transaksi == "1"){
 					// <option value="7">Pesanan Expired</option>
-					html += `<option value="1">Menunggu Pengiriman</option>
-							 <option value="2">Sementara Pengiriman</option>
-							 <option value="4">Pengajuan Pembatalan Pesanan</option>
+					html += `<option value="1">Dikemas</option>
+							 <option value="2">Dikirim</option>
+							 <option value="4">Dibatalkan</option>
 							 
-							 <option value="5">Pesanan Diterima</option>
-							 <option value="3">Pesanan Yang Dibatalkan</option>`;
+							 <option value="5">Terima</option>
+							 <option value="3">Dibatalkan</option>`;
 				}else if(jenis_transaksi == "2"){
 					// <option value="7">Pesanan Expired</option>
 					html += `<option value="6">Menunggu Transfer</option>
-							 <option value="1">Menunggu Pengiriman</option>
-							 <option value="2">Sementara Pengiriman</option>
-							 <option value="4">Pengajuan Pembatalan Pesanan</option>
+							 <option value="1">Dikemas</option>
+							 <option value="2">Dikirim</option>
+							
 							 
-							 <option value="5">Pesanan Diterima</option>
-							 <option value="3">Pesanan Yang Dibatalkan</option>`;
+							 <option value="5">Terima</option>
+							 <option value="4">Pengajuan Pembatalan</option>
+							 <option value="3">Dibatalkan</option>`;
 				}else if(jenis_transaksi == "3"){
 					 // <option value="7">Pesanan Expired</option>
-					html += `<option value="1">Menunggu Pengambilan</option>
-							 <option value="4">Pengajuan Pembatalan Pesanan</option>
+					html += `<option value="1">Dikemas</option>
+							 
 							
-							 <option value="5">Pesanan Diterima</option>
-							 <option value="3">Pesanan Yang Dibatalkan</option>`;
+							 <option value="5">Terima</option>
+							 <option value="4">Pengajuan Pembatalan</option>
+							 <option value="3">Dibatalkan</option>`;
 				}
 
 				$("#status_transaksi").html(html);
@@ -122,27 +123,27 @@
                                           <h5>Sedang Mempersiapkan Data</h5>
                                       </div>`);
 					},success:function(msg){
-						// console.log(msg);
+						console.log(msg);
 						// console.log(data);
 						var no = 1;
 						$.each(msg,function(index,value){
-							if(value.status == "3"){
 							
+							if(value.status == "3"){
 						  		sambung_tombol = `<button  onclick="hapus_pesanan('`+value.id+`')" class=' btn btn-danger btn-sm btn_hapus_`+value.id+`'><i class='fa fa-trash'  ></i></button>`;
 							}else{
 								sambung_tombol = '';
 							}
 
 							isiTable += `<tr>
-											<td align='center'>`+no+`</td>
-											<td>`+value.waktu_tampil+`</td>
-											<td>`+value.no_transaksi+`</td>
-											<td>`+value.nama+`</td>
-											<td>`+value.jum_pesanan+` Item</td>
-											<td>Rp. `+value.total_bayar+`</td>
-											<td align='center'>`+value.tampil_jt+`</td>
-											<td align='center'>`+value.tampil_status+`</td>
-											<td align='center'>
+											<td align='center' class='nowrap'>`+no+`</td>
+											<td  class='nowrap'>`+value.waktu_tampil+`</td>
+											<td  class='nowrap'>`+value.tampil_waktu_kirim+`</td>
+											<td  class='nowrap'>`+value.no_transaksi+`</td>
+											<td  class='nowrap'>`+value.nama+`</td>
+											<td  class='nowrap'>Rp. `+value.total_bayar+`</td>
+											<td  class='nowrap' align='center'>`+value.tampil_jt+`</td>
+											<td  class='nowrap' align='center'>`+value.tampil_status+`</td>
+											<td  class='nowrap' align='center'>
 												<a href="transaksi/`+value.id+`">
 													<button class="btn btn-warning btn-sm"><i class="fa fa-search"></i>
 													</button>
@@ -151,20 +152,20 @@
 											</td>
 									     </tr>`;
 						 no++;
-						})
+						});
 
 						var bodiHtml = `<table class="dataTables table  table-bordered" id="listPesanan">
 									<thead style=" font-size:14px;">
 										<tr>
 										<th style="width: 5px;">No</th>
-										<th>Waktu </th>
-										<th>No Transaksi</th>
-										<th>Pemesan</th>
-										<th ><center>Jumlah Item</center></th>
-										<th ><center>Total Bayar</center></th>
-										<th ><center>Jenis Transaksi</center></th>
-										<th ><center>Status</center></th>
-										<th style="width: 50px; text-align: center;">Aksi</th>
+										<th class='nowrap' ><center>Waktu Pemesanan</center></th>
+										<th class='nowrap' ><center>Waktu Kirim / Ambil</center></th>
+										<th class='nowrap'>No Transaksi</th>
+										<th class='nowrap'>Pemesan</th>
+										<th class='nowrap'><center>Total Bayar</center></th>
+										<th class='nowrap'><center>Jenis Transaksi</center></th>
+										<th class='nowrap'><center>Status</center></th>
+										<th class='nowrap' style="width: 50px; text-align: center;">Aksi</th>
 										</tr>
 									</thead>
 									<tbody>
