@@ -9,6 +9,7 @@ use App\Events\PusherEvent;
 use App\Notifikasi;
 use FCM;
 use Ixudra\Curl\Facades\Curl;
+use Carbon\Carbon;
 
 
 class SendNotif{
@@ -175,15 +176,26 @@ class SendNotif{
         return "insert Notif Db";
     }
 
-    public static function sendNotifWa($no_hp,$message)
+    public static function sendNotifWa($no_hp, $message)
     {
-        $response = Curl::to('https://wablas.com//api/send-message')
-                        ->withData( array( 'phone' => $no_hp,'message' => $message) )
-                        ->withHeader('Authorization: zvTglErmM7bamRaiaesQFyfyCWTUFODkSPrRVCjhdmVjztdsMC46GOZuWnaqfMl5')
-                        ->asJson( true )
-                        ->post();
+        $waktu_skrang = Carbon::now();
+        $response = Curl::to('http://103.27.207.4/mawar/api/sendOutbox')
+            ->withData(
+                array(
+                    'from' => '-',
+                    'to' => $no_hp,
+                    'msg' =>  $message,
+                    'send_at' => '2020-09-16 18:30:00',
+                    'session' => 'pw8ki4',
+                    'apikey' => '2u2892g8m94uo5s9otndqc9b10'
+                )
+            )
+            ->post();
+
+
         return $response;
     }
+
 
     
     public static function kirimEmail($email,$data,$subject)

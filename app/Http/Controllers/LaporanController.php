@@ -1047,10 +1047,10 @@ class LaporanController extends Controller
           if($data->Preorder->pencatat_entri == '-'){
              $data['pencatat'] = $data->User->name;
            }else{
-             $data['pencatat'] = $data->Preorder->pencatat_entri;
+             $data['pencatat'] = $data->Preorder->KasirDp->name;
            }
          
-          $data['pencatat_finish'] = $data->Preorder->pencatat_pengambilan;
+          $data['pencatat_finish'] = $data->Preorder->KasirLunas->name;
           $data['tampil_metode_pembayaran'] = 'Pemesanan';
         }else{
           $data['nama'] = $data->User->name;
@@ -1065,16 +1065,23 @@ class LaporanController extends Controller
           $data['total'] = $data->total_bayar;
           $data['uang_muka'] = 0;
           $data['sisa_bayar'] = 0;
-          $data['pencatat'] = '';
           $data['tgl_pesan'] = $data->created_at->format('d/m/Y');
-          $data['pencatat_finish'] = '';
+         
+          
           if($data->metode_pembayaran == '1'){
             $data['tampil_metode_pembayaran'] = 'TopUp';
+            $data['pencatat'] = '-';
+            $data['pencatat_finish'] = '-';
           }elseif($data->metode_pembayaran == '2'){
             $data['tampil_metode_pembayaran'] = 'Bank Transfer';
+            $data['pencatat'] = '-';
+            $data['pencatat_finish'] = '-';
           }elseif($data->metode_pembayaran == '3'){
             $data['tampil_metode_pembayaran'] = 'Bayar Ditoko';
+            $data['pencatat'] = $data->KasirM->name;
+            $data['pencatat_finish'] = '-';
           }
+
         }
 
         if($data->status == "5"){
@@ -1666,58 +1673,6 @@ class LaporanController extends Controller
 
     } 
 
-    public function SetTanggalProduksi()
-    {
-
-      $tgl_skrang = Carbon::now()->format('Y-m-d');
-      $cek = Produksi::whereDate('created_at',$tgl_skrang)->count();
-        
-      if($cek == 0){
-        $item = Item::select('id','stock as sisa_stock')->where('status_aktif','1')->get();
-        
-        $item->map(function($item){
-          $item['produksi1'] = 0;
-          $item['produksi2'] = 0;
-          $item['produksi3'] = 0;
-          $item['total_produksi'] = 0;
-          $item['penjualan_toko'] = 0;
-          $item['penjualan_pemesanan'] = 0;
-          $item['total_penjualan'] = 0;
-          $item['ket_rusak'] = 0;
-          $item['ket_lain'] = 0;
-          $item['total_lain'] = 0;
-          $item['catatan'] = 'tidak ada catatan';
-          $item['stock_awal'] = $item->sisa_stock;
-
-          return $item;
-        });
-          
-
-        foreach ($item as $key ) {
-          $array = ['item_id' => $key['id'],
-                     'produksi1' => 0,
-                     'produksi2' => 0,
-                     'produksi3' => 0,
-                     'total_produksi' => 0,
-                     'penjualan_toko' => 0,
-                     'penjualan_pemesanan' => 0,
-                     'total_penjualan' => 0,
-                     'ket_rusak' => 0,
-                     'ket_lain' => 0,
-                     'total_lain' => 0,
-                     'catatan' => 'tidak ada catatan',
-                     'stock_awal' => $key['sisa_stock'],
-                     'sisa_stock' => $key['sisa_stock']
-                   ];
-
-          Produksi::create($array);
-        }
-
-        return redirect()->route('opname')->with('success','Berhasil Set Tanggal Produksi '.Carbon::now()->format('d/m/Y'));
-      }else{
-        return redirect()->route('opname')->with('error','Tanggal '.Carbon::now()->format('d/m/Y').' Sudah Di Set Sebelumnya');
-      }
-
-    }
+  
     
 }

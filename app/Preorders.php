@@ -16,4 +16,14 @@ class Preorders extends Model
     {
         return $this->belongsTo(Transaksi::class,'id','transaksi_id');
     }
+
+    public function KasirDp()
+    {
+    	return $this->belongsTo(User::class,'pencatat_entri','id');
+    }
+
+    public function KasirLunas()
+    {
+    	return $this->belongsTo(User::class,'pencatat_pengambilan','id');
+    }
 }
