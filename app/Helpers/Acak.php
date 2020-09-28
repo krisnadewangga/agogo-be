@@ -22,4 +22,17 @@ class Acak {
 		$newkode = $transaksi_id.sprintf("%02s", $kode);
 		return $newkode;	
 	}
+
+	public static function otp($angka){
+		if(strlen($angka) == 1) {
+			$angka = $angka. rand(0, 9) . rand(0, 9) . rand(0, 9);
+		} else if(strlen($angka) == 2) {
+			$angka = $angka. rand(0, 9) . rand(0, 9);
+		} else if(strlen($angka) == 3) {
+			$angka = $angka. rand(0, 9);
+		}
+		$newkode = str_shuffle($angka);
+		return $newkode;
+	}
+
 }

@@ -44,7 +44,6 @@ class autoBatal extends Command
      */
     public function handle()
     {
-
         $transaksi = Transaksi::select('id','no_transaksi','waktu_kirim','metode_pembayaran', 'status','user_id')
                     ->where(function($q){
                         return $q->where([

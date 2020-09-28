@@ -115,5 +115,25 @@ class User extends Authenticatable
     {
       return $this->hasOne(Kurir::class);
     }
+
+    public function KasirDp()
+    {
+        return $this->hasMany(Preorders::class,'id','pencatat_entri');
+    }
+
+    public function KasirLunas()
+    {
+        return $this->hasMany(Preorders::class,'id','pencatat_pengambilan');
+    }
+
+    public function KasirM()
+    {
+        return $this->hasMany(Transaksi::class,'id','kasir_id');
+    }
+
+    public function Otp()
+    {
+        return $this->hasOne(Otp::class);
+    }
     
 }

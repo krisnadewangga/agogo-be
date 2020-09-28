@@ -108,9 +108,7 @@
                         <td style="text-align:center;border-bottom:0px" >{{ $key->stock_masuk }}</td>
                         <td  style="text-align:center;border-bottom:0px">{{ $key->stock_akhir }}</td>
                         <td  style="text-align:center;border-bottom:0px">
-                            @if($key->stock_toko == 'belum')
-                                Belum Di Set
-                            @else
+                            @if($key->stock_toko !== 'belum')
                                 {{ $key->stock_toko }}
                             @endif
                         </td>

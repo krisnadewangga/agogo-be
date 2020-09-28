@@ -42,6 +42,7 @@ Route::get('top_ten','Api\MasterController@topTen');
 Route::get('detail_item','Api\MasterController@DetailItem');
 
 Route::post('transaksi','Api\TransaksiController@Store');
+Route::get('get_otp','Api\TransaksiController@GetOtp');
 Route::get('list_transaksi','Api\TransaksiController@ListTransaksi');
 Route::get('detail_transaksi','Api\TransaksiController@DetailTransaksi');
 Route::get('get_ongkir','Api\TransaksiController@GetOngkir');

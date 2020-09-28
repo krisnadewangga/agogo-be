@@ -112,22 +112,17 @@ class KasController extends Controller
 
   public function getTrx($id)
     {
-
-       
        	$qr = Kas::where('user_id',$id)->where('status','0')->orderBy('id','DESC')->first();
     	$waktu = $qr['created_at'];
-    
 
     	// total transaksi gabungan order + pesanan  yg telah di bayar
-        $totalTranskasiPaid = DB::table('transaksi')
-        ->where('tgl_bayar', '>', $waktu)
-        ->where('status','5')
-        ->where('kasir_id',$id)
-        ->sum('total_bayar');
+        // $totalTranskasiPaid = DB::table('transaksi')
+        // ->where('tgl_bayar', '>', $waktu)
+        // ->where('status','5')
+        // ->where('kasir_id',$id)
+        // ->sum('total_bayar');
 
-
-
-	// total order bukan pesanan transaksi yg telah di bayar
+	    // total order bukan pesanan transaksi yg telah di bayar
         $totalOrders = DB::table('transaksi')
         ->where('tgl_bayar', '>', $waktu)
         ->where('status','5')
@@ -146,23 +141,19 @@ class KasController extends Controller
    //      ->sum('preorders.uang_muka');
 
 
-            //total pesanana uang muka
+        //total pesanana uang muka
         $sumPreordersDP = DB::table('transaksi')->join('preorders','preorders.transaksi_id','=','transaksi.id')
-        ->where('transaksi.created_at', '>', $waktu)
-        ->where('transaksi.status','1') //belum bayar
-        // ->where('hari_pelunasan','notsameday')
- 		->where('transaksi.user_id',$id)
-        ->where('transaksi.jenis','2')
-        ->sum('preorders.uang_muka');
+                           ->where('preorders.created_at','>',$waktu)
+                           ->where('preorders.pencatat_entri',$id)
+                           ->sum('preorders.uang_muka');
+
+       
 
              //total pelunasan pesanan
         $sumPreordersPelunasan = DB::table('transaksi')->join('preorders','preorders.transaksi_id','=','transaksi.id')
-        ->where('transaksi.tgl_bayar', '>', $waktu)
-        ->where('transaksi.status','5') //belum bayar
-        // ->where('hari_pelunasan','notsameday')
- 		->where('transaksi.kasir_id',$id)
-        ->where('transaksi.jenis','2')
-        ->sum('preorders.sisa_bayar');
+                                ->where('transaksi.tgl_bayar','>',$waktu)
+                                ->where('preorders.pencatat_pengambilan',$id)
+                                ->sum('preorders.sisa_bayar');
 
 
           //diskon order
@@ -173,15 +164,15 @@ class KasController extends Controller
  		->where('transaksi.kasir_id',$id)
         ->sum('r_order.discount');
 
-              //diskon pesanan
+        //diskon pesanan
         $sumDiskonPesanan = DB::table('transaksi')->join('preorders','preorders.transaksi_id','=','transaksi.id')
         ->where('transaksi.created_at', '>', $waktu)
         // ->where('hari_pelunasan','notsameday')
  		->where('transaksi.kasir_id',$id)
         ->sum('preorders.discount');
  
-        $diskon =  $sumDiskonPesanan + $sumDiskonOrder;
-        $totalKeseluruhan = ($totalTranskasiPaid + $sumPreordersDP) - $diskon;
+        $diskon =  $sumDiskonOrder;
+        $totalKeseluruhan = ($totalOrders + $sumPreordersDP + $sumPreordersPelunasan) - $diskon;
 
         return response()->json(array(
             'total_transaksi' => (int)$totalKeseluruhan,
@@ -192,8 +183,6 @@ class KasController extends Controller
             'saldo_awal' =>  $qr['saldo_awal'],
             'total_refund' => 0
         ), 200);
-
-        
     }
 
 
