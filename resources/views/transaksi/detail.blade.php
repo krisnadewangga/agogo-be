@@ -192,7 +192,11 @@
 													<td>{{ $transaksi->User->name }}</td>
 													<td>{{ $transaksi->User->no_hp }}</td>
 													<td>
-														{{ $transaksi->waktu_kirim->format('d M Y H:i A') }}
+														@if($transaksi->metode_pembayaran == '2')
+															{{ $transaksi->waktu_kirim_tf->format('d M Y H:i A') }}
+														@else
+															{{ $transaksi->waktu_kirim->format('d M Y H:i A') }}
+														@endif
 													</td>
 													<td align="center">
 														{{ $transaksi->detail_alamat }} 

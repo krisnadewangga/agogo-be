@@ -57,18 +57,19 @@ class TransaksiController extends Controller
             ->only(['no_transaksi','nama','lat','long','detail_alamat','marker_jt','marker_status'])
             ->all();
       });
+
       if($status_transaksi == '0'){
         $tampil_status = 'Aktif';
       }elseif($status_transaksi == '1'){
-        $tampil_status = 'Menunggu Pengiriman';
+        $tampil_status = 'Dikemas';
       }else if($status_transaksi == '2'){
-        $tampil_status = 'Sementara Pengiriman';
+        $tampil_status = 'Dikirim';
       }else if($status_transaksi == '3'){
-        $tampil_status = 'Pesanan Yang Dibatalkan';
+        $tampil_status = 'Dibatalkan';
       }else if($status_transaksi == '4'){
-        $tampil_status = 'Pengajuan Pembatalan Pesanan';
+        $tampil_status = 'Pengajuan Pembatalan';
       }else if($status_transaksi == '5'){
-        $tampil_status = 'Pesanan Diterima';
+        $tampil_status = 'Diterima';
       }else if($status_transaksi == '6'){
         $tampil_status = 'Menunggu Transfer';
       }else if($status_transaksi == '8'){
@@ -126,18 +127,18 @@ class TransaksiController extends Controller
                                   })
                                   ->orderBy('updated_at','desc')->get();
 
-      }else if($jenis_transaksi == "0" && $status_transaksi == "8"){
-          $transaksi = Transaksi::where([
-                                            ['metode_pembayaran','=','3'],
-                                            ['status','=','1'],
-                                            ['waktu_kirim','>', $waktu_sekarang ],
-                                            ['jenis','=','1'],
-                                            ['jalur','=','1']
-                                          ])
-                                  ->orderBy('updated_at','desc')->get();
+      // }else if($jenis_transaksi == "0" && $status_transaksi == "8"){
+      //     $transaksi = Transaksi::where([
+      //                                       ['metode_pembayaran','=','3'],
+      //                                       ['status','=','1'],
+      //                                       ['waktu_kirim','>', $waktu_sekarang ],
+      //                                       ['jenis','=','1'],
+      //                                       ['jalur','=','1']
+      //                                     ])
+      //                             ->orderBy('updated_at','desc')->get();
       }else if($jenis_transaksi == "0" && $status_transaksi == "1"){
           // menunggu pengiriman dan pengambilan
-          $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2'])
+          $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3'])
                                   ->where([
                                             ['status','=','1'],
                                             ['jenis','=','1'],
@@ -270,12 +271,15 @@ class TransaksiController extends Controller
           if($transaksi['metode_pembayaran'] == "1"){
               $tampil_jt = "<span class='label label-warning '>TopUp</span>";
               $marker_jt = "TopUp";
+              $waktu_kirim = $transaksi->waktu_kirim->format("d M Y h:i A");
           }else if($transaksi['metode_pembayaran'] == "2"){
               $tampil_jt = "<span class='label label-info'>Bank Transfer</span>";
               $marker_jt = "Bank Transfer";
+              $waktu_kirim = $transaksi->waktu_kirim_tf->format("d M Y h:i A");
           }else if($transaksi['metode_pembayaran'] == "3"){
               $tampil_jt = "<span class='label label-success'>Bayar Di Toko</span>";
               $marker_jt = "Bayar Di Toko";
+              $waktu_kirim = $transaksi->waktu_kirim->format("d M Y h:i A");
           }
 
           if( $transaksi['status'] == "1" || $transaksi['status'] == "6"){
@@ -283,21 +287,21 @@ class TransaksiController extends Controller
               $batas_ambe = strtotime($transaksi['waktu_kirim']);
              
               if( ($waktu_skrang < $batas_ambe ) && $transaksi['metode_pembayaran'] == "1"){
-                  $status = '<label class="label label-info">Menunggu Pengiriman</label>';
-                  $marker_status = 'Menunggu Pengiriman';
+                  $status = '<label class="label label-info">Dikemas</label>';
+                  $marker_status = 'Dikemas';
               }else if(($waktu_skrang > $batas_ambe ) && $transaksi['metode_pembayaran'] == "1"){
                 $status = '<label class="label label-danger">Lewat Batas Pengiriman</label>';
                 $marker_status = 'Lewat Batas Pengiriman';
               }else if( ($waktu_skrang < $batas_ambe ) && $transaksi['metode_pembayaran'] == "3"){
-                  $status = '<label class="label label-info">Menunggu Pengambilan</label>';
-                  $marker_status = 'Menunggu Pengambilan';
+                  $status = '<label class="label label-info">Dikemas</label>';
+                  $marker_status = 'Dikemas';
               }else if(  ($waktu_skrang < $batas_ambe )  && $transaksi['metode_pembayaran'] == "2"){
                   if($transaksi['status'] == "6"){
-                      $status = '<label class="label label-info">Menunggu Transfer</label>';
+                      $status = '<label class="label bg-yellow">Menunggu Transfer</label>';
                       $marker_status = 'Menunggu Transfer';
                   }else{
-                      $status = '<label class="label label-info">Menunggu Pengiriman</label>';
-                      $marker_status = 'Menunggu Pengiriman';
+                      $status = '<label class="label label-info">Dikemas</label>';
+                      $marker_status = 'Dikemas';
                   }     
                   
               }else if(  ($waktu_skrang > $batas_ambe )  && $transaksi['metode_pembayaran'] == "2"){
@@ -305,19 +309,17 @@ class TransaksiController extends Controller
                       $status = '<label class="label label-danger">Pesanan Dibatalkan </label>';
                       $marker_status = 'Pesanan Dibatalkan';
                   }else{
-                      $status = '<label class="label label-info">Menunggu Pengiriman</label>';
-                      $marker_status = 'Menunggu Pengiriman';
+                      $status = '<label class="label label-info">Dikemas</label>';
+                      $marker_status = 'Dikemas';
                   }     
-                  
               }else{
                   $status = '<label class="label label-danger>Pesanan Dibatalkan </label>';
                   $marker_status = 'Pesanan Dibatalkan';
               } 
-             
               
           }else if($transaksi['status'] == "2"){
-              $status = "<label class='label label-info'>Sementara Pengiriman</label>";
-              $marker_status = 'Sementara Pengiriman';
+              $status = "<label class='label bg-purple'>Dikirim</label>";
+              $marker_status = 'Dikirim';
           }else if($transaksi['status'] == "3"){
               $status = "<label class='label label-danger'>Pesanan Dibatalkan</label>";
               $marker_status = 'Pesanan Dibatalkan';
@@ -325,8 +327,8 @@ class TransaksiController extends Controller
               $status = "<label class='label label-warning'>Ajukan Pembatalan</label>";
               $marker_status = 'Ajukan Pembatalan';
           }else if($transaksi['status'] == "5"){
-              $status = "<label class='label label-success'>Pesanan Diterima</label>";
-              $marker_status = 'Pesanan Diterima';
+              $status = "<label class='label label-success'>Terima</label>";
+              $marker_status = 'Terima';
           }else if($transaksi['status'] == "7"){
               $status = "<label class='label label-warning'>Pesanan Disimpan</label>";
               $marker_status = 'Pesanan Disimpan';
@@ -336,7 +338,7 @@ class TransaksiController extends Controller
           $transaksi['tampil_status'] = $status;
           $transaksi['marker_status'] = $marker_status;
           $transaksi['marker_jt'] = $marker_jt;
-
+          $transaksi['tampil_waktu_kirim'] = $waktu_kirim;
           return $transaksi;
       });
 
@@ -350,7 +352,7 @@ class TransaksiController extends Controller
 
         $jenis_transaksi = $req['jenis_transaksi'];
         $status_transaksi = $req['status_transaksi'];
-        // return $req;
+       
 
         $transaksi = $this->setFilter($jenis_transaksi,$status_transaksi);
 

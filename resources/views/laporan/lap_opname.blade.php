@@ -85,10 +85,7 @@
 	        		<button class="btn btn-primary">Cari</button>
 	        		<a href="{{ route('opname') }}"><label class="btn btn-warning" >Reset</label></a>
 	        		<a href="javascript:export_pdf()"><label class="btn btn-success" >Export PDF</label></a>
-	        		<a href="{{ route('set_tanggal_produksi') }}" onclick="return confirm('Apakah Anda Yakin Untuk Set Tanggal ?') "><label class="btn btn-danger" >Set Tanggal</label></a>
-
 	        		
-
 	        	</div>
         	</form>
         </div>
@@ -130,8 +127,6 @@
 								<td class="nowrap" align="center">
 										@if($key->stock_toko !== 'belum' )
 											{{ $key->stock_toko }}
-										@else
-											<label class="label label-warning">Belum Diset</label>
 										@endif
 								</td>
 								<td class="nowrap" align="center">

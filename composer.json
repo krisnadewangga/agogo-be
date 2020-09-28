@@ -15,6 +15,7 @@
         "fideloper/proxy": "^4.0",
         "fruitcake/laravel-cors": "^1.0",
         "intervention/image": "^2.5",
+        "ixudra/curl": "^6.21",
         "laravel/framework": "^6.0",
         "laravel/passport": "^8.4",
         "laravel/tinker": "^1.0",

@@ -33,8 +33,9 @@ class Transaksi extends Model
                  'jenis',
                  'jalur',
                  'kasir_id',
-                 'for_ps'];
-    protected $dates = ['waktu_kirim','tgl_bayar','tgl_bayar'];
+                 'for_ps','waktu_kirim_tf'];
+
+    protected $dates = ['waktu_kirim','tgl_bayar','waktu_kirim_tf'];
 
   	protected $appends = array('ket_metodepembayaran','ket_status_transaksi');
 
@@ -146,6 +147,11 @@ class Transaksi extends Model
     public function NotifExpired()
     {
       return $this->hasOne(Transaksi::class);
+    }
+
+    public function KasirM()
+    {
+      return $this->belongsTo(User::class,'kasir_id','id');
     }
     
 }
