@@ -11,6 +11,7 @@ class Produksi extends Model
 
 	protected $fillable = [
 	
+	
 		'item_id',
 		'produksi1',
 		'produksi2',
@@ -24,7 +25,8 @@ class Produksi extends Model
 		'total_lain',
 		'catatan',
 		'stock_awal',
-		'sisa_stock'];
+		'sisa_stock',
+		'created_at'];
 
 
 
