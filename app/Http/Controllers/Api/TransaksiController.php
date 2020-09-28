@@ -180,7 +180,6 @@ class TransaksiController extends Controller
 										if($findOtp->otp == $req['otp']){
 											$req_transaksi['tgl_bayar'] = Carbon::now();
 											$req_transaksi['transaksi_member'] = '1';
-											
 											// return $req_transaksi;
 											$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 											
