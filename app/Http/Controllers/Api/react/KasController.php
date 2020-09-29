@@ -55,7 +55,7 @@ class KasController extends Controller
 			return response()->json([
 				'status' => 'failed',
 				'message' => 'Invalid Username / PIN'
-			], 200);
+			], 400);
 		$user = $request->user();
 		$role = Role::where('user_id',$user->id)
                     ->whereIn('level_id',['1','2'])->count();
@@ -94,7 +94,7 @@ class KasController extends Controller
 			return response()->json([
 				'status' => 'failed',
 				'message' => 'Invalid Username / PIN'
-			], 200);
+			], 400);
 		}
         // return $users;
 
