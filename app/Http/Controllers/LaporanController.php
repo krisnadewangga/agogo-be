@@ -896,8 +896,7 @@ class LaporanController extends Controller
       $dates = [ Carbon::now()->format('Y-m-d'), Carbon::now()->format('Y-m-d'),'1','1'];
 
       $result = $this->SetDataPemesanan($dates);
-       // return $result;
-
+     
       $input = ['mulai_tanggal' => Carbon::now()->format('d/m/Y'), 
                 'sampai_tanggal' => Carbon::now()->format('d/m/Y'),
                 'sort_by' => '1',
@@ -924,7 +923,7 @@ class LaporanController extends Controller
        
        $dates = [$mt, $st, $req['sort_by'], $req['opsi_sort']];
        $result = $this->SetDataPemesanan($dates);
-     
+      
        
        $input = ['mulai_tanggal' => $req['mulai_tanggal'], 
                  'sampai_tanggal' => $req['sampai_tanggal'],
@@ -1034,7 +1033,7 @@ class LaporanController extends Controller
 
       $data = $select->get();
       
-
+     
       $data->map(function($data){
         if($data->jenis == "2"){
           $data['nama'] = $data->Preorder->nama;
@@ -1049,8 +1048,13 @@ class LaporanController extends Controller
            }else{
              $data['pencatat'] = $data->Preorder->KasirDp->name;
            }
-         
-          $data['pencatat_finish'] = $data->Preorder->KasirLunas->name;
+
+          if($data->Preorder->pencatat_pengambilan == '-'){
+            $data['pencatat_finish'] = '';
+          }else{
+            $data['pencatat_finish'] = $data->Preorder->KasirLunas->name;
+          }
+          
           $data['tampil_metode_pembayaran'] = 'Pemesanan';
         }else{
           $data['nama'] = $data->User->name;
