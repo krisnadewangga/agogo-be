@@ -27,18 +27,18 @@ class LaporanController extends Controller
     // Pendapatan
     public function LapPendapatan()
     {
-    	$transaksi = Transaksi::selectRaw('transaksi.*, 
+      $transaksi = Transaksi::selectRaw('transaksi.*, 
                                           (SELECT sum(jumlah * margin) from item_transaksi Where transaksi_id =transaksi.id) as sub_total_bersih_item ')
                             ->where([ 
-    									['metode_pembayaran','=','1'],
-    									['status','>=','1'],
+                      ['metode_pembayaran','=','1'],
+                      ['status','>=','1'],
                       ['status','!=','3']
 
-    								  ])
-    						->orWhere([ 
-    									['metode_pembayaran','>','1'],
-    									['status','=','5']
-    								  ])
+                      ])
+                ->orWhere([ 
+                      ['metode_pembayaran','>','1'],
+                      ['status','=','5']
+                      ])
                 ->whereDate('tgl_bayar','=',Carbon::now()->format('Y-m-d'))->orderBy('tgl_bayar','DESC')->get();
         
         $transaksi->map(function($transaksi){
@@ -61,12 +61,12 @@ class LaporanController extends Controller
         $kop = "Laporan Pendapatan Hari Ini ".Carbon::now()->format('d M Y');
 
         $input = ['mt' => Carbon::now()->format('d/m/Y'), 'st' => "" ];
-    	  $total_pendapatan = $transaksi->sum('total_bayar');
+        $total_pendapatan = $transaksi->sum('total_bayar');
         $total_bersih_item = $transaksi->sum('sub_total_bersih_item');
         $total_pengiriman = $transaksi->sum('total_biaya_pengiriman');
 
         $menu_active = "laporan|pendapatan|0";
-    	
+      
         return view("laporan.lap_pendapatan",compact('transaksi','total_pendapatan','menu_active','kop','input','total_bersih_item','total_pengiriman'));
     }
 
@@ -393,7 +393,7 @@ class LaporanController extends Controller
           }
 
           $menu_active = "user|$ma|0";
-      	  return view("laporan.detail_user",compact('user','menu_active','transaksi','logBan'));
+          return view("laporan.detail_user",compact('user','menu_active','transaksi','logBan'));
         }else{
           abort('404','Halaman Tidak Ditemukan');
         }
@@ -896,8 +896,7 @@ class LaporanController extends Controller
       $dates = [ Carbon::now()->format('Y-m-d'), Carbon::now()->format('Y-m-d'),'1','1'];
 
       $result = $this->SetDataPemesanan($dates);
-       // return $result;
-
+     
       $input = ['mulai_tanggal' => Carbon::now()->format('d/m/Y'), 
                 'sampai_tanggal' => Carbon::now()->format('d/m/Y'),
                 'sort_by' => '1',
@@ -924,7 +923,7 @@ class LaporanController extends Controller
        
        $dates = [$mt, $st, $req['sort_by'], $req['opsi_sort']];
        $result = $this->SetDataPemesanan($dates);
-     
+      
        
        $input = ['mulai_tanggal' => $req['mulai_tanggal'], 
                  'sampai_tanggal' => $req['sampai_tanggal'],
@@ -1034,7 +1033,7 @@ class LaporanController extends Controller
 
       $data = $select->get();
       
-
+     
       $data->map(function($data){
         if($data->jenis == "2"){
           $data['nama'] = $data->Preorder->nama;
@@ -1049,8 +1048,13 @@ class LaporanController extends Controller
            }else{
              $data['pencatat'] = $data->Preorder->KasirDp->name;
            }
-         
-          $data['pencatat_finish'] = $data->Preorder->KasirLunas->name;
+
+          if($data->Preorder->pencatat_pengambilan == '-'){
+            $data['pencatat_finish'] = '';
+          }else{
+            $data['pencatat_finish'] = $data->Preorder->KasirLunas->name;
+          }
+          
           $data['tampil_metode_pembayaran'] = 'Pemesanan';
         }else{
           $data['nama'] = $data->User->name;
@@ -1673,6 +1677,5 @@ class LaporanController extends Controller
 
     } 
 
-  
     
 }
