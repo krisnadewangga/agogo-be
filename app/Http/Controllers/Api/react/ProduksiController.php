@@ -29,150 +29,151 @@ public function getNotAvailProduct()
 
 
 
-public function getTrxByProduct($id)
+public function getTrxByProduct($id) {
 
 
-{
     $production = DB::table('produksi')
     ->where('item_id', $id)
     ->where('created_at', '>', Carbon::today())
     ->orderBy('created_at','DESC')->first();
 
-    if ($production == null ) {
+   
 
-        $date_produksi = DB::table('produksi')
-        ->select('created_at')
-        ->where('item_id', $id)
-        ->orderBy('created_at', 'DESC')->first();
+    // if ($production == null ) {
 
-
-            //Cek apakah ada initial produksi / tidak
-        if ($date_produksi == null) {  
+    //     $date_produksi = DB::table('produksi')
+    //     ->select('created_at')
+    //     ->where('item_id', $id)
+    //     ->orderBy('created_at', 'DESC')->first();
 
 
-
-            $order = DB::table('item_transaksi')
-            ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
-            ->where('item_transaksi.item_id', $id)
-                // ->whereBetween('order_details.created_at', [$start_date, $end_date])
-            ->where('transaksi.status','5')
-            ->where('transaksi.jenis','1')
-                // ->get();
-            ->sum('jumlah');
-
-             $orderDalamPengantaran = DB::table('item_transaksi')
-            ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
-            ->where('item_transaksi.item_id', $id)
-                // ->whereBetween('order_details.created_at', [$start_date, $end_date])
-            ->where('transaksi.status','2')
-            ->where('transaksi.jenis','1')
-                // ->get();
-            ->sum('jumlah');
+    //         //Cek apakah ada initial produksi / tidak
+    //     if ($date_produksi == null) {  
 
 
 
-            $preorder = DB::table('item_transaksi')
-            ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
-            ->where('item_transaksi.item_id', $id)
-                // ->whereBetween('preorder_details.created_at', [$start_date, $end_date])
-            ->where('transaksi.status','5')
-            ->where('transaksi.jenis','2')            
-                // ->where('status','PAID')
-            ->sum('jumlah');
+    //         $order = DB::table('item_transaksi')
+    //         ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
+    //         ->where('item_transaksi.item_id', $id)
+    //             // ->whereBetween('order_details.created_at', [$start_date, $end_date])
+    //         ->where('transaksi.status','5')
+    //         ->where('transaksi.jenis','1')
+    //             // ->get();
+    //         ->sum('jumlah');
+
+    //          $orderDalamPengantaran = DB::table('item_transaksi')
+    //         ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
+    //         ->where('item_transaksi.item_id', $id)
+    //             // ->whereBetween('order_details.created_at', [$start_date, $end_date])
+    //         ->where('transaksi.status','2')
+    //         ->where('transaksi.jenis','1')
+    //             // ->get();
+    //         ->sum('jumlah');
 
 
 
-            $getStock = DB::table('item')
-            ->select('stock')            
-            ->where('id', $id) 
-            ->orderBy('created_at', 'DESC')
-            ->first();
-            $stock_awal = $getStock->stock + $preorder + $order + $orderDalamPengantaran ;
+    //         $preorder = DB::table('item_transaksi')
+    //         ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
+    //         ->where('item_transaksi.item_id', $id)
+    //             // ->whereBetween('preorder_details.created_at', [$start_date, $end_date])
+    //         ->where('transaksi.status','5')
+    //         ->where('transaksi.jenis','2')            
+    //             // ->where('status','PAID')
+    //         ->sum('jumlah');
 
 
 
-            return response()->json(array(
-                // 'status'        => 'failed',
-                'count_order'   => $order,
-                'count_preorder'=> $preorder,
-                'stok_awal'     => $stock_awal,
-                'sisa_stock'    => $getStock->stock,
-                'message'       => 'production : null',
-                'production'    => $production,
-            ),200);
-
-        }    
-        else {
-                // Jika ada tanggal produksi maka menggunakan tanggal produksi yg sudah didapatkan tadi
-            $start_date = Carbon::parse($date_produksi->created_at)->format('Y-m-d') . ' 00:00:01';
-            $end_date = Carbon::parse($date_produksi->created_at)->format('Y-m-d') . ' 23:59:59';
-                // $end_date = Carbon::now()->format('Y-m-d H:i:s');
-                // $tgl_produksi = $date_production_not_null;
+    //         $getStock = DB::table('item')
+    //         ->select('stock')            
+    //         ->where('id', $id) 
+    //         ->orderBy('created_at', 'DESC')
+    //         ->first();
+    //         $stock_awal = $getStock->stock + $preorder + $order + $orderDalamPengantaran ;
 
 
-            $production = DB::table('produksi')
-            ->where('item_id', $id)
-            ->whereBetween('created_at', [$start_date, $end_date])
-            ->orderBy('created_at','DESC')->first();
 
-                //  dd($production);
+    //         return response()->json(array(
+    //             // 'status'        => 'failed',
+    //             'count_order'   => $order,
+    //             'count_preorder'=> $preorder,
+    //             'stok_awal'     => $stock_awal,
+    //             'sisa_stock'    => $getStock->stock,
+    //             'message'       => 'production : null',
+    //             'production'    => $production,
+    //         ),200);
 
-            $order = DB::table('item_transaksi')
-            ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
-            ->where('item_transaksi.item_id', $id)
-            ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
-            ->where('transaksi.status','5')
-            ->where('transaksi.jenis','1')
-                // ->get();
-            ->sum('jumlah');
-
-            $orderDalamPengantaran = DB::table('item_transaksi')
-            ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
-            ->where('item_transaksi.item_id', $id)
-            ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
-            ->where('transaksi.status','2')
-            ->where('transaksi.jenis','1')
-                // ->get();
-            ->sum('jumlah');
-
-            $preorder = DB::table('item_transaksi')
-            ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
-            ->where('item_id', $id)
-            ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
-            ->where('transaksi.status','5')  
-            ->where('transaksi.jenis','2')          
-                // ->where('status','PAID')
-            ->sum('jumlah');
+    //     }    
+    //     else {
+    //             // Jika ada tanggal produksi maka menggunakan tanggal produksi yg sudah didapatkan tadi
+    //         $start_date = Carbon::parse($date_produksi->created_at)->format('Y-m-d') . ' 00:00:01';
+    //         $end_date = Carbon::parse($date_produksi->created_at)->format('Y-m-d') . ' 23:59:59';
+    //             // $end_date = Carbon::now()->format('Y-m-d H:i:s');
+    //             // $tgl_produksi = $date_production_not_null;
 
 
-                // $getStock = DB::table('products')
-                // ->select('stock')
-                // ->where('id', $id) 
-                // ->get();
-                // $stock_awal = $getStock[0]->stock + $preorder + $order;
+    //         $production = DB::table('produksi')
+    //         ->where('item_id', $id)
+    //         ->whereBetween('created_at', [$start_date, $end_date])
+    //         ->orderBy('created_at','DESC')->first();
 
-            $getStock = DB::table('produksi')
-            ->select('stock_awal')            
-            ->where('item_id', $id) 
-            ->orderBy('created_at', 'DESC')
-            ->first();
-            $stock_awal = $getStock->stock_awal + $preorder + $order + $orderDalamPengantaran;
+    //             //  dd($production);
 
-            return response()->json(array(
-                    // 'last_trx_date' =>  null,
-                'count_order'   => $order,
-                'count_preorder'=> $preorder,
-                'stok_awal'     => $stock_awal,
-                'production'    => $production,
+    //         $order = DB::table('item_transaksi')
+    //         ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
+    //         ->where('item_transaksi.item_id', $id)
+    //         ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
+    //         ->where('transaksi.status','5')
+    //         ->where('transaksi.jenis','1')
+    //             // ->get();
+    //         ->sum('jumlah');
 
-            ),200); 
-        }           
+    //         $orderDalamPengantaran = DB::table('item_transaksi')
+    //         ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
+    //         ->where('item_transaksi.item_id', $id)
+    //         ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
+    //         ->where('transaksi.status','2')
+    //         ->where('transaksi.jenis','1')
+    //             // ->get();
+    //         ->sum('jumlah');
 
-    }else {
+    //         $preorder = DB::table('item_transaksi')
+    //         ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
+    //         ->where('item_id', $id)
+    //         ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
+    //         ->where('transaksi.status','5')  
+    //         ->where('transaksi.jenis','2')          
+    //             // ->where('status','PAID')
+    //         ->sum('jumlah');
+
+
+    //             // $getStock = DB::table('products')
+    //             // ->select('stock')
+    //             // ->where('id', $id) 
+    //             // ->get();
+    //             // $stock_awal = $getStock[0]->stock + $preorder + $order;
+
+    //         $getStock = DB::table('produksi')
+    //         ->select('stock_awal')            
+    //         ->where('item_id', $id) 
+    //         ->orderBy('created_at', 'DESC')
+    //         ->first();
+    //         $stock_awal = $getStock->stock_awal + $preorder + $order + $orderDalamPengantaran;
+
+    //         return response()->json(array(
+    //                 // 'last_trx_date' =>  null,
+    //             'count_order'   => $order,
+    //             'count_preorder'=> $preorder,
+    //             'stok_awal'     => $stock_awal,
+    //             'production'    => $production,
+
+    //         ),200); 
+    //     }           
+
+    // }else {
 
         $curent_date = Carbon::now()->format('Y-m-d');
 
-            // $curent_date = Carbon::now();
+        // $curent_date = Carbon::now();
 
         $start_date = Carbon::parse($curent_date)->format('Y-m-d') . ' 00:00:01';
         $end_date = Carbon::parse($curent_date)->format('Y-m-d') . ' 23:59:59';
@@ -188,7 +189,7 @@ public function getTrxByProduct($id)
             // ->get();
         ->sum('jumlah');
 
-            $orderDalamPengantaran = DB::table('item_transaksi')
+        $orderDalamPengantaran = DB::table('item_transaksi')
         ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
         ->where('item_transaksi.item_id', $id)
         ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
@@ -227,7 +228,7 @@ public function getTrxByProduct($id)
 
         ),200);
 
-    }
+    //}
 
 }
 
