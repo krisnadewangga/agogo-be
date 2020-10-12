@@ -450,19 +450,13 @@ public function bayarPreorder(Request $request)
    foreach ($result as $key => $row) {  
 
 
-    $getCount = Item::where(['id' => $row['product_id']])->get();
-
-    if ($getCount[0]['stock'] >= $row['qty']) {
       DB::table('item')->where('id', $row['product_id'])->decrement('stock', $row['qty']);
 
       DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_pemesanan', $row['qty']);
       DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $row['qty']);
       DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $row['qty']);  
-    }
-    else {
-      throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
-     // DB::rollback();
-    }
+    
+    
 
 
 
