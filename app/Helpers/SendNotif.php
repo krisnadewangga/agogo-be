@@ -204,7 +204,7 @@ class SendNotif{
         Mail::send('email_template',$data,function ($mail) use ($email,$subject) {
                 $mail->to($email,'no-reply')
                      ->subject($subject);
-                $mail->from('developagogobakery@mail.com','AgogoBakery.com');
+                $mail->from('agogodevelop@gmail.com','AgogoBakery.com');
         });
 
         if(Mail::failures()){
@@ -214,5 +214,5 @@ class SendNotif{
         }
     }
 
-
+    
 }
