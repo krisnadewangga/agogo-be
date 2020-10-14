@@ -240,7 +240,7 @@ public function store(Request $request)
       return response()->json([
         'status' => 'failed',
         'status1' => '0',
-        'message' => 'Invalid Username / PIN'
+        'message' => 'Anda Bukan Approval'
       ], 400);
 
     }
@@ -361,7 +361,7 @@ public function editPreorder(Request $request)
   else {
     return response()->json([
       'status' => 'failed',
-      'message' => 'Invalid Username / PIN'
+      'message' => 'Anda Bukan Approval'
     ], 400);
   }
 }
@@ -508,7 +508,7 @@ public function cancelPreorder(Request $request,$id)
 else {
   return response()->json([
     'status' => 'failed',
-    'message' => 'Invalid Username / PIN'
+    'message' => 'Anda Bukan Approval'
   ], 400);
 }
 }
