@@ -93,7 +93,7 @@ class KasController extends Controller
 		}else {
 			return response()->json([
 				'status' => 'failed',
-				'message' => 'Invalid Username / PIN'
+				'message' => 'Anda Bukan Approval'
 			], 400);
 		}
         // return $users;
@@ -254,7 +254,7 @@ class KasController extends Controller
         else {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Invalid Username / PIN'
+                'message' => 'Anda Bukan Approval'
             ], 200);
         }
         // return $users;
