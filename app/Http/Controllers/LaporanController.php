@@ -1082,8 +1082,14 @@ class LaporanController extends Controller
             $data['pencatat_finish'] = '-';
           }elseif($data->metode_pembayaran == '3'){
             $data['tampil_metode_pembayaran'] = 'Bayar Ditoko';
-            $data['pencatat'] = $data->KasirM->name;
-            $data['pencatat_finish'] = '-';
+            // $data['pencatat'] = $data->KasirM->name;
+            $data['pencatat'] = '-';
+            if($data->status == '5'){
+              $data['pencatat_finish'] = $data->KasirM->name;
+            }else{
+              $data['pencatat_finish'] = '-';
+            }
+            
           }
 
         }
