@@ -30,10 +30,11 @@ class UserController extends Controller
         $user['role'] = $sel_role;
 
         if(empty($user['photo'])){
-            $user['photo'] = "http://agogobakery.com/assets/dist/img/user.png";
+            $user['photo'] = "http://agogobakery.com/atur/assets/dist/img/user.png";
         }else{
             // $user['photo'] = "http://agogobakery.com/".$user['photo'];
-            $user['photo'] = "http://127.0.0.1/agogo/".$user['photo'];
+            $user['photo'] = "http://agogobakery.com/atur/upload/".$user['photo'];
+            // $user['photo'] = "http://127.0.0.1/agogo/upload/".$user['photo'];
         }
         
         return $user;
