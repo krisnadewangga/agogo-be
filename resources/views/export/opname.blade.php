@@ -102,12 +102,12 @@
                @php $no=1;@endphp
                @forelse($data as $key)
                     <tr>
-                        <td align="center" style="text-align:center;border-bottom:0px">{{ $no++ }}</td>
-                        <td style="text-align:center;border-bottom:0px">{{ $key['code'] }}</td>
-                        <td style="text-align:center;border-bottom:0px">{{ $key['nama_item'] }}</td>
-                        <td style="text-align:center;border-bottom:0px" >{{ $key->stock_masuk }}</td>
-                        <td  style="text-align:center;border-bottom:0px">{{ $key->stock_akhir }}</td>
-                        <td  style="text-align:center;border-bottom:0px">
+                        <td align="center" style="text-align:center;">{{ $no++ }}</td>
+                        <td style="text-align:center;">{{ $key['code'] }}</td>
+                        <td style="text-align:center;">{{ $key['nama_item'] }}</td>
+                        <td style="text-align:center;" >{{ $key->stock_masuk }}</td>
+                        <td  style="text-align:center;">{{ $key->stock_akhir }}</td>
+                        <td  style="text-align:center;">
                             @if($key->stock_toko !== 'belum')
                                 {{ $key->stock_toko }}
                             @endif

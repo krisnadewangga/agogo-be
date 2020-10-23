@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Produksi;
 use App\Item;
+use App\Kas;
 use Carbon\Carbon;
 use Auth;
 
@@ -42,6 +43,19 @@ class SetTanggalController extends Controller
       $cek = Produksi::whereDate('created_at',$tgl_skrang)->count();
         
       if($cek == 0){
+         $cek_kas = Kas::where('status','0')->get();
+         $belum_tutup_kas = $cek_kas->count();
+
+         if($belum_tutup_kas > 0){
+            $nama_kasir = "<ul>";
+            foreach($cek_kas as $key){
+              $nama_kasir .= '<li>'.$key->User->name.'</li>';
+            }
+            $nama_kasir .= "</ul>";
+            
+            return redirect()->back()->with('error','Ada Kasir Yang Belum Menutup Kas '.$nama_kasir);
+         }
+
         $item = Item::select('id','stock as sisa_stock')->where('status_aktif','1')->get();
         
         $item->map(function($item){
@@ -65,7 +79,7 @@ class SetTanggalController extends Controller
         foreach ($item as $key ) {
           if($key['sisa_stock'] < 0){
             $sisa_stock = 0;
-            Item::where('id',$key['id'])->update(['stock' => 0]);
+            Item::where('id',$key['id'])->update(['stock' => '0']);
             
           }else{
             $sisa_stock = $key['sisa_stock'];
