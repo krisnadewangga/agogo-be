@@ -557,7 +557,7 @@ public function keepOrder(Request $request)
       else {
         return response()->json([
           'status' => 'failed',
-          'message' => 'Invalid PIN'
+          'message' => 'Anda Bukan Approval'
         ], 400);
       }
     }
