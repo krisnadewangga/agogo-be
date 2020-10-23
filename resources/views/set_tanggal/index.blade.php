@@ -25,7 +25,7 @@
 
 			@if (session('error'))
 			 	@component("components.alert_error", ["type" => "error"])
-					{{ session('error') }}
+					{!! session('error') !!}
 				@endcomponent
 			@endif
 

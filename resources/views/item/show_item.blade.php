@@ -197,7 +197,9 @@
 			              		<table class="table-galeri" style="margin-top: 10px;">
 			              			<tr>
 			              				<td rowspan="4">
-			              					<img src="{{ asset($gambarUtama->gambar ) }}" height="100">
+			              					@if(isset($gambarUtama->gambar))
+			              						<img src="{{ asset('upload/'.$gambarUtama->gambar ) }}" height="100">
+			              					@endif
 			              				</td>
 			              			</tr>
 			              			<tr>
@@ -227,7 +229,7 @@
 			              					@foreach($listGambarItem as $keyGambar)
 			              						<td>
 			              							<div>
-				                						<img src="{{ asset($keyGambar->gambar ) }}" height="150">
+				                						<img src="{{ asset('upload/'.$keyGambar->gambar ) }}" height="150">
 				                					</div>
 				                					<div style="margin-top: 5px;">
 					                					<div class="row">
@@ -257,6 +259,7 @@
 
 				                		</tr>
 				                	</table>
+				                	
 			              		
 			              		</div>
 			                	
