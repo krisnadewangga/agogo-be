@@ -36,7 +36,7 @@
 								<td class="nowrap">{{ $key->created_at->format('d M Y H:i A') }}</td>
 								<td class="nowrap">{{ $key->judul }}</td>
 								<td class="nowrap">{!! $key->deskripsi !!}</td>
-								<td class="nowrap" align="center"><a href="{{ $key->gambar }}" target="_blank" title="Lihat Gambar"><button class="btn-warning btn btn-sm" ><i class="fa fa-image"></i></button></a></td>
+								<td class="nowrap" align="center"><a href="upload/{{ $key->gambar }}" target="_blank" title="Lihat Gambar"><button class="btn-warning btn btn-sm" ><i class="fa fa-image"></i></button></a></td>
 								<td class="nowrap" align="center">{{ $key->berlaku_sampai->format('d M Y') }}</td>
 								<td class="nowrap" align="center">
 									@php

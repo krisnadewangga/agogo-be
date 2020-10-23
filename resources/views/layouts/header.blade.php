@@ -56,7 +56,7 @@
             <li class="dropdown user user-menu">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 @if(!empty(Auth::User()->foto))
-                   <img src="{{ asset(Auth::User()->foto) }}" class="user-image" alt="User Image">
+                   <img src="{{ asset('upload/'.Auth::User()->foto) }}" class="user-image" alt="User Image">
                 @else
                    <img src="{{asset('assets/dist/img/user.png') }}" class="user-image" alt="User Image">
                 @endif
@@ -67,7 +67,7 @@
                 <!-- User image -->
                 <li class="user-header">
                   @if(!empty(Auth::User()->foto))
-                    <img src="{{ asset(Auth::User()->foto) }}" class="img-circle" alt="User Image">
+                    <img src="{{ asset('upload/'.Auth::User()->foto) }}" class="img-circle" alt="User Image">
                   @else
                      <img src="{{asset('assets/dist/img/user.png') }}" class="img-circle" alt="User Image">
                   @endif

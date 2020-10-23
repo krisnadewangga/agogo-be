@@ -58,7 +58,7 @@ class KompresFoto {
 
 			
 		if(file_exists($path_tujuan)){
-			unlink($path_tujuan);
+			unlink('upload/'.$path_tujuan);
 		}
 
 	}
@@ -69,7 +69,7 @@ class KompresFoto {
         $angka = Acak::Kaseputar(20);
         $filename  = date('YmdHis').'-'.$angka.'.' .$image->getClientOriginalExtension();
         $image->move($destinationPath, $filename);
-        return $destinationPath.$filename;
+        return $folder.'/'.$filename;
 	}
 
 }
