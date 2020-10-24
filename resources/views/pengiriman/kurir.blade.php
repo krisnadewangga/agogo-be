@@ -44,7 +44,7 @@
 								<td class="nowrap">{{ $key->merek }}</td>
 								<td class="nowrap">{{ $key->no_polisi }}</td>
 								<td class="nowrap" align="center">
-									<a href="{{ $key->User->foto }}" target="_blank" title="Lihat Gambar"><button class="btn-warning btn btn-sm" ><i class="fa fa-image"></i></button></a>
+									<a href="upload/{{ $key->User->foto }}" target="_blank" title="Lihat Gambar"><button class="btn-warning btn btn-sm" ><i class="fa fa-image"></i></button></a>
 								</td>
 								<td class="nowrap" align="center">
 									@if($key->User->status_aktif == 1)

@@ -119,9 +119,12 @@ class ItemController extends Controller
     {
         $find = GambarItem::findOrFail($id);
         if($find->utama == "1"){
-            $select = GambarItem::where('id','>',$find['id'])->first();
-            $findUp = GambarItem::findOrFail($select->id);
-            $findUp->update(['utama' => '1']);
+            if($find->count > 1){
+                $select = GambarItem::where('id','>',$find['id'])->first();
+                $findUp = GambarItem::findOrFail($select->id);
+                $findUp->update(['utama' => '1']);
+            }
+           
         }
         $hapusFoto = KompresFoto::HapusFoto($find->gambar);
         $find->delete();
@@ -139,6 +142,7 @@ class ItemController extends Controller
         $kategori = Kategori::where('status_aktif','1')->get();
         $item = Item::findOrFail($id);
         $gambarUtama = $item->GambarItem()->where('utama','1')->first();
+        
         $stocker = Stocker::where('item_id',$id)->orderBy('created_at','DESC')->get();
         $listGambarItem = GambarItem::where(['item_id' => $id])->orderBy('utama','DESC')->get();
         

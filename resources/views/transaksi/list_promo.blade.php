@@ -34,7 +34,7 @@
 								<td align="center"></td>
 								<td>{{ $key->updated_at->format('d M Y H:i A') }}</td>
 								<td>{{ $key->judul }}</td>
-								<td align="center"><a href="upload/images-700/{{ $key->gambar }}" target="_blank" title="Lihat Gambar"><button class="btn-warning btn btn-sm" ><i class="fa fa-image"></i></button></a></td>
+								<td align="center"><a href="upload/{{ $key->gambar }}" target="_blank" title="Lihat Gambar"><button class="btn-warning btn btn-sm" ><i class="fa fa-image"></i></button></a></td>
 								<td align="center">{{ $key->berlaku_sampai->format('d M Y') }}</td>
 								<td align="center">
 									{{ $key->dibuat_oleh }}

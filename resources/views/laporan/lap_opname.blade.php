@@ -103,44 +103,72 @@
 					{{ session('error') }}
 				@endcomponent
 			@endif
-        	<div class="table-responsive" style="margin-top: 10px;">
-				<table class=" table  table-bordered" id="table_opname">
-					<thead style=" font-size:14px;">
-						<tr>
-							<th style="width: 5px;">No</th>
-							<th>Kode Barang</th>
-							<th>Nama Menu</th>
-							<th ><center>Stok Masuk</center></th>
-							<th ><center>Stok Akhir</center></th>
-							<th ><center>Stok Toko</center></th>
-							<th ><center>Aksi</center></th>
-						</tr>
-					</thead>
-					<tbody style=" font-size:14px;">
-						@foreach($item as $key)
+			<form method="POST" action="{{ route('post_opname') }}" >
+				@csrf
+				<input type="text" name="tanggal" value="{{ $tanggal_form }}" hidden>
+	        	<div class="table-responsive" style="margin-top: 10px;">
+					<table class=" table  table-bordered" >
+						<thead style=" font-size:14px;">
 							<tr>
-								<td class="nowrap"></td>
-								<td class="nowrap">{{ $key->code }}</td>
-								<td class="nowrap">{{ $key->nama_item }}</td>
-								<td class="nowrap" align="center">{{ $key->stock_masuk }}</td>
-								<td class="nowrap" align="center">{{ $key->stock_akhir }}</td>
-								<td class="nowrap" align="center">
-										@if($key->stock_toko !== 'belum' )
-											{{ $key->stock_toko }}
-										@endif
-								</td>
-								<td class="nowrap" align="center">
-									<button onclick="edit('{{ $key->id }}','{{ $key->nama_item }}',
-									'{{ $key->stock_masuk }}','{{$key->stock_akhir}}', '{{$key->stock_toko}}')" class='btn btn-sm btn-primary ' >
-		       							<i class='fa fa-pencil'  ></i></button>
-								</td>
+								<th style="width: 5px;">No</th>
+								<th>Kode Barang</th>
+								<th>Nama Menu</th>
+								<th ><center>Stok Masuk</center></th>
+								<th ><center>Stok Akhir</center></th>
+								<th ><center>Stok Toko</center></th>
 							</tr>
-						@endforeach
-					</tbody>
-					
-				</table>
+						</thead>
+						<tbody style=" font-size:14px;">
+							@php $no=1; @endphp
+							@foreach($item as $key)
+								<tr>
+									<td class="nowrap" align="center">{{ $no++ }}</td>
+									<td class="nowrap">{{ $key->code }}</td>
+									<td class="nowrap">{{ $key->nama_item }}</td>
+									<td class="nowrap" align="center">
+										{{ $key->stock_masuk }}
+										<input type="hidden" name="total_stock_masuk_{{$key->id}}" value="{{ $key->stock_masuk }}" >
+									</td>
+									<td class="nowrap" align="center">
+										{{ $key->stock_akhir }}
+										<input type="hidden" name="total_stock_akhir_{{$key->id}}" value="{{ $key->stock_akhir }}" >
+									</td>
+									<td class="nowrap" align="center">	
+										
+										<input type="numeric" name="total_stock_toko_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('total_stock_toko_'.$key->id) }} @else {{$key->stock_toko}} @endif" style="width: 80px;">
+										
+									</td>
+									
+								</tr>
+							@endforeach
+						</tbody>
+						
+					</table>
+					<label class="btn btn-success" onclick="aproval()">Simpan</label>
+
+					@component("components.modal", ["id" => "modal_input" ,"kop_modal" => "Aproval Simpan Opname"])
+						@if (session('error_auth'))
+						 	@component("components.alert_error", ["type" => "error"])
+								{{ session('error_auth') }}
+							@endcomponent
+						@endif
+						<div class="form-group">
+							<label>Username</label>
+							<input type="text" id="username" name="username"   class="form-control">
+						</div>
+
+						<div class="form-group">
+							<label>Password</label>
+							<input type="password" id="username" name="password"   class="form-control">
+						</div>
+				       
+				        <div class="text-right">
+				        	 <button type="submit" class="btn btn-success btn-sm">Proses</button>
+				        </div>
+					@endcomponent
+
+				</form>
 			</div>
-			
         </div>
 
         <script type="text/javascript">
@@ -159,14 +187,6 @@
 		           endDate: '+0d',
 		        });
 
-		        var table_opname = $("#table_opname").DataTable({
-				    "ordering": false
-				});
-        		table_opname.on( 'order.dt search.dt', function () {
-		            table_opname.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-		                cell.innerHTML = i+1;
-		            } );
-		        } ).draw();
 
 	 		});
 
@@ -182,74 +202,15 @@
         		window.open('export_opname?tanggal='+kt+'&sort_by='+sort_by+'&opsi_sort='+opsi_sort, '_blank');
         	}
 
-	     	function edit(id,nama_item,stock_masuk,stock,stock_akhir){
-	     		var tanggal = $("#mt").val();
-        		var pisah = tanggal.split('/');
-        		var kt = pisah[2]+"-"+pisah[1]+"-"+pisah[0];
+        	function aproval()
+        	{
+        		$("#modal_input").modal('show');
+        	}
 
-        		$("#id").val(id);
-        		$("#tanggal").val(kt);
-        		$("#tampil_tanggal").val(tanggal);
-        		$("#nama_item").val(nama_item);
-        		$("#total_stock_masuk").val(stock_masuk);
-        		$("#total_stock_akhir").val(stock);
-
-        		if(stock_akhir == 'belum'){
-        			$("#total_stock_toko").val('');
-        		}else{
-        			$("#total_stock_toko").val(stock_akhir);
-        		}
-        		
-	     		$("#modal_input").modal('show');
-	     	}
-
-	     
 
         </script>
     @endcomponent
 
-    @component("components.modal", ["id" => "modal_input" ,"kop_modal" => "Form Set Stock Akhir"])
-		<form method="POST" action="{{ route('post_opname') }}" >
-			@csrf
-			<input type="text" name="id" id="id" hidden value="{{old('id')}}" readonly>
-			<input type="text" name="tanggal" id="tanggal"  value="{{old('tanggal')}}" hidden readonly>
-			
-			<div class="form-group">
-				<label>Tanggal</label>
-				<input type="text" id="tampil_tanggal" name="tampil_tanggal" value="{{old('tampil_tanggal')}}" readonly class="form-control">
-			</div>
-
-			<div class="form-group">
-				<label>Nama Item</label>
-				<input type="text" id="nama_item" name="nama_item" value="{{old('nama_item')}}"  readonly class="form-control">
-			</div>
-
-			<div class="form-group">
-				<label>Total Stock Masuk</label>
-				<input type="text" id="total_stock_masuk" name="total_stock_masuk"  value="{{old('total_stock_masuk')}}" readonly class="form-control">
-			</div>
-
-			<div class="form-group">
-				<label>Total Stock Akhir</label>
-				<input type="text" id="total_stock_akhir" name="total_stock_akhir" value="{{old('total_stock_akhir')}}"  readonly class="form-control">
-			</div>
-
-
-			<div class="form-group @error('total_stock_toko') has-error @enderror ">
-		        <label>Total Stock Toko</label>
-		        <input id="total_stock_toko" type="text" class="form-control " value="{{ old('total_stock_toko') }}" name="total_stock_toko" >
-		        @error('total_stock_toko')
-		            <label class="control-label" for="inputError">
-                    	<i class="fa fa-times-circle-o"></i> <strong>{{ $message }}</strong>
-                	</label>    
-		        @enderror 
-	        </div>
-
-	       
-	        <div class="text-right">
-	        	 <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
-	        </div>
-		</form>
-	@endcomponent
+  
 
 @endsection

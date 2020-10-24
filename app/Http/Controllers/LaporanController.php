@@ -14,6 +14,7 @@ use App\Produksi;
 use App\Opname;
 use Carbon\Carbon;
 use App\Kategori;
+use App\Role;
 use PDF;
 use Auth;
 use DB;
@@ -1549,6 +1550,9 @@ class LaporanController extends Controller
         $tanggal = Carbon::now()->format('d/m/Y');
       }
 
+      $pisah_tanggal = explode('/', $tanggal);
+      $tanggal_form = $pisah_tanggal[2]."-".$pisah_tanggal[1]."-".$pisah_tanggal[0];
+
       if(isset($req['sort_by'])){
         $sort_by = $req['sort_by'];
       }else{
@@ -1568,9 +1572,9 @@ class LaporanController extends Controller
       $dates = [$explode[2]."-".$explode[1]."-".$explode[0],$sort_by,$opsi_sort];
 
       $item = $this->SetDataOpname($dates);
- 
+      
 
-      return view('laporan.lap_opname', compact('menu_active','input','item'));
+      return view('laporan.lap_opname', compact('menu_active','input','item','tanggal_form'));
     }
 
     public function CariOpname(Request $request)
@@ -1604,30 +1608,39 @@ class LaporanController extends Controller
     {
       $req = $request->all();
       
-      $validator = \Validator::make($req,['total_stock_toko' => 'required']);
+      if(!Auth::attempt(['name' => $req['username'], 'password' => $req['password'] ]))
+      return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username Atau Password Salah')->withInput();        
+
+      $user = $request->user();
+      $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
+   
+      if($role == 0)
+      return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','User Tidak Punya Akses')->withInput();        
+
+      $item = Item::where('status_aktif','1')->select('id')->get();
+      foreach ($item as $key) {
+        $select = Opname::whereDate('tanggal',$req['tanggal'])
+                       ->where('item_id',$key->id)->first();
+
+        if($req['total_stock_toko_'.$key->id] !== NULL){
+          if(isset($select->id)){
+            $select->update(['stock_masuk' => $req['total_stock_masuk_'.$key->id],
+                             'stock_akhir' => $req['total_stock_akhir_'.$key->id],
+                             'stock_toko' => $req['total_stock_toko_'.$key->id]]);
+          }else{
+            $entri = Opname::create(['item_id'=>$key->id,
+                                     'stock_masuk' => $req['total_stock_masuk_'.$key->id],
+                                     'stock_akhir' => $req['total_stock_akhir_'.$key->id],
+                                     'stock_toko' => $req['total_stock_toko_'.$key->id],
+                                     'tanggal' => $req['tanggal']
+                                    ]);
+          }
+        }
+        
+      }
       
-      if($validator->fails()){
-        return redirect()->back()->withErrors($validator)->with('gagal_modal','simpan')->withInput();
-      }
-
-      $select = Opname::whereDate('tanggal',$req['tanggal'])
-                       ->where('item_id',$req['id'])->first();
-  
-      if(isset($select->id)){
-        $select->update(['stock_masuk' => $req['total_stock_masuk'],
-                         'stock_akhir' => $req['total_stock_akhir'],
-                         'stock_toko' => $req['total_stock_toko']]);
-      }else{
-        $entri = Opname::create(['item_id'=>$req['id'],
-                                 'stock_masuk' => $req['total_stock_masuk'],
-                                 'stock_akhir' => $req['total_stock_akhir'],
-                                 'stock_toko' => $req['total_stock_toko'],
-                                 'tanggal' => $req['tanggal']
-                                ]);
-      }
-
-      return redirect()->route('opname',['tanggal' => $req['tampil_tanggal'], 'sort_by' => '1', 'opsi_sort' => '1' ])->with('success','Berhasil Set Opname '.$req['nama_item'])->withInput();
-
+      
+      return redirect()->route('opname',['tanggal' => Carbon::parse($req['tanggal'])->format('d/m/Y'), 'sort_by' => '1', 'opsi_sort' => '1' ])->with('success','Berhasil Set Opname ')->withInput();
     }
 
     public function SetDataOpname($data)
@@ -1639,7 +1652,7 @@ class LaporanController extends Controller
                   '5' => 'stock_toko'
                  ];
 
-      $item = Item::get();
+      $item = Item::where('status_aktif','1')->get();
       $item->map(function($item) use ($data){
         $query = Produksi::where('item_id',$item->id)
                           ->whereDate('created_at',$data[0])
@@ -1670,7 +1683,7 @@ class LaporanController extends Controller
         if(isset($opname->id)){
           $item['stock_toko'] = $opname->stock_toko;
         }else{
-          $item['stock_toko'] = 'belum';
+          $item['stock_toko'] = '';
         }
 
       });
