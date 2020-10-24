@@ -32,8 +32,8 @@ class UserController extends Controller
         if(empty($user['photo'])){
             $user['photo'] = "http://agogobakery.com/atur/assets/dist/img/user.png";
         }else{
-            // $user['photo'] = "http://agogobakery.com/".$user['photo'];
-            $user['photo'] = "http://127.0.0.1/agogo/upload/".$user['photo'];
+            //$user['photo'] = "http://agogobakery.com/atur/".$user['photo'];
+            $user['photo'] = "http://192.168.1.30/agogo/upload/".$user['photo'];
         }
         
         return $user;
