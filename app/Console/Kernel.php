@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         Commands\DemoCron::class,
         Commands\autoBatal::class,
         Commands\HapusTransaksi::class,
+        Commands\setTanggal::class
     ];
 
     /**
@@ -25,16 +26,11 @@ class Kernel extends ConsoleKernel
      * @return void
      */
     protected function schedule(Schedule $schedule)
-    {
-        // $schedule->command('inspire')
-        //          ->hourly();
-        
-        $schedule->command(['demo:cron','autoBatal:cron','hapusTransaksi:cron'])
-                 ->everyMinute();
-
-        // $schedule->command('autoBatal:class')
-        //          ->everyMinute();
-                 
+    {   
+        $schedule->command('setTanggal:cron')->everyMinute();
+        $schedule->command('demo:cron')->everyMinute();
+        $schedule->command('autoBatal:cron')->everyMinute();
+        $schedule->command('hapusTransaksi:cron')->everyMinute();      
     }
 
     /**
