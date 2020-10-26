@@ -115,6 +115,7 @@
 								<th>Nama Menu</th>
 								<th ><center>Stok Masuk</center></th>
 								<th ><center>Stok Akhir</center></th>
+								<th ><center>Stok Update</center></th>
 								<th ><center>Stok Toko</center></th>
 							</tr>
 						</thead>
@@ -132,6 +133,15 @@
 									<td class="nowrap" align="center">
 										{{ $key->stock_akhir }}
 										<input type="hidden" name="total_stock_akhir_{{$key->id}}" value="{{ $key->stock_akhir }}" >
+									</td>
+									<td class="nowrap" align="center">
+										@if($key->stock_toko === '')
+											-
+										@else
+											{{ $key->stock_toko }}
+										@endif
+										
+										
 									</td>
 									<td class="nowrap" align="center">	
 										
