@@ -1572,7 +1572,7 @@ class LaporanController extends Controller
       $dates = [$explode[2]."-".$explode[1]."-".$explode[0],$sort_by,$opsi_sort];
 
       $item = $this->SetDataOpname($dates);
-      
+      // return $item;
 
       return view('laporan.lap_opname', compact('menu_active','input','item','tanggal_form'));
     }
@@ -1635,7 +1635,26 @@ class LaporanController extends Controller
                                      'tanggal' => $req['tanggal']
                                     ]);
           }
-          $updateItemStock = Item::where('id',$key->id)->update(['stock' => $req['total_stock_toko_'.$key->id] ]);
+          
+          $findProduksi = Produksi::where('item_id',$key->id)
+                                    ->whereDate('created_at',$req['tanggal'])
+                                    ->orderBy('id','DESC')->first();
+
+          $stokAwalProduksi = $findProduksi->stock_awal;
+          $stokAkhirProduksi = $findProduksi->sisa_stock;
+
+          if($req['total_stock_toko_'.$key->id] > $stokAwalProduksi){
+            $selisih = $req['total_stock_toko_'.$key->id] - $stokAwalProduksi;
+            $fix_sisa_stok = $stokAkhirProduksi + $selisih;
+          }else{
+            $selisih = $stokAwalProduksi - $req['total_stock_toko_'.$key->id];
+            $fix_sisa_stok =  $stokAkhirProduksi - $selisih;
+          }
+
+          $updateProduksi = Produksi::where('id',$findProduksi->id)->update(['stock_awal' => $req['total_stock_toko_'.$key->id],
+                                                                             'sisa_stock' => $fix_sisa_stok
+                                                                            ]);
+          $updateItemStock = Item::where('id',$key->id)->update(['stock' => $fix_sisa_stok ]);
         }
         
       }
@@ -1675,16 +1694,18 @@ class LaporanController extends Controller
            $item['stock_masuk'] = 0;
         }
        
-        if(isset($stock_akhir->id)){
-          $item['stock_akhir'] = $stock_akhir->sisa_stock;
-        }else{
-          $item['stock_akhir'] = 0;
-        }
+        // if(isset($stock_akhir->id)){
+        //   $item['stock_akhir'] = $stock_akhir->sisa_stock;
+        // }else{
+        //   $item['stock_akhir'] = 0;
+        // }
         
         if(isset($opname->id)){
           $item['stock_toko'] = $opname->stock_toko;
+          $item['stock_akhir'] = $opname->stock_akhir;
         }else{
           $item['stock_toko'] = '';
+          $item['stock_akhir'] = $stock_akhir->sisa_stock;
         }
 
       });

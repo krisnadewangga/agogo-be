@@ -95,6 +95,7 @@
                     <th style="text-align:center;">Nama Menu</th>
                     <th style="text-align:center;">Stock Masuk</th>
                     <th style="text-align:center;">Stock Akhir</th>
+                    <th style="text-align:center;">Stock Update</th>
                     <th style="text-align:center;">Stock Toko</th>
                 </tr>
             </thead>
@@ -107,6 +108,13 @@
                         <td style="text-align:center;">{{ $key['nama_item'] }}</td>
                         <td style="text-align:center;" >{{ $key->stock_masuk }}</td>
                         <td  style="text-align:center;">{{ $key->stock_akhir }}</td>
+                        <td  style="text-align:center;">
+                            @if($key->stock_toko === '')
+                                -
+                            @else
+                                {{ $key->stock_toko }}
+                            @endif
+                        </td>
                         <td  style="text-align:center;">
                             @if($key->stock_toko !== 'belum')
                                 {{ $key->stock_toko }}
