@@ -1635,6 +1635,7 @@ class LaporanController extends Controller
                                      'tanggal' => $req['tanggal']
                                     ]);
           }
+          $updateItemStock = Item::where('id',$key->id)->update(['stock' => $req['total_stock_toko_'.$key->id] ]);
         }
         
       }
