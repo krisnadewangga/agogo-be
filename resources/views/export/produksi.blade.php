@@ -95,6 +95,7 @@
                         <th >No.</th>
                         <th >Kode Menu</th>
                         <th >Nama Menu</th>
+                        <th >Stock Awal</th>
                         <th >Produksi</th>
                         <th >Toko</th>
                         <th >Pemesanan</th>
@@ -114,6 +115,7 @@
                             <td align="center" style="text-align:center;border-bottom:0px">{{ $key->Item->code }}</td>
                             <td style="text-align:center;border-bottom:0px">{{ $key->Item->nama_item }}</td>
                 
+                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->stock_awal,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->produksi1,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->penjualan_toko,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->penjualan_pemesanan,'0','','.') }}</td>

@@ -27,35 +27,40 @@ class AuthServiceProvider extends ServiceProvider
         Passport::routes();
         
         Gate::define('add_users', function($user){
-            if( ($user->level_id == "1" || $user->level_id == '2' ) && $user->status_aktif == "1"){
+            $roles = $user->Roles->pluck('level_id')->toArray();
+            if( (in_array('1', $roles) || in_array('2', $roles)  ) && $user->status_aktif == "1"){
                 return true;
             }
             return false;
         });
 
         Gate::define('manage-kurirs',function($user){
-            if( ($user->level_id == "1" || $user->level_id == '2' ) && $user->status_aktif == "1"){
+            $roles = $user->Roles->pluck('level_id')->toArray();
+            if( (in_array('1', $roles) || in_array('2', $roles)  ) && $user->status_aktif == "1"){
                 return true;
             }
             return false;
         });
 
         Gate::define('manage_items',function($user){
-            if( ($user->level_id == "1" || $user->level_id == '2' ) && $user->status_aktif == "1"){
+            $roles = $user->Roles->pluck('level_id')->toArray();
+            if( (in_array('1', $roles) || in_array('2', $roles)  ) && $user->status_aktif == "1"){
                 return true;
             }
             return false;
         });
 
         Gate::define('manage-konsu',function($user){
-            if( ($user->level_id == "1" || $user->level_id == '2' ) && $user->status_aktif == "1"){
+            $roles = $user->Roles->pluck('level_id')->toArray();
+            if( (in_array('1', $roles) || in_array('2', $roles)  ) && $user->status_aktif == "1"){
                 return true;
             }
             return false;
         });
 
         Gate::define('manage-versi',function($user){
-            if( ($user->level_id == "1" || $user->level_id == '2' ) && $user->status_aktif == "1"){
+            $roles = $user->Roles->pluck('level_id')->toArray();
+            if( (in_array('1', $roles) || in_array('2', $roles)  ) && $user->status_aktif == "1"){
                 return true;
             }
             return false;
