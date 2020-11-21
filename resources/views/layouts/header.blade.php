@@ -75,7 +75,13 @@
 
                   <p>
                     <small><span style="cursor: pointer;" data-target="#modal_ganti_fp" data-toggle="modal"><u>Ganti Foto Profil</u></span></small>
-                    {{ Auth::User()->name }} - @if(Auth::User()->level_id == 1)SuperAdmin @elseif(Auth::User()->level_id == 2) Administrator @else Office @endif
+                    @php
+                      $sel_role = App\Role::where(['user_id' => Auth::User()->id])->pluck('level_id');
+                      $tampil_rol = App\Level::selectRaw("GROUP_CONCAT(level) as tampil_rol")->whereIn('id', $sel_role)->first();
+                    @endphp 
+                    {{ Auth::User()->name }} <br/>
+                    <small>{{ $tampil_rol->tampil_rol }}</small>
+                  
                    
                   </p>
                 </li>
