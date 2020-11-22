@@ -31,16 +31,15 @@ class LaporanController extends Controller
       $transaksi = Transaksi::selectRaw('transaksi.*, 
                                           (SELECT sum(jumlah * margin) from item_transaksi Where transaksi_id =transaksi.id) as sub_total_bersih_item ')
                             ->where([ 
-                      ['metode_pembayaran','=','1'],
-                      ['status','>=','1'],
-                      ['status','!=','3']
-
-                      ])
-                ->orWhere([ 
-                      ['metode_pembayaran','>','1'],
-                      ['status','=','5']
-                      ])
-                ->whereDate('tgl_bayar','=',Carbon::now()->format('Y-m-d'))->orderBy('tgl_bayar','DESC')->get();
+                                      ['metode_pembayaran','=','1'],
+                                      ['status','>=','1'],
+                                      ['status','!=','3']
+                                   ])
+                            ->orWhere([ 
+                                      ['metode_pembayaran','>','1'],
+                                      ['status','=','5']
+                                   ])
+                            ->whereDate('tgl_bayar','=',Carbon::now()->format('Y-m-d'))->orderBy('tgl_bayar','DESC')->get();
         
         $transaksi->map(function($transaksi){
           if($transaksi->jenis == "2"){
@@ -1238,6 +1237,7 @@ class LaporanController extends Controller
     {
       $dates = [Carbon::now()->format('Y-m-d'),'1','1'];
       $data = $this->SetDataPergerakanStock($dates);
+      
 
       $input = ['tanggal' => Carbon::now()->format('d/m/Y'),'sort_by' => '1', 'opsi_sort' => '1' ];
       $menu_active = "laporan|pergerakan_stock|0";
@@ -1273,7 +1273,6 @@ class LaporanController extends Controller
       $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.produksi', compact('data', 'start_tanggal'));
       return $pdf->stream('laporan-pergerakan-stock-'.$start_tanggal.'.pdf');
       // return View('export.produksi', compact('data', 'start_tanggal'));
-    
 
     } 
 
@@ -1287,11 +1286,12 @@ class LaporanController extends Controller
                    '6' => 'total_penjualan',
                    '7' => 'ket_rusak',
                    '8' => 'ket_lain',
-                   '9' => 'sisa_stock'
+                   '9' => 'sisa_stock',
+                   '10' => 'stock_awal'
                   ];
-       $opsi_sort = ['1' => 'ASC', '2' => 'DESC'];
 
-       $data = Produksi::selectRaw('produksi.*,
+       $opsi_sort = ['1' => 'ASC', '2' => 'DESC'];
+       $item = Produksi::selectRaw('produksi.*,
                                    (select code from item where id = produksi.item_id) as code,
                                    (select nama_item from item where id = produksi.item_id) as nama_item
                                   ')
@@ -1302,10 +1302,34 @@ class LaporanController extends Controller
                            ->groupBy('produksi.item_id');
 
                            return $q;
-                        })
-                        ->orderBy($sort_by[$data[1]],$opsi_sort[$data[2]])->get();
+                        })->get();
 
-        return $data;
+       $item->map(function($item) use ($data){
+        
+       $opname = Opname::where('item_id',$item->item_id)
+                        ->whereDate('tanggal',$data[0])
+                        ->first();
+
+       $stock_akhir = Produksi::where('item_id',$item->item_id)
+                          ->whereDate('created_at',$data[0])
+                          ->orderBy('id','DESC')
+                          ->first();
+
+       if(isset($opname->id)){
+          $item['stock_awal'] = $opname->stock_toko;
+       }else{
+          $item['stock_awal'] = $stock_akhir->sisa_stock;
+       }
+
+      });
+
+      if($data[2] == '1'){
+         return $item->sortBy($sort_by[$data[1]])->values()->all();
+      }elseif($data[2] == '2'){
+         return $item->sortByDesc($sort_by[$data[1]])->values()->all();
+      }
+
+
     } 
 
     //penjualan per item
@@ -1705,7 +1729,12 @@ class LaporanController extends Controller
           $item['stock_akhir'] = $opname->stock_akhir;
         }else{
           $item['stock_toko'] = '';
-          $item['stock_akhir'] = $stock_akhir->sisa_stock;
+          if(isset($stock_akhir->id)){
+            $item['stock_akhir'] = $stock_akhir->sisa_stock;
+          }else{
+            $item['stock_akhir'] = $item->stock;
+          }
+          
         }
 
       });

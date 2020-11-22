@@ -13,28 +13,32 @@
            
           </li>
 
-          @if(Auth::user()->level_id == "1" || Auth::user()->level_id == "2") 
-          <li class="treeview" id="m_user">
-            <a href="#">
-              <i class="fa  fa-users"></i>
-              <span>Master User</span>
-              <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-            </span>
-            </a>
-            <ul class="treeview-menu">
-              @if(Auth::user()->level_id == "1")
-                <li id="sm_level"><a href="{{ route('level.index') }}"><i class="fa fa-circle-o"></i>Level</a></li>
-              @endif
-              <li id="sm_admin"><a href="{{ route('administrator.index') }}"><i class="fa fa-circle-o"></i>User</a></li>
+          @php
+            $roles = App\Role::where('user_id',Auth::user()->id)->pluck('level_id')->toArray();
+          @endphp
+           
+          @if( in_array('1', $roles) || in_array('2', $roles) )
+            <li class="treeview" id="m_user">
+              <a href="#">
+                <i class="fa  fa-users"></i>
+                <span>Master User</span>
+                <span class="pull-right-container">
+                  <i class="fa fa-angle-left pull-right"></i>
+              </span>
+              </a>
+              <ul class="treeview-menu">
+                @if( in_array('1', $roles) )
+                  <li id="sm_level"><a href="{{ route('level.index') }}"><i class="fa fa-circle-o"></i>Level</a></li>
+                @endif
+                <li id="sm_admin"><a href="{{ route('administrator.index') }}"><i class="fa fa-circle-o"></i>User</a></li>
+                  
+                 <li id="sm_kurir"><a href="{{ route('kurir.index') }}"><i class="fa fa-circle-o"></i>Kurir</a></li>
                 
-               <li id="sm_kurir"><a href="{{ route('kurir.index') }}"><i class="fa fa-circle-o"></i>Kurir</a></li>
-              
-               <li id="sm_member" ><a href="{{ route('member') }}"><i class="fa fa-circle-o"></i><span>Member</span></a></li>
-               <li id="sm_not_member" ><a href="{{ route('not_member') }}"><i class="fa fa-circle-o"></i><span>Not Member</span></a></li>
-              
-            </ul>
-          </li>
+                 <li id="sm_member" ><a href="{{ route('member') }}"><i class="fa fa-circle-o"></i><span>Member</span></a></li>
+                 <li id="sm_not_member" ><a href="{{ route('not_member') }}"><i class="fa fa-circle-o"></i><span>Not Member</span></a></li>
+                
+              </ul>
+            </li>
           @endif
 
           <li class="treeview" id="m_item">
@@ -47,7 +51,7 @@
               
             </a>
             <ul class="treeview-menu">
-               @if(Auth::user()->level_id == "1" || Auth::user()->level_id == "2") 
+               @if( in_array('1', $roles) || in_array('2', $roles) ) 
                 <li id="sm_kategori"><a href="{{ route('kategori.index') }}"><i class="fa fa-circle-o"></i>Kategori</a></li>
                 <li id="sm_item"><a href="{{ route('item.index') }}"><i class="fa fa-circle-o"></i>Item</a></li>
                @endif
