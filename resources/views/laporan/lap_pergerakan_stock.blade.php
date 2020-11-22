@@ -35,6 +35,7 @@
                                 @if($input['sort_by'] == '1')
                                     <option value="1" selected>Kode Item</option>
                                     <option value="2">Nama Item</option>
+                                    <option value="10" >Stock Awal</option>
                                     <option value="3">Produksi</option>
                                     <option value="4">Toko</option>
                                     <option value="5">Pemesanan</option>
@@ -45,6 +46,7 @@
                                 @elseif($input['sort_by'] == '2')
                                    <option value="1" >Kode Item</option>
                                     <option value="2" selected>Nama Item</option>
+                                    <option value="10" >Stock Awal</option>
                                     <option value="3">Produksi</option>
                                     <option value="4">Toko</option>
                                     <option value="5">Pemesanan</option>
@@ -55,6 +57,7 @@
                                 @elseif($input['sort_by'] == '3')
                                     <option value="1" >Kode Item</option>
                                     <option value="2">Nama Item</option>
+                                    <option value="10" >Stock Awal</option>
                                     <option value="3" selected>Produksi</option>
                                     <option value="4">Toko</option>
                                     <option value="5">Pemesanan</option>
@@ -65,6 +68,7 @@
                                 @elseif($input['sort_by'] == '4')
                                     <option value="1" >Kode Item</option>
                                     <option value="2">Nama Item</option>
+                                    <option value="10" >Stock Awal</option>
                                     <option value="3">Produksi</option>
                                     <option value="4" selected>Toko</option>
                                     <option value="5">Pemesanan</option>
@@ -75,6 +79,7 @@
                                 @elseif($input['sort_by'] == '5')
                                     <option value="1" >Kode Item</option>
                                     <option value="2">Nama Item</option>
+                                    <option value="10" >Stock Awal</option>
                                     <option value="3">Produksi</option>
                                     <option value="4">Toko</option>
                                     <option value="5" selected>Pemesanan</option>
@@ -85,6 +90,7 @@
                                 @elseif($input['sort_by'] == '6')
                                  	<option value="1" >Kode Item</option>
                                     <option value="2">Nama Item</option>
+                                    <option value="10" >Stock Awal</option>
                                     <option value="3">Produksi</option>
                                     <option value="4">Toko</option>
                                     <option value="5" >Pemesanan</option>
@@ -95,6 +101,7 @@
                                 @elseif($input['sort_by'] == '7')
                                  	<option value="1" >Kode Item</option>
                                     <option value="2">Nama Item</option>
+                                    <option value="10" >Stock Awal</option>
                                     <option value="3">Produksi</option>
                                     <option value="4">Toko</option>
                                     <option value="5" >Pemesanan</option>
@@ -105,6 +112,7 @@
                                 @elseif($input['sort_by'] == '8')
                                  	<option value="1" >Kode Item</option>
                                     <option value="2">Nama Item</option>
+                                    <option value="10" >Stock Awal</option>
                                     <option value="3">Produksi</option>
                                     <option value="4">Toko</option>
                                     <option value="5" >Pemesanan</option>
@@ -115,6 +123,7 @@
                                 @elseif($input['sort_by'] == '9')
                                  	<option value="1" >Kode Item</option>
                                     <option value="2">Nama Item</option>
+                                    <option value="10" >Stock Awal</option>
                                     <option value="3">Produksi</option>
                                     <option value="4">Toko</option>
                                     <option value="5" >Pemesanan</option>
@@ -122,6 +131,17 @@
                                     <option value="7">Rusak</option>
                                     <option value="8">Lain Lain</option>
                                     <option value="9" selected>Sisa Stock</option>
+                                @elseif($input['sort_by'] == '10')
+                                    <option value="1" >Kode Item</option>
+                                    <option value="2">Nama Item</option>
+                                    <option value="10" selected>Stock Awal</option>
+                                    <option value="3">Produksi</option>
+                                    <option value="4">Toko</option>
+                                    <option value="5" >Pemesanan</option>
+                                    <option value="6">Total Penjualan</option>
+                                    <option value="7">Rusak</option>
+                                    <option value="8">Lain Lain</option>
+                                    <option value="9" >Sisa Stock</option>
                                 @endif
                             </select>
                         </div>
@@ -157,6 +177,7 @@
 							<th  class="nowrap">Kode Item</th>
 							<th  class="nowrap">Nama Item</th>
 							<th  class="nowrap">TGL Produksi</th>
+                            <th  class="nowrap">Stock Awal</th>
 							<th  class="text-center">Produksi</th>
 							<th class="nowrap" >Toko</th>
 							<th class="nowrap" >Pemesanan</th>
@@ -173,6 +194,7 @@
 								<td align="center">{{ $key->Item->code }}</td>
 								<td >{{ $key->Item->nama_item }}</td>
 								<td align="center">{{ $key->created_at->format('d/m/Y') }}</td>
+                                <td align="center">{{ number_format($key->stock_awal,'0','','.') }}</td>
 								<td align="center">{{ number_format($key->produksi1,'0','','.') }}</td>
 								<td align="center">{{ number_format($key->penjualan_toko,'0','','.') }}</td>
 								<td align="center">{{ number_format($key->penjualan_pemesanan,'0','','.') }}</td>
