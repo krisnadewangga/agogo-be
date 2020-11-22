@@ -1306,20 +1306,20 @@ class LaporanController extends Controller
 
        $item->map(function($item) use ($data){
         
-        $opname = Opname::where('item_id',$item->item_id)
+       $opname = Opname::where('item_id',$item->item_id)
                         ->whereDate('tanggal',$data[0])
                         ->first();
 
-        $stock_akhir = Produksi::where('item_id',$item->item_id)
+       $stock_akhir = Produksi::where('item_id',$item->item_id)
                           ->whereDate('created_at',$data[0])
                           ->orderBy('id','DESC')
                           ->first();
 
-        if(isset($opname->id)){
-          $item['stock_awal'] = $opname->stock_akhir;
-        }else{
+       if(isset($opname->id)){
+          $item['stock_awal'] = $opname->stock_toko;
+       }else{
           $item['stock_awal'] = $stock_akhir->sisa_stock;
-        }
+       }
 
       });
 
