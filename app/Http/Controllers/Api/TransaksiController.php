@@ -58,30 +58,31 @@ class TransaksiController extends Controller
 			$countItemError = 0;
 			$ItemError = [];
 			for($i=1; $i<=$req['banyak_item']; $i++){
-			
 				$rules['item_id'.$i] = 'required';
 				$rules['jumlah'.$i] = 'required|numeric';
 				$rules['harga'.$i] = 'required|numeric';
 				$rules['margin'.$i] = 'required|numeric';
 				
 				$selItem = Item::findOrFail($req['item_id'.$i]);
-				if($selItem->stock >= $req['jumlah'.$i]){
-					$itemTransaksi[$i-1] = ['item_id' => $req['item_id'.$i], 
-									'jumlah' => $req['jumlah'.$i],
-									'harga' => $req['harga'.$i],
-									'margin' => $req['margin'.$i],
-								   ];
-					if(isset($req['diskon'.$i])){
-						$itemTransaksi[$i-1]['diskon'] = $req['diskon'.$i];
-						$itemTransaksi[$i-1]['harga_diskon'] = $req['harga_diskon'.$i];
-						$itemTransaksi[$i-1]['total'] = $req['jumlah'.$i] * $req['harga_diskon'.$i];
-					}else{
-						$itemTransaksi[$i-1]['total'] = $req['jumlah'.$i] * $req['harga'.$i];
-					}
-				}else{
+				if($selItem->stock < $req['jumlah'.$i]){
 					$countItemError += 1;	
 					$ItemError[] = $selItem->nama_item;
 				}
+
+				$itemTransaksi[$i-1] = ['item_id' => $req['item_id'.$i], 
+										'jumlah' => $req['jumlah'.$i],
+										'harga' => $req['harga'.$i],
+										'margin' => $req['margin'.$i],
+									   ];
+
+				if(isset($req['diskon'.$i])){
+					$itemTransaksi[$i-1]['diskon'] = $req['diskon'.$i];
+					$itemTransaksi[$i-1]['harga_diskon'] = $req['harga_diskon'.$i];
+					$itemTransaksi[$i-1]['total'] = $req['jumlah'.$i] * $req['harga_diskon'.$i];
+				}else{
+					$itemTransaksi[$i-1]['total'] = $req['jumlah'.$i] * $req['harga'.$i];
+				}
+				
 			}
 
 			// stok
@@ -99,9 +100,9 @@ class TransaksiController extends Controller
 						$tempMsgItem .= $ItemError[$a-1].$sambungan;
 					}
 					if($req['metode_pembayaran']  == '1' || $req['metode_pembayaran']  == '2'){
-						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Melebihi Jumlah Stock, Pesanan Akan Di Kirimkan Besok ".Carbon::now()->add(1,'day')->format('d/m/Y')." Pukul 07:00 AM";
+						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong, Apakah anda setuju pesanan ini kami proses pada tanggal ".Carbon::now()->add(1,'day')->format('d/m/Y')." Pukul 07:00 AM ?";
 					}else{
-						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Melebihi Jumlah Stock, Anda Bisa Mengambil Pesanan Besok ".Carbon::now()->add(1,'day')->format('d/m/Y')." Pukul 07:00 AM";
+						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong, Apakah anda setuju pesanan ini kami proses pada tanggal ".Carbon::now()->add(1,'day')->format('d/m/Y')." Pukul 07:00 AM ?";
 					}
 					
 					$req['waktu_kirim'] = Carbon::now()->add(1,'day')->format('Y-m-d')." 07:00:00";
@@ -143,6 +144,8 @@ class TransaksiController extends Controller
 				$msg_operasional = "";
 			}
 
+
+
 			$validator = Validator::make($req, $rules);
 		    if($validator->fails()){
 		        $success = 0;
@@ -175,6 +178,7 @@ class TransaksiController extends Controller
 						if($req['metode_pembayaran'] == '1'){
 							if($status_member == "1"){
 								if($saldo > $req['total_bayar'] ){
+
 									if(isset($req['otp'])){
 										$findOtp = Otp::where('user_id',$req['user_id'])->first();
 										if($findOtp->otp == $req['otp']){
@@ -201,6 +205,8 @@ class TransaksiController extends Controller
 										$msg = "Masukan Kode Otp";
 										$data = '';
 									}
+
+
 								}else{
 									$success = 0;
 									$msg = "Saldo Anda Tidak Cukup";
@@ -225,7 +231,7 @@ class TransaksiController extends Controller
 							// return $req_transaksi;	
 							$req_transaksi['status'] = '6';
 
-							// return $itemTransaksi;
+							
 							$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 							// $min_stock_item = $this->UpdateStock($itemTransaksi);
 							
