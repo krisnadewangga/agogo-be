@@ -34,7 +34,7 @@
 						<div class="col-md-12">
 							<div  style="padding:10px;">
 								<h4 style="margin-top: 5px; margin-bottom: 5px;"><b>Daftar Item</b></h4>
-								<div>Daftar Item Belanja Yang Masuk Dalam Pesanan </div>
+								<div>Daftar Item Belanja Yang Masuk Dalam Pesanan</div>
 							</div>
 						</div>
 						
@@ -120,35 +120,19 @@
 									$batas_ambe = strtotime($transaksi->waktu_kirim);
 								@endphp
 
-								@if($transaksi->metode_pembayaran == '1')
-									@if( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '1') )
-										<label class="label label-danger">Lewat Batas Pengiriman</label>
-									@elseif( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '3') )
-										<label class="label label-danger">Pesanan Dibatalkan</label>
-									@elseif( ($waktu_skrang < $batas_ambe) && ($transaksi->status == '3') )
-										<label class="label label-danger">Pesanan Dibatalkan</label>
-									@else
-										
-										@if($transaksi->status == '1')
-											<label class="label label-warning">Menunggu Pengiriman</label>
-										@elseif($transaksi->status == '2')
-											<label class="label label-info">Sedang Pengiriman</label>
-										@elseif($transaksi->status == '5')
-											<label class="label label-success">Pesanan Diterima</label>
-										@endif
-									@endif
-								@else
-									@if($transaksi->status == '2')
-										<label class="label label-info">Sedang Pengiriman</label>
-									@elseif($transaksi->status == '1')
-										<label class="label label-warning">Menunggu Pengiriman</label>
-									@elseif( $transaksi->status == '3' )
-										<label class="label label-danger">Pesanan Dibatalkan</label>
-									@elseif($transaksi->status == '5')
-										<label class="label label-success">Pesanan Diterima</label>
-									@endif
+								@if($transaksi->status == '1')
+									<label class="label label-info">Dikemas</label>
+								@elseif($transaksi->status == '2')
+									<label class='label bg-purple'>Dikirim</label>
+								@elseif($transaksi->status == '3')
+									<label class='label label-danger'>Pesanan Dibatalkan</label>
+								@elseif($transaksi->status == '4')
+									<label class='label label-warning'>Ajukan Pembatalan</label>
+								@elseif($transaksi->status == '5')
+									<label class='label label-success'>Terima</label>
+								@elseif($transaksi->status == '6')
+									<label class="label bg-yellow">Menunggu Transfer</label>
 								@endif
-								
 
 								<h6 style="margin-bottom: 0px; margin-top: 5px; cursor:pointer;" onclick="$('#bodi_pengiriman').toggle('slow')"><u>Lihat Detail</u></h6>
 								
@@ -278,18 +262,18 @@
 									$batas_ambe = strtotime($transaksi->waktu_kirim);
 								@endphp
 
-								@if( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '1') )
-									<label class="label label-danger">Pesanan Expired</label>
-								@elseif( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '3') )
-									<label class="label label-danger">Pesanan Dibatalkan</label>
-								@else
-									@if($transaksi->status == '1')
-										<label class="label label-warning">Menunggu Pengambilan</label>
-									@elseif($transaksi->status == '5')
-										<label class="label label-success">Pesanan Telah Diambil</label>
-									@endif
+								@if($transaksi->status == '1')
+									<label class="label label-info">Dikemas</label>
+							
+								@elseif($transaksi->status == '3')
+									<label class='label label-danger'>Dibatalkan</label>
+								@elseif($transaksi->status == '4')
+									<label class='label label-warning'>Pengajuan Pembatalan</label>
+								@elseif($transaksi->status == '5')
+									<label class='label label-success'>Terima</label>
 								@endif
 
+								
 								<h6 style="margin-bottom: 0px; margin-top: 5px; cursor:pointer;" onclick="$('#bodi_pengambilan').toggle('slow')"><u>Lihat Detail</u></h6>
 								
 							</div>
@@ -402,7 +386,7 @@
 										<label class="label label-danger">Pesanan Dibatalkan</label>
 									@else
 										@if($transaksi->status == '6' )
-											&nbsp <label class="label label-info">Menunggu Transfer</label> &nbsp; <label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim->format('d/m/Y h:i A') }} </label>
+											&nbsp  <label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim->format('d/m/Y h:i A') }} </label>
 										@elseif($transaksi->status == '4')
 											&nbsp <label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim->format('d/m/Y h:i A') }} </label>
 										@else

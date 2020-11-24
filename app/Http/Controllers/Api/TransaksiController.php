@@ -100,9 +100,9 @@ class TransaksiController extends Controller
 						$tempMsgItem .= $ItemError[$a-1].$sambungan;
 					}
 					if($req['metode_pembayaran']  == '1' || $req['metode_pembayaran']  == '2'){
-						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong, Apakah anda setuju pesanan ini kami proses pada tanggal ".Carbon::now()->add(1,'day')->format('d/m/Y')." Pukul 07:00 AM ?";
+						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong/stok tidak mencukupi, Apakah anda setuju pesanan ini kami proses pada tanggal ".Carbon::now()->add(1,'day')->format('d/m/Y')." Pukul 07:00 AM ?";
 					}else{
-						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong, Apakah anda setuju pesanan ini kami proses pada tanggal ".Carbon::now()->add(1,'day')->format('d/m/Y')." Pukul 07:00 AM ?";
+						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong/stok tidak mencukupi, Apakah anda setuju pesanan ini kami proses pada tanggal ".Carbon::now()->add(1,'day')->format('d/m/Y')." Pukul 07:00 AM ?";
 					}
 					
 					$req['waktu_kirim'] = Carbon::now()->add(1,'day')->format('Y-m-d')." 07:00:00";
