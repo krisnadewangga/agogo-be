@@ -63,29 +63,29 @@ class Transaksi extends Model
 
       if($mp == "1" || $mp == "2"){
          if($attr == "1"){
-           $ket = "Mempersiapkan Pesanan";
+           $ket = "Dikemas";
          }else if($attr == "2"){
-           $ket = "Pengiriman Pesanan";
+           $ket = "Dikirim";
          }else if($attr == "5"){
-           $ket = "Pesanan Diterima";
+           $ket = "Terima";
          }else if($attr == "3"){
-           $ket = "Pesanan Dibatalkan";
+           $ket = "Dibatalkan";
          }else if($attr == "6"){
-           $ket = "Menunggu Pembayaran";
+           $ket = "Menunggu Transfer";
          }else if($attr == "4"){
-           $ket = "Ajukan Pembatalan";
+           $ket = "Pengajuan Pembatalan";
          }else{
            $ket = "";
          }
       }else{
          if($attr == "1"){
-           $ket = "Menunggu Pengambilan Pesanan";
+           $ket = "Dikemas";
          }else if($attr == "5"){
-           $ket = "Pesanan Telah Diambil";
+           $ket = "Terima";
          }else if($attr == "3"){
-           $ket = "Pesanan Dibatalkan";
+           $ket = "Dibatalkan";
          }else if($attr == "4"){
-           $ket = "Ajukan Pembatalan";
+           $ket = "Pengajuan Pembatalan";
          }else {
            $ket = "";
          }
