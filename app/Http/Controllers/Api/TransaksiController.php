@@ -100,12 +100,14 @@ class TransaksiController extends Controller
 						$tempMsgItem .= $ItemError[$a-1].$sambungan;
 					}
 					if($req['metode_pembayaran']  == '1' || $req['metode_pembayaran']  == '2'){
-						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong/stok tidak mencukupi, Apakah anda setuju pesanan ini kami proses pada tanggal ".Carbon::now()->add(1,'day')->format('d/m/Y')." Pukul 07:00 AM ?";
+						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong/stok tidak mencukupi, Apakah anda setuju pesanan ini kami proses dan kirim pada tanggal ".Carbon::now()->add(1,'day')->format('d/m/Y')." setelah Pukul 07:00 AM ?";
 					}else{
-						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong/stok tidak mencukupi, Apakah anda setuju pesanan ini kami proses pada tanggal ".Carbon::now()->add(1,'day')->format('d/m/Y')." Pukul 07:00 AM ?";
+						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong/stok tidak mencukupi, Apakah anda setuju pesanan ini kami proses, anda bisa mengambilnya pada tanggal ".Carbon::now()->add(1,'day')->format('d/m/Y')." setelah Pukul 07:00 AM ?";
 					}
 					
-					$req['waktu_kirim'] = Carbon::now()->add(1,'day')->format('Y-m-d')." 07:00:00";
+					$req['waktu_kirim'] = Carbon::now()->add(1,'day')->format('Y-m-d')." 08:00:00";
+				}else {
+					# code...
 				}
 			}else{
 				$countItemError = 0;
@@ -125,7 +127,7 @@ class TransaksiController extends Controller
 						$msg_operasional = "MAAF !!! Saat ini sudah bukan Waktu Operasional, Anda Bisa Mengambil Pesanan besok ".Carbon::now()->add(1,'day')->format('d/m/Y')." setelah Pukul 07:00 AM";
 					}
 				
-					$req['waktu_kirim'] = Carbon::now()->add(1,'day')->format('Y-m-d')." 07:00:00";
+					$req['waktu_kirim'] = Carbon::now()->add(1,'day')->format('Y-m-d')." 08:00:00";
 				}elseif( ($jamSekarang < $jamBuka) ){
 					$operasional = 0;
 					if($req['metode_pembayaran']  == '1' || $req['metode_pembayaran']  == '2'){
@@ -133,12 +135,15 @@ class TransaksiController extends Controller
 					}else{
 						$msg_operasional = "MAAF !!! Saat ini sudah bukan Waktu Operasional, Anda Bisa Mengambil Pesanan besok setelah pukul 7:00 AM pagi";
 					}
-					$req['waktu_kirim'] = Carbon::now()->format('Y-m-d')." 07:00:00";
+					$req['waktu_kirim'] = Carbon::now()->format('Y-m-d')." 08:00:00";
 					
 				}else{
+				
 					$operasional = 1;
 					$msg_operasional = "";
 				}
+
+
 			}else{
 				$operasional = 1;
 				$msg_operasional = "";
@@ -377,6 +382,16 @@ class TransaksiController extends Controller
 							$data = '';
 							
 						}else if($req['metode_pembayaran'] == "3"){
+						
+					
+							$waktu_skrang = Carbon::parse($req_transaksi['waktu_kirim']);
+
+
+							$batas_bayar = $waktu_skrang->addHours(6);
+							
+
+							$req_transaksi['waktu_kirim'] = $batas_bayar;
+
 							$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 							$itemForEmail = "";
 							$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
