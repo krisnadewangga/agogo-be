@@ -110,8 +110,13 @@ class TopupSaldoController extends Controller
         
         $notif = Notifikasi::create($dnotif);
 
+        $userWa = User::findOrfail($find->id);
+        SendNotif::sendNotifWa($userWa->no_hp,$notif->isi);
+
         //NotifGCM
         SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'histori_topup', $notif->judul_id);
+
+
 
         return redirect()->back()->with('success','Berhasil Topup Saldo');
     }
