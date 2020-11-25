@@ -120,18 +120,18 @@ class TransaksiController extends Controller
 				if( ($jamSekarang > $jamTutup) ){
 					$operasional = 0;
 					if($req['metode_pembayaran']  == '1' || $req['metode_pembayaran']  == '2'){
-						$msg_operasional = "Maaf ! Pesanan Melebihi Waktu Operasional. Pesanan Akan Di Kirimkan Besok ".Carbon::now()->add(1,'day')->format('d/m/Y')." Pukul 07:00 AM";
+						$msg_operasional = "MAAF !!! Saat ini sudah bukan Waktu Operasional lagi sehingga pesanan anda akan dikirim besok ".Carbon::now()->add(1,'day')->format('d/m/Y')." setelah Pukul 07:00 AM";
 					}else{
-						$msg_operasional = "Maaf ! Pesanan Melebihi Waktu Operasional. Anda Bisa Mengambil Pesanan Besok ".Carbon::now()->add(1,'day')->format('d/m/Y')." Pukul 07:00 AM";
+						$msg_operasional = "MAAF !!! Saat ini sudah bukan Waktu Operasional, Anda Bisa Mengambil Pesanan besok ".Carbon::now()->add(1,'day')->format('d/m/Y')." setelah Pukul 07:00 AM";
 					}
 				
 					$req['waktu_kirim'] = Carbon::now()->add(1,'day')->format('Y-m-d')." 07:00:00";
 				}elseif( ($jamSekarang < $jamBuka) ){
 					$operasional = 0;
 					if($req['metode_pembayaran']  == '1' || $req['metode_pembayaran']  == '2'){
-						$msg_operasional = "Maaf ! Pesanan Kurang Dari Waktu Operasional. Pesanan Akan Di Kirimkan Pukul 07:00 AM";
+						$msg_operasional = "MAAF !!! Saat ini sudah bukan Waktu Operasional lagi sehingga pesanan anda akan dikirim besok setelah pukul 7:00 AM pagi";
 					}else{
-						$msg_operasional = "Maaf ! Pesanan Kurang Dari Waktu Operasional. Anda Bisa Mengambil Pesanan Pukul 07:00 AM";
+						$msg_operasional = "MAAF !!! Saat ini sudah bukan Waktu Operasional, Anda Bisa Mengambil Pesanan besok setelah pukul 7:00 AM pagi";
 					}
 					$req['waktu_kirim'] = Carbon::now()->format('Y-m-d')." 07:00:00";
 					
@@ -239,6 +239,16 @@ class TransaksiController extends Controller
 							$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
 							$dataItemForEmail = $selitemForEmail->ItemTransaksi()->get();
 							$noItemForEmail = 1;
+							// foreach ( $dataItemForEmail as $key) {
+							// 	$itemForEmail .= "<tr>
+							// 					  	<td align='center'>".$noItemForEmail."</td>
+							// 					  	<td>".$key->Item->nama_item."</td>
+							// 					  	<td align='center'>".$key->jumlah." PCS</td>
+							// 					  	<td align='right'>Rp. ".number_format($key->harga,'0','','.')."</td>
+							// 					  	<td align='right'>Rp. ".number_format($key->total,'0','','.')."</td>
+							// 					  </tr>";
+							// 	$noItemForEmail++;
+							// }
 							foreach ( $dataItemForEmail as $key) {
 								$itemForEmail .= "<tr>
 												  	<td align='center'>".$noItemForEmail."</td>
@@ -339,7 +349,9 @@ class TransaksiController extends Controller
 						             'email_body' => $email_body
 						            ];
 	   					    $subject = "Invoice Pembayaran Agogobakery.com";
-						    $a = SendNotif::kirimEmail($email,$data,$subject);
+						    //$a = SendNotif::kirimEmail($email,$data,$subject);
+						    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke Nomor Rekening : \n(BRI) 0168  \n(BNI) 000000  \n(MANDIRI) 000000  \n(BCA) 000000 \nAN ALex Ferdiansyah, Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A');
+
 
 						    // notif android
 						    $dnotif =[
@@ -347,13 +359,16 @@ class TransaksiController extends Controller
 					                'penerima_id' => $req['user_id'],
 					                'judul_id' => $ins_transaksi->id,
 					                'judul' => 'Pembayaran Pesanan No '.$ins_transaksi->no_transaksi,
-					                'isi' => 'Anda Telah Melakukan Pesanan Dengan Nomor Transaksi '.$ins_transaksi->no_transaksi.' Segera 		Lakukan Pembayaran Dengan Mentransfer Ke Nomor Rekening (BRI) 0168 atas nama Prasss. 
-					                		  Batas Waktu Pembayaran '.$ins_transaksi->waktu_kirim->format('d/m/Y h:i A'),
+					                'isi' => $pesanWa,
 					                'jenis_notif' => 1,
 					                'dibaca' => '0'
 					                ];
 
+					               
+                             
+
 					        $notif = Notifikasi::create($dnotif);
+					        $a = SendNotif::sendNotifWa($sel_user->no_hp,$pesanWa);
 					        $sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pesanan Baru', $notif->judul_id);
 						    
 
@@ -433,7 +448,10 @@ class TransaksiController extends Controller
 						             'email_body' => $email_body
 						            ];
 	   					    $subject = "Pesanan Agogobakery.com";
-						    $a = SendNotif::kirimEmail($email,$data,$subject);
+						   // $a = SendNotif::kirimEmail($email,$data,$subject);
+
+
+						    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nDengan Metode Pembayaran Bayar Di Toko . Batas Waktu Pengambilan Pesanan ".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A');
 
 							// notif android
 						    $dnotif =[
@@ -445,7 +463,7 @@ class TransaksiController extends Controller
 					                'jenis_notif' => 1,
 					                'dibaca' => '0'
 					                ];
-
+					        $a = SendNotif::sendNotifWa($sel_user->no_hp,$pesanWa);        	
 					        $notif = Notifikasi::create($dnotif);
 					        $sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pesanan Baru', $notif->judul_id);
 						    
