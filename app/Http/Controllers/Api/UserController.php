@@ -55,23 +55,34 @@ class UserController extends Controller
 
 	        if($register){
 	          
-	          $email = $register->email;
-	  		    $data = ['name' => $register->name,
-	                   'email_body' => "Sekarang kamu telah berhasil melakukan registrasi akun  <span style='color:#FBB901;'>
-	                        AgoogoBakery.com </span>  <br/>
-	                        Nikmati belanja online dari produk AgogoBakery yang aman dan dapat dipercaya .. <br/>
-	                        <p></p>
-	                        Silahkan klik link dibawah ini untuk aktifasi akun anda <br/>http://".$_SERVER['HTTP_HOST']."/aktifasi/$no_aktifasi
-	                        <p></p>
-	                        Pingin Ngemil ? Atau.. Buat Acara ? Atau... Buat Orang Terspesial ? <br/> Pesan Aja Di <span style='color:#FBB901;'>AgogoBakery.com</span>"
-	                   ];
+	        //   $email = $register->email;
+	  		    // $data = ['name' => $register->name,
+	        //            'email_body' => "Sekarang kamu telah berhasil melakukan registrasi akun  <span style='color:#FBB901;'>
+	        //                 AgoogoBakery.com </span>  <br/>
+	        //                 Nikmati belanja online dari produk AgogoBakery yang aman dan dapat dipercaya .. <br/>
+	        //                 <p></p>
+	        //                 Silahkan klik link dibawah ini untuk aktifasi akun anda <br/>http://".$_SERVER['HTTP_HOST']."/aktifasi/$no_aktifasi
+	        //                 <p></p>
+	        //                 Pingin Ngemil ? Atau.. Buat Acara ? Atau... Buat Orang Terspesial ? <br/> Pesan Aja Di <span style='color:#FBB901;'>AgogoBakery.com</span>"
+	        //            ];
 	          
-	          $subject = "Registrasi AgogoBakery.com";
-	          SendNotif::kirimEmail($email,$data,$subject);
+	        //   $subject = "Registrasi AgogoBakery.com";
+
+
+	          //SendNotif::kirimEmail($email,$data,$subject);
+
+            $hp = $register->no_hp;
+
+            $pesan ="Selamat " .$register->name. " pendaftaran anda berhasi Silahkan klik link dibawah ini untuk aktifasi akun anda \n http://".$_SERVER['HTTP_HOST']."/aktifasi/".$no_aktifasi;
+
+            
+
+
+            SendNotif::sendNotifWa($hp,$pesan);
 	        
 	          $success = 1;
 	          // $token = JWTAuth::fromUser($register);
-	          $msg = "Silahkan Aktifasi Akun Anda , Kami Telah Mengirimkan Link Aktifasi Ke Email Anda";
+	          $msg = "Silahkan Aktifasi Akun Anda , Kami Telah Mengirimkan Link Aktifasi Ke WA Anda";
 	          // $response = [
 	          //     "success" => $success,
 	          //     "user_id" => $register['id'],
@@ -322,18 +333,20 @@ class UserController extends Controller
           $passwordNew = Acak::Kaseputar(6);
           $find->Update(['password' => bcrypt($passwordNew) ]);
 
-          $data = ['name' => $find->name,
-                   'email_body' => "Sekarang kamu telah berhasil melakukan reset password akun  <span style='color:#FBB901;'>
-                      AgoogoBakery.com </span>  <br/>
-                         Silahkan Login dengan password standar : $passwordNew<br/>
-                          <p></p>
-                          Dan pastikan anda langsung mengganti password standar guna keamanan dari Akun Anda .
-                          <p></p>
-                         "
-                     ];
+          // $data = ['name' => $find->name,
+          //          'email_body' => "Sekarang kamu telah berhasil melakukan reset password akun  <span style='color:#FBB901;'>
+          //             AgoogoBakery.com </span>  <br/>
+          //                Silahkan Login dengan password standar : $passwordNew<br/>
+          //                 <p></p>
+          //                 Dan pastikan anda langsung mengganti password standar guna keamanan dari Akun Anda .
+          //                 <p></p>
+          //                "
+          //            ];
             
-          $subject = "Reset Password Akun AgogoBakery.com";
-          SendNotif::kirimEmail($find->email,$data,$subject);
+          //$subject = "Reset Password Akun AgogoBakery.com";
+         // SendNotif::kirimEmail($find->email,$data,$subject);
+          $data = "Selamat !! anda Berhasil melakukan reset password, Silahkan Login dengan password baru ini ".$passwordNew;
+          SendNotif::sendNotifWa($find->hp,$data);
 
           $success = 1;
           $msg = "Berhasil Reset Password";
@@ -379,6 +392,7 @@ class UserController extends Controller
      }
      return response()->json(['success' => $success, 'msg' => $msg], $kr);
   }
+
 
 
   

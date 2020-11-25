@@ -412,6 +412,9 @@ class TransaksiController extends Controller
         $notif = Notifikasi::create($dnotif);
         SendNotif::SendNotPesan('5',['jenisNotif' => '2']);
 
+
+        $userWa = User::findOrfail($transaksi->user_id);
+        SendNotif::sendNotifWa($userWa->no_hp,$notif->isi);
         //NotifGCM
         SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'pengiriman', $notif->judul_id);
         
@@ -476,8 +479,12 @@ class TransaksiController extends Controller
         ];
         
         $notif = Notifikasi::create($dnotif);
+
+          $userWa = User::findOrfail($find->user_id);
+        SendNotif::sendNotifWa($userWa->no_hp,$notif->isi);
         //NotifGCM
         SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'transaksi', $notif->judul_id);
+       
         return redirect()->back()->with("success","Berhasil Membatalkan Transaksi");
     }
 
@@ -517,11 +524,13 @@ class TransaksiController extends Controller
         ];
     
         $notif = Notifikasi::create($dnotif);
+
+        $userWa = User::findOrfail($find->user_id);
+        SendNotif::sendNotifWa($userWa->no_hp,$notif->isi);
          //NotifGCM
         SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'transaksi', $notif->judul_id);
 
         $this->setKunciTransaksi($penerima_id);
-        
         return redirect()->back()->with("success","Berhasil Menyelesaikan Transaksi");
     }
 
@@ -572,9 +581,11 @@ class TransaksiController extends Controller
         ];
     
         $notif = Notifikasi::create($dnotif);
+        $userWa = User::findOrfail($find->user_id);
+        SendNotif::sendNotifWa($userWa->no_hp,$notif->isi);
          //NotifGCM
         SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'transaksi', $notif->judul_id);
-
+        
         return redirect()->back()->with("success","Berhasil Konfir Pembayaran");
 
 
