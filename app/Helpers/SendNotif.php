@@ -186,8 +186,8 @@ class SendNotif{
                     'to' => $no_hp,
                     'msg' =>  $message,
                     'send_at' => '2020-09-16 18:30:00',
-                    'session' => 'pw8ki4',
-                    'apikey' => '2u2892g8m94uo5s9otndqc9b10'
+                    'session' => 'w7eq36',
+                    'apikey' => 'o76tq4gdc9m555o3u8u29ns0b1'
                 )
             )
             ->post();
