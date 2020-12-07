@@ -29,13 +29,13 @@ class AdministratorController extends Controller
     
     public function index()
     {
-       $administrator = User::whereNotIn('level_id',['6'])->get();
+       $administrator = User::whereNotIn('level_id',['6','8'])->get();
        // $find = User::where('id',20)->first();
        // $role = $find->Roles->pluck('level_id')->toArray();
 
        // return $role;
 
-       $administrator->map(function($administrator){
+        $administrator->map(function($administrator){
          $sel_role = Role::where(['user_id' => $administrator->id])->pluck('level_id');
          $tampil_rol = Level::selectRaw("GROUP_CONCAT(level) as tampil_rol")->whereIn('id', $sel_role)->get();
          
@@ -45,7 +45,7 @@ class AdministratorController extends Controller
          return $administrator;
        });  
 
-       $levels = Level::whereNotIn('id',['6'])->get();
+       $levels = Level::whereNotIn('id',['6','8'])->get();
   
 
        $menu_active = "user|admin|0";
