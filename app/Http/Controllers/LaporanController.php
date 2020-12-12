@@ -1340,6 +1340,7 @@ class LaporanController extends Controller
                 '1','1'
                ];
       $data = $this->SetDataPenjualanPerItem($dates);
+      // return $data;
 
       $input = ['tanggal' => Carbon::now()->format('d/m/Y'), 
                 'sampai_tanggal' =>  Carbon::now()->format('d/m/Y'),
@@ -1390,47 +1391,96 @@ class LaporanController extends Controller
               ];
       $opsi = ['1' => 'ASC','2' => 'DESC'];
 
-  
+      // return $data;
+      
       if($data[0] == $data[1]){
-        $transaksi = ItemTransaksi::selectRaw("item_transaksi.item_id,
-                                                (SELECT nama_item FROM item where id = item_transaksi.item_id ) as nama_item,
-                                                (SELECT code FROM item where id = item_transaksi.item_id ) as kode_menu,
-                                                sum(jumlah) as qty,
-                                                sum(total) as total ")
-                                      ->whereIn('transaksi_id',function($q) use ($data){
-                                        return $q->from('transaksi')
-                                                  ->select('id')
-                                                  ->where('status','5')
-                                                  ->whereDate('updated_at',$data[0]);
-                                      })->groupBy('item_transaksi.item_id')
-                                      ->orderBy($sort[$data[2]], $opsi[$data[3]])
-                                      ->get();
-      }else{
-         $transaksi = ItemTransaksi::selectRaw("item_transaksi.item_id,
-                                                (SELECT nama_item FROM item where id = item_transaksi.item_id ) as nama_item,
-                                                (SELECT code FROM item where id = item_transaksi.item_id ) as kode_menu,
-                                                sum(jumlah) as qty,
-                                                sum(total) as total ")
-                                      ->whereIn('transaksi_id',function($q) use ($data){
-                                        return $q->from('transaksi')
-                                                  ->select('id')
-                                                  ->where('status','5')
-                                                  ->where('updated_at','>=', $data[0]." 00:00:00")
-                                                  ->where('updated_at','<=', $data[1]." 23:59:59");
-                                      })->groupBy('item_transaksi.item_id')
-                                      ->orderBy($sort[$data[2]], $opsi[$data[3]])
-                                      ->get();
-       
-      }
+        $transaksi = Produksi::selectRaw('produksi.total_penjualan as qty,
+                                     (select harga from item where id = produksi.item_id) as harga,
+                                     (select code from item where id = produksi.item_id) as kode_menu,
+                                     (select nama_item from item where id = produksi.item_id) as nama_item,
+                                     produksi.total_penjualan * (select harga from item where id = produksi.item_id) as total
+                                    ')
+                          ->whereIn('id',function($q) use ($data){
+                             $q->from('produksi')
+                             ->where('total_penjualan','>',0)
+                             ->selectRaw('max(produksi.id)')
+                             ->whereDate('produksi.created_at',$data[0])
+                             ->groupBy('produksi.item_id');
 
+                             return $q;
+                          })->orderBy($sort[$data[2]], $opsi[$data[3]])
+                            ->get();
+      }else{
+         $transaksi = Produksi::selectRaw('produksi.total_penjualan as qty,
+                                     (select harga from item where id = produksi.item_id) as harga,
+                                     (select code from item where id = produksi.item_id) as kode_menu,
+                                     (select nama_item from item where id = produksi.item_id) as nama_item,
+                                     produksi.total_penjualan * (select harga from item where id = produksi.item_id) as total
+                                    ')
+                          ->whereIn('id',function($q) use ($data){
+                             $q->from('produksi')
+                             ->where('total_penjualan','>',0)
+                             ->selectRaw('max(produksi.id)')
+                             ->where('produksi.created_at','>=', $data[0]." 00:00:00")
+                             ->where('produksi.created_at','<=', $data[1]." 23:59:59")
+                             ->groupBy('produksi.item_id');
+
+                             return $q;
+                          })->orderBy($sort[$data[2]], $opsi[$data[3]])
+                            ->get();
+      }
       $transaksi->map(function($transaksi){
         $transaksi['tampil_total'] = number_format($transaksi->total,'0','','.');
       });
-      
       $grandTotal = number_format($transaksi->sum('total'),'0','','.');
+      
+      
 
       $array = ['data' => $transaksi, 'grandTotal' => $grandTotal];
       return $array;
+
+      // if($data[0] == $data[1]){
+      //   $transaksi = ItemTransaksi::selectRaw("item_transaksi.item_id,
+      //                                           (SELECT nama_item FROM item where id = item_transaksi.item_id ) as nama_item,
+      //                                           (SELECT code FROM item where id = item_transaksi.item_id ) as kode_menu,
+      //                                           sum(jumlah) as qty,
+      //                                           sum(total) as total ")
+      //                                 ->whereIn('transaksi_id',function($q) use ($data){
+      //                                   return $q->from('transaksi')
+      //                                             ->select('id')
+      //                                             ->where('status','5')
+      //                                             ->whereDate('created_at',$data[0]);
+      //                                 })->groupBy('item_transaksi.item_id')
+      //                                 ->orderBy($sort[$data[2]], $opsi[$data[3]])
+      //                                 ->get();
+      // }else{
+      //    $transaksi = ItemTransaksi::selectRaw("item_transaksi.item_id,
+      //                                           (SELECT nama_item FROM item where id = item_transaksi.item_id ) as nama_item,
+      //                                           (SELECT code FROM item where id = item_transaksi.item_id ) as kode_menu,
+      //                                           sum(jumlah) as qty,
+      //                                           sum(total) as total ")
+      //                                 ->whereIn('transaksi_id',function($q) use ($data){
+      //                                   return $q->from('transaksi')
+      //                                             ->select('id')
+      //                                             ->where('status','5')
+      //                                             ->where('created_at','>=', $data[0]." 00:00:00")
+      //                                             ->where('created_at','<=', $data[1]." 23:59:59");
+      //                                 })->groupBy('item_transaksi.item_id')
+      //                                 ->orderBy($sort[$data[2]], $opsi[$data[3]])
+      //                                 ->get();
+       
+      // }
+
+      // $transaksi->map(function($transaksi){
+      //   $transaksi['tampil_total'] = number_format($transaksi->total,'0','','.');
+      // });
+      
+      // $grandTotal = number_format($transaksi->sum('total'),'0','','.');
+
+      // $array = ['data' => $transaksi, 'grandTotal' => $grandTotal];
+      // return $array;
+
+      
     } 
 
     public function ExportPenjualanPerItem(Request $request)
