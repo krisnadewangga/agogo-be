@@ -85,8 +85,10 @@ class TransaksiController extends Controller
 				
 			}
 
-			// stok
-			if($req['confirm_stock'] == 0){
+			
+			
+			if($req['confirm_error'] == 0){
+				// stok
 				if($countItemError > 0){
 					$tempMsgItem = "";
 					for($a=1; $a<=$countItemError; $a++ ){
@@ -99,44 +101,21 @@ class TransaksiController extends Controller
 						}
 						$tempMsgItem .= $ItemError[$a-1].$sambungan;
 					}
-					if($req['metode_pembayaran']  == '1' || $req['metode_pembayaran']  == '2'){
-						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong/stok tidak mencukupi, Apakah anda setuju pesanan ini kami proses dan kirim pada tanggal ".Carbon::now()->add(1,'day')->format('d/m/Y')." setelah Pukul 07:00 AM ?";
-					}else{
-						$msgItem = "Maaf ! Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong/stok tidak mencukupi, Apakah anda setuju pesanan ini kami proses, anda bisa mengambilnya pada tanggal ".Carbon::now()->add(1,'day')->format('d/m/Y')." setelah Pukul 07:00 AM ?";
-					}
-					
+				
+					$msgItem = "Pesanan Untuk ".$tempMsgItem." Saat ini stock kosong/stok tidak mencukupi ";
 					$req['waktu_kirim'] = Carbon::now()->add(1,'day')->format('Y-m-d')." 08:00:00";
-				}else {
-					# code...
 				}
-			}else{
-				$countItemError = 0;
-			}
-			
-			// operasional toko
-			if($req['confirm_operasional'] == 0){
+
+				// operasional
 				$jamBuka = strtotime('07:00:00');
 				$jamTutup = strtotime('20:00:00');
 				$jamSekarang = strtotime(date('H:i:s'));
 
-				if( ($jamSekarang > $jamTutup) ){
+				if( ($jamSekarang > $jamTutup) || ($jamSekarang < $jamBuka) ){
 					$operasional = 0;
-					if($req['metode_pembayaran']  == '1' || $req['metode_pembayaran']  == '2'){
-						$msg_operasional = "MAAF !!! Saat ini sudah bukan Waktu Operasional lagi sehingga pesanan anda akan dikirim besok ".Carbon::now()->add(1,'day')->format('d/m/Y')." setelah Pukul 07:00 AM";
-					}else{
-						$msg_operasional = "MAAF !!! Saat ini sudah bukan Waktu Operasional, Anda Bisa Mengambil Pesanan besok ".Carbon::now()->add(1,'day')->format('d/m/Y')." setelah Pukul 07:00 AM";
-					}
-				
-					$req['waktu_kirim'] = Carbon::now()->add(1,'day')->format('Y-m-d')." 08:00:00";
-				}elseif( ($jamSekarang < $jamBuka) ){
-					$operasional = 0;
-					if($req['metode_pembayaran']  == '1' || $req['metode_pembayaran']  == '2'){
-						$msg_operasional = "MAAF !!! Saat ini sudah bukan Waktu Operasional lagi sehingga pesanan anda akan dikirim besok setelah pukul 7:00 AM pagi";
-					}else{
-						$msg_operasional = "MAAF !!! Saat ini sudah bukan Waktu Operasional, Anda Bisa Mengambil Pesanan besok setelah pukul 7:00 AM pagi";
-					}
-					$req['waktu_kirim'] = Carbon::now()->format('Y-m-d')." 08:00:00";
+					$msg_operasional = "Saat ini sudah bukan Waktu Operasional";
 					
+					$req['waktu_kirim'] = Carbon::now()->add(1,'day')->format('Y-m-d')." 08:00:00";
 				}else{
 				
 					$operasional = 1;
@@ -144,12 +123,26 @@ class TransaksiController extends Controller
 				}
 
 
+				if($operasional == 0 && $countItemError == 0 ){ 
+					$confirm_error = 0;
+					$msg = "Maaf ! ".$msg_operasional." pesanan anda akan diproses besok ".Carbon::now()->add(1,'day')->format('d/m/Y')." setelah Pukul 07:00 AM";
+				}elseif($operasional == 0 && $countItemError > 0){
+					$confirm_error = 2;
+					$msg = "Maaf ! ".$msg_operasional." Dan ".$msgItem." pesanan anda akan diproses besok ".Carbon::now()->add(1,'day')->format('d/m/Y')." setelah Pukul 07:00 AM";
+				}elseif($operasional == 1 && $countItemError >  0){
+					$confirm_error = 0;
+					$msg = "Maaf !  ".$msgItem.", pesanan anda akan diproses besok ".Carbon::now()->add(1,'day')->format('d/m/Y')." setelah Pukul 07:00 AM";
+				}else{
+					$confirm_error = 1;
+				}
+
+				
 			}else{
-				$operasional = 1;
-				$msg_operasional = "";
+				$confirm_error = 1;
+				$msg = "";
 			}
 
-
+		
 
 			$validator = Validator::make($req, $rules);
 		    if($validator->fails()){
@@ -178,323 +171,319 @@ class TransaksiController extends Controller
 				$saldo = $sel_user->DetailKonsumen->saldo;
 				$status_member = $sel_user->DetailKonsumen->status_member;
 				
-				if($operasional == 1){
-					if($countItemError == 0 ){
-						if($req['metode_pembayaran'] == '1'){
-							if($status_member == "1"){
-								if($saldo > $req['total_bayar'] ){
 
-									if(isset($req['otp'])){
-										$findOtp = Otp::where('user_id',$req['user_id'])->first();
-										if($findOtp->otp == $req['otp']){
-											$req_transaksi['tgl_bayar'] = Carbon::now();
-											$req_transaksi['transaksi_member'] = '1';
-											// return $req_transaksi;
-											$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
-											
-											// $min_stock_item = $this->UpdateStock($itemTransaksi);
+				if($confirm_error == 1){
+					if($req['metode_pembayaran'] == '1'){
+						if($status_member == "1"){
+							if($saldo > $req['total_bayar'] ){
 
-											$new_saldo = $saldo - $req['total_bayar'];
-											$this->UpdateSaldo($req['user_id'],$new_saldo);
+								if(isset($req['otp'])){
+									$findOtp = Otp::where('user_id',$req['user_id'])->first();
+									if($findOtp->otp == $req['otp']){
+										$req_transaksi['tgl_bayar'] = Carbon::now();
+										$req_transaksi['transaksi_member'] = '1';
+										// return $req_transaksi;
+										$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
+										
+										// $min_stock_item = $this->UpdateStock($itemTransaksi);
 
-											$success = 1;
-											$msg = "Berhasil Simpan Transaksi";
-											$data = '';
-										}else{
-											$success = 0;
-											$msg = "Kode Otp Yang Dmasukan Salah";
-											$data = '';
-										}
+										$new_saldo = $saldo - $req['total_bayar'];
+										$this->UpdateSaldo($req['user_id'],$new_saldo);
+
+										$success = 1;
+										$msg = "Berhasil Simpan Transaksi";
+										$data = '';
 									}else{
 										$success = 0;
-										$msg = "Masukan Kode Otp";
+										$msg = "Kode Otp Yang Dmasukan Salah";
 										$data = '';
 									}
-
-
 								}else{
 									$success = 0;
-									$msg = "Saldo Anda Tidak Cukup";
+									$msg = "Masukan Kode Otp";
 									$data = '';
 								}
+
+
 							}else{
 								$success = 0;
-								$msg = "Maaf! Silahkan Daftarkan Akun Anda Menjadi Member";
+								$msg = "Saldo Anda Tidak Cukup";
 								$data = '';
 							}
-						}else if($req['metode_pembayaran'] == "2"){
-						
-							$waktu_skrang = Carbon::now();
-							$waktu_skrang1 = Carbon::now();
-
-							$batas_bayar = $waktu_skrang->addHours(6);
-							$kirim_notif = $waktu_skrang1->addMinutes(330)->format('Y-m-d H:i:s');
-							$req_transaksi['waktu_kirim_tf'] = $req['waktu_kirim'];
-
-							$req_transaksi['waktu_kirim'] = $batas_bayar;
-
-							// return $req_transaksi;	
-							$req_transaksi['status'] = '6';
-
-							
-							$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
-							// $min_stock_item = $this->UpdateStock($itemTransaksi);
-							
-							$itemForEmail = "";
-							$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
-							$dataItemForEmail = $selitemForEmail->ItemTransaksi()->get();
-							$noItemForEmail = 1;
-							// foreach ( $dataItemForEmail as $key) {
-							// 	$itemForEmail .= "<tr>
-							// 					  	<td align='center'>".$noItemForEmail."</td>
-							// 					  	<td>".$key->Item->nama_item."</td>
-							// 					  	<td align='center'>".$key->jumlah." PCS</td>
-							// 					  	<td align='right'>Rp. ".number_format($key->harga,'0','','.')."</td>
-							// 					  	<td align='right'>Rp. ".number_format($key->total,'0','','.')."</td>
-							// 					  </tr>";
-							// 	$noItemForEmail++;
-							// }
-							foreach ( $dataItemForEmail as $key) {
-								$itemForEmail .= "<tr>
-												  	<td align='center'>".$noItemForEmail."</td>
-												  	<td>".$key->Item->nama_item."</td>
-												  	<td align='center'>".$key->jumlah." PCS</td>
-												  	<td align='right'>Rp. ".number_format($key->harga,'0','','.')."</td>
-												  	<td align='right'>Rp. ".number_format($key->total,'0','','.')."</td>
-												  </tr>";
-								$noItemForEmail++;
-							}
-
-
-
-							$itemForEmail .= "<tr>
-												 <td align='center'>#</td>
-												 <td colspan='3'>Ongkir </td>
-												 <td align='right'>Rp. ".number_format($ins_transaksi->total_biaya_pengiriman,'0','','.')."</td>
-											  </tr>
-											  <tr>
-												 <td align='center'>#</td>
-												 <td colspan='3'>Total Bayar </td>
-												 <td align='right'>Rp. ".number_format($ins_transaksi->total_bayar,'0','','.')."</td>
-											  </tr>";
-							
-							//setNotifExpired
-							$dataNE = ['transaksi_id' => $ins_transaksi->id, 
-									   'email' => $sel_user->email,
-									   'waktu_kirim' => $kirim_notif ,
-									   'item' => $itemForEmail,
-									   'status' => '0'];
-							$insDataNE = NotifExpired::create($dataNE);
-
-							// kirim email
-							$email_body = "<div style='padding:10px;'>
-											<div>
-												Anda Baru Saja Melakukan Pemesanan Di Agogobakery.com <br/>
-												Dengan No Transaksi <b class='fg-red'>".$ins_transaksi->no_transaksi."</b> Dan List Pemesanan Sebagai Berikut
-										    </div>
-
-									        <table class='blueTable' style='margin-top:10px; margin-bottom:10px;'>
-												<thead>
-													<th style='width:10px;'>No</th>
-													<th>Item</th>
-													<th>Jumlah</th>
-													<th>Harga</th>
-													<th>Total</th>
-												</thead>
-												<tbody>
-													".$itemForEmail."
-												</tbody>
-											</table>
-											<div>
-												Segera Lakukan Pembayaran <br/>
-												Dengan Mentransfer Ke Salah Satu Rekening Dibawah Ini :
-											</div>
-
-											<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; background:#ededed'>
-												<h2 style='margin:0px'>BRI</h2>
-												<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
-												<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
-											</div>
-											<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; background:#ededed;'>
-												<h2 style='margin:0px'>BNI</h2>
-												<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
-												<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
-											</div>
-											<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; background:#ededed;'>
-												<h2 style='margin:0px'>BCA</h2>
-												<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
-												<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
-											</div>
-											<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; background:#ededed'>
-												<h2 style='margin:0px'>MANDIRI</h2>
-												<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
-												<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
-											</div>
-											<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; margin-bottom:20px;  background:#ededed;'>
-												<h2 style='margin:0px'>SULUTGO</h2>
-												<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
-												<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
-											</div>
-
-											<div syle='margin-top:10px; '>
-												Batas Transfer Pembayaran Sampai : 
-												<h2 style='margin-top:3px; margin-bottom:3px;'>".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A')."</h2>
-												<i style='font-size:12px;'>*) Pesanan Akan Dibatalkan Apabila Sampai Dengan Batas Waktu Yang Telah Ditentukan Anda Belum Melakukan Transfer Pembayaran </i>
-											</div>
-
-											<div style='margin-top:20px; margin-bottom:20px; text-align:center'>
-												<a href='https://api.whatsapp.com/send?phone=6282343965747&text=Halo Admin, Saya Mau Konfirmasi Pembayaran, Untuk Pesanan Nomor Transaksi ".$ins_transaksi->no_transaksi."'><button class='myButton'>Konfirmasi Pembayaran</button></a>
-											</div>
-
-											<hr />
-										   </div>
-									      ";
-						    $email = $sel_user->email;
-							$data = ['name' => $sel_user->name,
-						             'email_body' => $email_body
-						            ];
-	   					    $subject = "Invoice Pembayaran Agogobakery.com";
-						    //$a = SendNotif::kirimEmail($email,$data,$subject);
-						    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke Nomor Rekening : \n(BRI) 0168  \n(BNI) 000000  \n(MANDIRI) 000000  \n(BCA) 000000 \nAN ALex Ferdiansyah, Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A');
-
-
-						    // notif android
-						    $dnotif =[
-					                'pengirim_id' => '1',
-					                'penerima_id' => $req['user_id'],
-					                'judul_id' => $ins_transaksi->id,
-					                'judul' => 'Pembayaran Pesanan No '.$ins_transaksi->no_transaksi,
-					                'isi' => $pesanWa,
-					                'jenis_notif' => 1,
-					                'dibaca' => '0'
-					                ];
-
-					               
-                             
-
-					        $notif = Notifikasi::create($dnotif);
-					        $a = SendNotif::sendNotifWa($sel_user->no_hp,$pesanWa);
-					        $sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pesanan Baru', $notif->judul_id);
-						    
-
-							$success = 1;
-							$msg = "Berhasil Simpan Transaksi";
-							$data = '';
-							
-						}else if($req['metode_pembayaran'] == "3"){
-						
-					
-							$waktu_skrang = Carbon::parse($req_transaksi['waktu_kirim']);
-
-
-							$batas_bayar = $waktu_skrang->addHours(6);
-							
-
-							$req_transaksi['waktu_kirim'] = $batas_bayar;
-
-							$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
-							$itemForEmail = "";
-							$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
-							$dataItemForEmail = $selitemForEmail->ItemTransaksi()->get();
-							$noItemForEmail = 1;
-							
-							foreach ( $dataItemForEmail as $key) {
-								$itemForEmail .= "<tr>
-												  	<td align='center'>".$noItemForEmail."</td>
-												  	<td>".$key->Item->nama_item."</td>
-												  	<td align='center'>".$key->jumlah." PCS</td>
-												  	<td align='right'>Rp. ".number_format($key->harga,'0','','.')."</td>
-												  	<td align='right'>Rp. ".number_format($key->total,'0','','.')."</td>
-												  </tr>";
-								$noItemForEmail++;
-							}
-
-							$itemForEmail .= "<tr>
-												 <td align='center'>#</td>
-												 <td colspan='3'>Ongkir </td>
-												 <td align='right'>Rp. ".number_format($ins_transaksi->total_biaya_pengiriman,'0','','.')."</td>
-											  </tr>
-											  <tr>
-												 <td align='center'>#</td>
-												 <td colspan='3'>Total Bayar </td>
-												 <td align='right'>Rp. ".number_format($ins_transaksi->total_bayar,'0','','.')."</td>
-											  </tr>";
-
-							//setNotifExpired
-							$kirim_notif = date('Y-m-d H:i:s',strtotime($ins_transaksi['waktu_kirim']) - 1200);
-							$dataNE = ['transaksi_id' => $ins_transaksi->id, 
-									   'email' => $sel_user->email,
-									   'waktu_kirim' => $kirim_notif ,
-									   'item' => $itemForEmail,
-									   'status' => '0'];
-							$insDataNE = NotifExpired::create($dataNE);
-
-							// kirim email
-							$email_body = "<div style='padding:10px;'>
-											<div>
-												Anda Baru Saja Melakukan Pemesanan Di Agogobakery.com <br/>
-												Dengan No Transaksi <b class='fg-red'>".$ins_transaksi->no_transaksi."</b> Dan List Pemesanan Sebagai Berikut
-										    </div>
-
-									        <table class='blueTable' style='margin-top:10px; margin-bottom:10px;'>
-												<thead>
-													<th style='width:10px;'>No</th>
-													<th>Item</th>
-													<th>Jumlah</th>
-													<th>Harga</th>
-													<th>Total</th>
-												</thead>
-												<tbody>
-													".$itemForEmail."
-												</tbody>
-											</table>
-										
-											<div syle='margin-top:10px; '>
-												Batas Pengambilan Pesanan Sampai : 
-												<h2 style='margin-top:3px; margin-bottom:3px;'>".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A')."</h2>
-												<i style='font-size:12px;'>*) Pesanan Akan Dibatalkan Apabila Sampai Dengan Batas Waktu Yang Telah Ditentukan Anda Belum Mengambil Pesanan </i>
-											</div>
-										
-											<hr />
-										   </div>
-									      ";
-						    $email = $sel_user->email;
-							$data = ['name' => $sel_user->name,
-						             'email_body' => $email_body
-						            ];
-	   					    $subject = "Pesanan Agogobakery.com";
-						   // $a = SendNotif::kirimEmail($email,$data,$subject);
-
-
-						    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nDengan Metode Pembayaran Bayar Di Toko . Batas Waktu Pengambilan Pesanan ".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A');
-
-							// notif android
-						    $dnotif =[
-					                'pengirim_id' => '1',
-					                'penerima_id' => $req['user_id'],
-					                'judul_id' => $ins_transaksi->id,
-					                'judul' => 'Pesanan No '.$ins_transaksi->no_transaksi,
-					                'isi' => 'Anda Telah Melakukan Pesanan Dengan Nomor Transaksi '.$ins_transaksi->no_transaksi.' Dengan Metode Pembayaran Bayar Di Toko . Batas Waktu Pengambilan Pesanan '.$ins_transaksi->waktu_kirim->format('d/m/Y h:i A'),
-					                'jenis_notif' => 1,
-					                'dibaca' => '0'
-					                ];
-					        $a = SendNotif::sendNotifWa($sel_user->no_hp,$pesanWa);        	
-					        $notif = Notifikasi::create($dnotif);
-					        $sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pesanan Baru', $notif->judul_id);
-						    
-
-							$success = 1;
-							$msg = "Berhasil Simpan Transaksi";
+						}else{
+							$success = 0;
+							$msg = "Maaf! Silahkan Daftarkan Akun Anda Menjadi Member";
 							$data = '';
 						}
-					}else{
-						$success = 3;
-						$msg = $msgItem;
-						$data = $req;
+					}else if($req['metode_pembayaran'] == "2"){
+					
+						$waktu_skrang = Carbon::now();
+						$waktu_skrang1 = Carbon::now();
+
+						$batas_bayar = $waktu_skrang->addHours(6);
+
+						$kirim_notif = $waktu_skrang1->addMinutes(330)->format('Y-m-d H:i:s');
+						$req_transaksi['waktu_kirim_tf'] = $req['waktu_kirim'];
+
+						$req_transaksi['waktu_kirim'] = $batas_bayar;
+
+						// return $req_transaksi;	
+						$req_transaksi['status'] = '6';
+
+						
+						$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
+						// $min_stock_item = $this->UpdateStock($itemTransaksi);
+						
+						$itemForEmail = "";
+						$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
+						$dataItemForEmail = $selitemForEmail->ItemTransaksi()->get();
+						$noItemForEmail = 1;
+						// foreach ( $dataItemForEmail as $key) {
+						// 	$itemForEmail .= "<tr>
+						// 					  	<td align='center'>".$noItemForEmail."</td>
+						// 					  	<td>".$key->Item->nama_item."</td>
+						// 					  	<td align='center'>".$key->jumlah." PCS</td>
+						// 					  	<td align='right'>Rp. ".number_format($key->harga,'0','','.')."</td>
+						// 					  	<td align='right'>Rp. ".number_format($key->total,'0','','.')."</td>
+						// 					  </tr>";
+						// 	$noItemForEmail++;
+						// }
+						foreach ( $dataItemForEmail as $key) {
+							$itemForEmail .= "<tr>
+											  	<td align='center'>".$noItemForEmail."</td>
+											  	<td>".$key->Item->nama_item."</td>
+											  	<td align='center'>".$key->jumlah." PCS</td>
+											  	<td align='right'>Rp. ".number_format($key->harga,'0','','.')."</td>
+											  	<td align='right'>Rp. ".number_format($key->total,'0','','.')."</td>
+											  </tr>";
+							$noItemForEmail++;
+						}
+
+
+
+						$itemForEmail .= "<tr>
+											 <td align='center'>#</td>
+											 <td colspan='3'>Ongkir </td>
+											 <td align='right'>Rp. ".number_format($ins_transaksi->total_biaya_pengiriman,'0','','.')."</td>
+										  </tr>
+										  <tr>
+											 <td align='center'>#</td>
+											 <td colspan='3'>Total Bayar </td>
+											 <td align='right'>Rp. ".number_format($ins_transaksi->total_bayar,'0','','.')."</td>
+										  </tr>";
+						
+						//setNotifExpired
+						$dataNE = ['transaksi_id' => $ins_transaksi->id, 
+								   'email' => $sel_user->email,
+								   'waktu_kirim' => $kirim_notif ,
+								   'item' => $itemForEmail,
+								   'status' => '0'];
+						$insDataNE = NotifExpired::create($dataNE);
+
+						// kirim email
+						$email_body = "<div style='padding:10px;'>
+										<div>
+											Anda Baru Saja Melakukan Pemesanan Di Agogobakery.com <br/>
+											Dengan No Transaksi <b class='fg-red'>".$ins_transaksi->no_transaksi."</b> Dan List Pemesanan Sebagai Berikut
+									    </div>
+
+								        <table class='blueTable' style='margin-top:10px; margin-bottom:10px;'>
+											<thead>
+												<th style='width:10px;'>No</th>
+												<th>Item</th>
+												<th>Jumlah</th>
+												<th>Harga</th>
+												<th>Total</th>
+											</thead>
+											<tbody>
+												".$itemForEmail."
+											</tbody>
+										</table>
+										<div>
+											Segera Lakukan Pembayaran <br/>
+											Dengan Mentransfer Ke Salah Satu Rekening Dibawah Ini :
+										</div>
+
+										<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; background:#ededed'>
+											<h2 style='margin:0px'>BRI</h2>
+											<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
+											<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
+										</div>
+										<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; background:#ededed;'>
+											<h2 style='margin:0px'>BNI</h2>
+											<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
+											<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
+										</div>
+										<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; background:#ededed;'>
+											<h2 style='margin:0px'>BCA</h2>
+											<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
+											<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
+										</div>
+										<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; background:#ededed'>
+											<h2 style='margin:0px'>MANDIRI</h2>
+											<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
+											<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
+										</div>
+										<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; margin-bottom:20px;  background:#ededed;'>
+											<h2 style='margin:0px'>SULUTGO</h2>
+											<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
+											<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
+										</div>
+
+										<div syle='margin-top:10px; '>
+											Batas Transfer Pembayaran Sampai : 
+											<h2 style='margin-top:3px; margin-bottom:3px;'>".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A')."</h2>
+											<i style='font-size:12px;'>*) Pesanan Akan Dibatalkan Apabila Sampai Dengan Batas Waktu Yang Telah Ditentukan Anda Belum Melakukan Transfer Pembayaran </i>
+										</div>
+
+										<div style='margin-top:20px; margin-bottom:20px; text-align:center'>
+											<a href='https://api.whatsapp.com/send?phone=6282343965747&text=Halo Admin, Saya Mau Konfirmasi Pembayaran, Untuk Pesanan Nomor Transaksi ".$ins_transaksi->no_transaksi."'><button class='myButton'>Konfirmasi Pembayaran</button></a>
+										</div>
+
+										<hr />
+									   </div>
+								      ";
+					    $email = $sel_user->email;
+						$data = ['name' => $sel_user->name,
+					             'email_body' => $email_body
+					            ];
+						    $subject = "Invoice Pembayaran Agogobakery.com";
+					    //$a = SendNotif::kirimEmail($email,$data,$subject);
+					    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke Nomor Rekening : \n(BRI) 0168  \n(BNI) 000000  \n(MANDIRI) 000000  \n(BCA) 000000 \nAN ALex Ferdiansyah, Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A');
+
+
+					    // notif android
+					    $dnotif =[
+				                'pengirim_id' => '1',
+				                'penerima_id' => $req['user_id'],
+				                'judul_id' => $ins_transaksi->id,
+				                'judul' => 'Pembayaran Pesanan No '.$ins_transaksi->no_transaksi,
+				                'isi' => $pesanWa,
+				                'jenis_notif' => 1,
+				                'dibaca' => '0'
+				                ];
+
+				               
+	                     
+
+				        $notif = Notifikasi::create($dnotif);
+				        $a = SendNotif::sendNotifWa($sel_user->no_hp,$pesanWa);
+				        $sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pesanan Baru', $notif->judul_id);
+					    
+
+						$success = 1;
+						$msg = "Berhasil Simpan Transaksi";
+						$data = '';
+						
+					}else if($req['metode_pembayaran'] == "3"){
+					
+				
+						$waktu_skrang = Carbon::parse($req_transaksi['waktu_kirim']);
+
+
+						$batas_bayar = $waktu_skrang->addHours(6);
+						
+
+						$req_transaksi['waktu_kirim'] = $batas_bayar;
+
+						$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
+						$itemForEmail = "";
+						$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
+						$dataItemForEmail = $selitemForEmail->ItemTransaksi()->get();
+						$noItemForEmail = 1;
+						
+						foreach ( $dataItemForEmail as $key) {
+							$itemForEmail .= "<tr>
+											  	<td align='center'>".$noItemForEmail."</td>
+											  	<td>".$key->Item->nama_item."</td>
+											  	<td align='center'>".$key->jumlah." PCS</td>
+											  	<td align='right'>Rp. ".number_format($key->harga,'0','','.')."</td>
+											  	<td align='right'>Rp. ".number_format($key->total,'0','','.')."</td>
+											  </tr>";
+							$noItemForEmail++;
+						}
+
+						$itemForEmail .= "<tr>
+											 <td align='center'>#</td>
+											 <td colspan='3'>Ongkir </td>
+											 <td align='right'>Rp. ".number_format($ins_transaksi->total_biaya_pengiriman,'0','','.')."</td>
+										  </tr>
+										  <tr>
+											 <td align='center'>#</td>
+											 <td colspan='3'>Total Bayar </td>
+											 <td align='right'>Rp. ".number_format($ins_transaksi->total_bayar,'0','','.')."</td>
+										  </tr>";
+
+						//setNotifExpired
+						$kirim_notif = date('Y-m-d H:i:s',strtotime($ins_transaksi['waktu_kirim']) - 1200);
+						$dataNE = ['transaksi_id' => $ins_transaksi->id, 
+								   'email' => $sel_user->email,
+								   'waktu_kirim' => $kirim_notif ,
+								   'item' => $itemForEmail,
+								   'status' => '0'];
+						$insDataNE = NotifExpired::create($dataNE);
+
+						// kirim email
+						$email_body = "<div style='padding:10px;'>
+										<div>
+											Anda Baru Saja Melakukan Pemesanan Di Agogobakery.com <br/>
+											Dengan No Transaksi <b class='fg-red'>".$ins_transaksi->no_transaksi."</b> Dan List Pemesanan Sebagai Berikut
+									    </div>
+
+								        <table class='blueTable' style='margin-top:10px; margin-bottom:10px;'>
+											<thead>
+												<th style='width:10px;'>No</th>
+												<th>Item</th>
+												<th>Jumlah</th>
+												<th>Harga</th>
+												<th>Total</th>
+											</thead>
+											<tbody>
+												".$itemForEmail."
+											</tbody>
+										</table>
+									
+										<div syle='margin-top:10px; '>
+											Batas Pengambilan Pesanan Sampai : 
+											<h2 style='margin-top:3px; margin-bottom:3px;'>".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A')."</h2>
+											<i style='font-size:12px;'>*) Pesanan Akan Dibatalkan Apabila Sampai Dengan Batas Waktu Yang Telah Ditentukan Anda Belum Mengambil Pesanan </i>
+										</div>
+									
+										<hr />
+									   </div>
+								      ";
+					    $email = $sel_user->email;
+						$data = ['name' => $sel_user->name,
+					             'email_body' => $email_body
+					            ];
+						    $subject = "Pesanan Agogobakery.com";
+					   // $a = SendNotif::kirimEmail($email,$data,$subject);
+
+
+					    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nDengan Metode Pembayaran Bayar Di Toko . Batas Waktu Pengambilan Pesanan ".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A');
+
+						// notif android
+					    $dnotif =[
+				                'pengirim_id' => '1',
+				                'penerima_id' => $req['user_id'],
+				                'judul_id' => $ins_transaksi->id,
+				                'judul' => 'Pesanan No '.$ins_transaksi->no_transaksi,
+				                'isi' => 'Anda Telah Melakukan Pesanan Dengan Nomor Transaksi '.$ins_transaksi->no_transaksi.' Dengan Metode Pembayaran Bayar Di Toko . Batas Waktu Pengambilan Pesanan '.$ins_transaksi->waktu_kirim->format('d/m/Y h:i A'),
+				                'jenis_notif' => 1,
+				                'dibaca' => '0'
+				                ];
+				        $a = SendNotif::sendNotifWa($sel_user->no_hp,$pesanWa);        	
+				        $notif = Notifikasi::create($dnotif);
+				        $sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pesanan Baru', $notif->judul_id);
+					    
+
+						$success = 1;
+						$msg = "Berhasil Simpan Transaksi";
+						$data = '';
 					}
 				}else{
 					$success = 2;
-					$msg = $msg_operasional;
+					$msg = $msg;
 					$data = $req;
 				}
 				
