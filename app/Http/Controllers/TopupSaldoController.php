@@ -6,7 +6,10 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Notifikasi;
 use App\HistoriTopup;
+use App\Transaksi;
+use App\Helpers\Acak;
 use App\Helpers\SendNotif;
+use Carbon\Carbon;
 use Auth;
 
 class TopupSaldoController extends Controller
@@ -94,6 +97,39 @@ class TopupSaldoController extends Controller
         $find->HistoriTopup()->create(['user_id' => $req['user_id'], 
                                         'nominal' => $req['saldo'],
                                         'ditopup_oleh' => 'Admin - '.Auth::User()->name    
+                                      ]);
+
+        $forCode = Carbon::now()->format('Ymd');
+        $maxKD = Transaksi::where('no_transaksi','LIKE','T'.$forCode.'%')->orderBy('id','DESC')->first();
+        if(!empty($maxKD->id)){
+            $nexKD = Acak::AmbilId($maxKD['no_transaksi'],'T'.$forCode,9,3);    
+        }else{
+            $nexKD = 'T'.$forCode.'001';
+        }
+
+        $transaksi = Transaksi::create(['user_id' => $req['user_id'],
+                                        'no_transaksi' => $nexKD,
+                                        'total_transaksi' => $req['saldo'],
+                                        'biaya_pengiriman' => 0,
+                                        'jarak_tempuh' => 0,
+                                        'total_biaya_pengiriman' => 0,
+                                        'kode_voucher' => '-',
+                                        'potongan' => 0,
+                                        'total_bayar' => $req['saldo'],
+                                        'banyak_item' => 0,
+                                        'alamat_lain' => '0',
+                                        'lat' => '-',
+                                        'long' => '-',
+                                        'detail_alamat' => '-',
+                                        'metode_pembayaran' => '3',
+                                        'transaksi_member' => '1',
+                                        'status' => '5',
+                                        'tgl_bayar' => Carbon::now()->format('Y-m-d H:i:s'),
+                                        'catatan' => '-',
+                                        'durasi_kirim' => 0,
+                                        'waktu_kirim' => Carbon::now()->format('Y-m-d H:i:s'),
+                                        'for_ps' => '0',
+                                        'top_up' => '1'
                                       ]);
         //Insert Notifikasi
        

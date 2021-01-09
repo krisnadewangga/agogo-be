@@ -33,11 +33,13 @@ class LaporanController extends Controller
                             ->where([ 
                                       ['metode_pembayaran','=','1'],
                                       ['status','>=','1'],
-                                      ['status','!=','3']
+                                      ['status','!=','3'],
+                                      ['top_up', '=','0']
                                    ])
                             ->orWhere([ 
                                       ['metode_pembayaran','>','1'],
-                                      ['status','=','5']
+                                      ['status','=','5'],
+                                      ['top_up', '=','0']
                                    ])
                             ->whereDate('tgl_bayar','=',Carbon::now()->format('Y-m-d'))->orderBy('tgl_bayar','DESC')->get();
         
@@ -159,7 +161,8 @@ class LaporanController extends Controller
         
         if( !empty($req['mt']) && empty($req['st']) ){
             $transaksi = Transaksi::whereDate('tgl_bayar','=',$mt)
-                                    ->where('status','!=', '3')
+                                    ->where('status','!=', '3'),
+                                    ->where('top_up','=','0')
                                     ->orderBy('tgl_bayar','DESC')->get();
             
             $kop = "Laporan Pendapatan Di Tanggal $kop_mt";
@@ -168,7 +171,7 @@ class LaporanController extends Controller
 
         }else if( empty($req['mt']) && !empty($req['st']) ){
             $transaksi = Transaksi::whereDate('tgl_bayar','<=',$st)
-                                    
+                                    ->where('top_up','=','0')
                                     ->where('status','!=', '3')
                                     ->orderBy('tgl_bayar','DESC')->get();
             $kop = "Laporan Pendapatan Sampai Tanggal $kop_st";
@@ -178,7 +181,7 @@ class LaporanController extends Controller
              $arr_bettwen = ["$mt","$st"];
              $transaksi = Transaksi::whereDate('tgl_bayar','>=',$mt)
                                     ->whereDate('tgl_bayar','<=',$st)
-                                    
+                                    ->where('top_up','=','0')
                                     ->where('status','!=', '3')
                                     ->orderBy('tgl_bayar','DESC')->get();
              $kop = "Laporan Pendapatan Mulai Tanggal $kop_mt S/D $kop_st";
@@ -450,7 +453,8 @@ class LaporanController extends Controller
     public function ShowPenjualan()
     {
         $tahun = Transaksi::selectRaw("MIN(YEAR(tgl_bayar)) as min_tahun,
-                                            MAX(YEAR(tgl_bayar)) as max_tahun ")->first();
+                                            MAX(YEAR(tgl_bayar)) as max_tahun ")
+                          ->where('top_up','=','0')->first();
 
         $tahunNow = date('Y');
         $tahun['max_tahun'] = $tahunNow;
@@ -1692,7 +1696,7 @@ class LaporanController extends Controller
       return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username Atau Password Salah')->withInput();        
 
       $user = $request->user();
-      $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
+      $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
    
       if($role == 0)
       return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','User Tidak Punya Akses')->withInput();        
