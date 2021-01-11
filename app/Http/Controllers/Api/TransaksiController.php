@@ -12,6 +12,7 @@ use App\User;
 use App\Item;
 use App\Ongkir;
 use App\ItemTransaksi;
+use App\HistoriTopup;
 use App\Helpers\Acak;
 use App\Helpers\SendNotif;
 use App\NotifExpired;
@@ -628,17 +629,20 @@ class TransaksiController extends Controller
              $offset = ($page - 1) * $dataPerpage;
 
              $transaksi = Transaksi::where('status','!=', '3')
-             						->where('metode_pembayaran','1')
+             						// ->where('metode_pembayaran','1')
              						->where('user_id',$req['user_id'])
-             						->selectRaw("id,user_id,no_transaksi,banyak_item,total_bayar,metode_pembayaran,status,created_at as waktu")
+             						->selectRaw("id,user_id,no_transaksi,banyak_item,total_bayar,metode_pembayaran,status,created_at as waktu,top_up")
          						    ->orderBy('transaksi.id','DESC')
 									->limit($dataPerpage)
 									->offset($offset)->get();
             
             $jumdat =  Transaksi::where('status','!=', '3')
-             						->where('metode_pembayaran','1')
+             						// ->where('metode_pembayaran','1')
              						->where('user_id',$req['user_id'])
 	         					    ->count();
+
+	         // $HistoriTopup = HistoriTopup::where('user_id',$req['user_id'])->get();
+	         // return $HistoriTopup;
 
 	         $jumHal = ceil($jumdat / $dataPerpage);
 	         $pageSaatIni = (int) $page;
