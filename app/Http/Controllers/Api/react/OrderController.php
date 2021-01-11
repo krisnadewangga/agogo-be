@@ -113,14 +113,14 @@ public function postOrder(Request $request)
   }
 
 
-  $sel = Transaksi::where([ 
-                            ['no_transaksi', '=', $no_transaksi],
-                            ['user_id' ,'=', $req[0]['user_id'] ]
-                          ])->first();
-  if(isset($sel->id)){
-    $find_delete = Transaksi::findOrFail($sel->id);
-    $find_delete->delete(); 
-  }
+  // $sel = Transaksi::where([ 
+  //                           ['no_transaksi', '=', $no_transaksi],
+  //                           ['user_id' ,'=', $req[0]['user_id'] ]
+  //                         ])->first();
+  // if(isset($sel->id)){
+  //   $find_delete = Transaksi::findOrFail($sel->id);
+  //   $find_delete->delete(); 
+  // }
 
   $insertTransaksi = Transaksi::create($req_transaksi);
 
