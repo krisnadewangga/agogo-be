@@ -58,7 +58,7 @@ class KasController extends Controller
 			], 400);
 		$user = $request->user();
 		$role = Role::where('user_id',$user->id)
-                    ->whereIn('level_id',['1','2'])->count();
+                    ->whereIn('level_id',['1','2','7'])->count();
 
         
 
@@ -128,6 +128,7 @@ class KasController extends Controller
         ->where('status','5')
         ->where('jenis','1')
         ->where('kasir_id',$id)
+        ->where('top_up','0')
         ->sum('total_bayar');
 
 
@@ -195,7 +196,7 @@ class KasController extends Controller
 				'message' => 'Invalid Username / PIN'
 			], 200);
 		$user = $request->user();
-		$role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
+		$role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
 
 		if($role > 0){
             return response()->json([
@@ -220,7 +221,7 @@ class KasController extends Controller
 				'message' => 'Invalid Username / PIN'
 			], 200);
 		$user = $request->user();
-		$role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
+		$role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
 
 		if($role > 0){
         

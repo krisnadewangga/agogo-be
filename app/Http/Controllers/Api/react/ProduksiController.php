@@ -268,7 +268,7 @@ public function postProduction(Request $request)
       ], 400);
     $user = $request->user();
     $role = Role::where('user_id',$user->id)
-                 ->whereIn('level_id',['1','2'])
+                 ->whereIn('level_id',['1','2','7'])
                  ->count();
 
     if($role > 0){
