@@ -15,6 +15,7 @@ use App\Role;
 use Illuminate\Support\Facades\Auth;
 use DB;
 use App\Refund;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -73,6 +74,8 @@ public function checkLastInvoice()
       return $aa;            
     }
 
+
+
 public function postOrder(Request $request)
 {
   $req = $request->all();
@@ -110,37 +113,6 @@ public function postOrder(Request $request)
   }
 
 
-  $insItem = [];
-  foreach ($req as $key) {
-    $array = [];
-    // $array['transaksi_id'] =  $insertTransaksi->id;
-    $findItem = Item::findOrFail($key['product_id']);
-    $array['item_id'] = $key['product_id'];
-    $array['jumlah'] = $key['qty'];
-    $array['harga'] = $findItem['harga'];
-    $array['margin'] = 0;
-    $array['total'] = $key['qty'] * $findItem['harga'];
-
-    $insItem[] = $array;
-
-    $getCount = Item::where(['id' => $key['product_id']])->get();
-    // if ($getCount[0]['stock'] >= $key['qty']) {
-        DB::table('item')->where('id', $key['product_id'])
-            ->decrement('stock', $key['qty']);  
-      
-       
-        DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['qty']);
-        
-        DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['qty']);
-        
-        DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['qty']);
-
-    // }else {
-    //     throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
-    // }
-
-  }
-
   $sel = Transaksi::where([ 
                             ['no_transaksi', '=', $no_transaksi],
                             ['user_id' ,'=', $req[0]['user_id'] ]
@@ -151,17 +123,68 @@ public function postOrder(Request $request)
   }
 
   $insertTransaksi = Transaksi::create($req_transaksi);
+
+  $insItem = [];
+  foreach ($req as $key) {
+    $array = [];
+    // $array['transaksi_id'] =  $insertTransaksi->id;
+    $findItem = Item::findOrFail($key['product_id']);
+    $array['transaksi_id'] = $insertTransaksi->id;
+    $array['item_id'] = $key['product_id'];
+    $array['jumlah'] = $key['qty'];
+    $array['harga'] = $findItem['harga'];
+    $array['margin'] = 0;
+    $array['total'] = $key['qty'] * $findItem['harga'];
+    $array['created_at'] = Carbon::now()->format('Y-m-d H:i:s');
+    $array['updated_at'] = Carbon::now()->format('Y-m-d H:i:s');
+
+    $insItem[] = $array;
+
+    $getCount = Item::where(['id' => $key['product_id']])->get();
+    // if ($getCount[0]['stock'] >= $key['qty']) {
+      
+
+
+        // $find->ItemTransaksi()->createMany($insItem);
+        $insert = ItemTransaksi::insert($insItem);
+
+        DB::table('item')->where('id', $key['product_id'])
+            ->decrement('stock', $key['qty']);  
+      
+       
+        DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['qty']);
+        
+        DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['qty']);
+        
+        DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['qty']);
+
+
+
+    // }else {
+    //     throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
+    // }
+
+  }
+
+  
   $find = Transaksi::findOrFail($insertTransaksi->id);
-  $find->ItemTransaksi()->createMany($insItem);
   $find->R_Order()->create(['transaksi_id' => $insertTransaksi->id, 
    'uang_dibayar' => $req[0]['dibayar'],
    'uang_kembali' => $req[0]['kembali'],
    'status' => $req[0]['status'] ]);
 
-  return response()->json([
-   'status' => 'success',
-   'message' => $no_transaksi,
-  ], 200);
+  if($insertTransaksi){
+    return response()->json([
+     'status' => 'success',
+     'message' => $no_transaksi,
+    ], 200);
+  }else{
+     return response()->json([
+     'status' => 'failed',
+     'message' => $no_transaksi,
+    ], 500);
+  }
+  
 }
 
 public function bayarTransaksiM(Request $request)
