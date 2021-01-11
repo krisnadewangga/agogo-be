@@ -231,6 +231,9 @@ class KurirController extends Controller
         $notif = Notifikasi::create($dnotif);
         SendNotif::SendNotPesan('5',['jenisNotif' => '2']);
 
+        $userWa = User::findOrfail($notif->penerima_id);
+        SendNotif::sendNotifWa($userWa->no_hp,$notif->isi);
+
         //NotifGCM
         SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'pengiriman', $notif->judul_id);
         

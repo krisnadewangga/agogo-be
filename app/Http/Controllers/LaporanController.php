@@ -33,11 +33,13 @@ class LaporanController extends Controller
                             ->where([ 
                                       ['metode_pembayaran','=','1'],
                                       ['status','>=','1'],
-                                      ['status','!=','3']
+                                      ['status','!=','3'],
+                                      ['top_up', '=','0']
                                    ])
                             ->orWhere([ 
                                       ['metode_pembayaran','>','1'],
-                                      ['status','=','5']
+                                      ['status','=','5'],
+                                      ['top_up', '=','0']
                                    ])
                             ->whereDate('tgl_bayar','=',Carbon::now()->format('Y-m-d'))->orderBy('tgl_bayar','DESC')->get();
         
@@ -160,6 +162,7 @@ class LaporanController extends Controller
         if( !empty($req['mt']) && empty($req['st']) ){
             $transaksi = Transaksi::whereDate('tgl_bayar','=',$mt)
                                     ->where('status','!=', '3')
+                                    ->where('top_up','=','0')
                                     ->orderBy('tgl_bayar','DESC')->get();
             
             $kop = "Laporan Pendapatan Di Tanggal $kop_mt";
@@ -168,7 +171,7 @@ class LaporanController extends Controller
 
         }else if( empty($req['mt']) && !empty($req['st']) ){
             $transaksi = Transaksi::whereDate('tgl_bayar','<=',$st)
-                                    
+                                    ->where('top_up','=','0')
                                     ->where('status','!=', '3')
                                     ->orderBy('tgl_bayar','DESC')->get();
             $kop = "Laporan Pendapatan Sampai Tanggal $kop_st";
@@ -178,7 +181,7 @@ class LaporanController extends Controller
              $arr_bettwen = ["$mt","$st"];
              $transaksi = Transaksi::whereDate('tgl_bayar','>=',$mt)
                                     ->whereDate('tgl_bayar','<=',$st)
-                                    
+                                    ->where('top_up','=','0')
                                     ->where('status','!=', '3')
                                     ->orderBy('tgl_bayar','DESC')->get();
              $kop = "Laporan Pendapatan Mulai Tanggal $kop_mt S/D $kop_st";
@@ -450,7 +453,8 @@ class LaporanController extends Controller
     public function ShowPenjualan()
     {
         $tahun = Transaksi::selectRaw("MIN(YEAR(tgl_bayar)) as min_tahun,
-                                            MAX(YEAR(tgl_bayar)) as max_tahun ")->first();
+                                            MAX(YEAR(tgl_bayar)) as max_tahun ")
+                          ->where('top_up','=','0')->first();
 
         $tahunNow = date('Y');
         $tahun['max_tahun'] = $tahunNow;
@@ -1340,6 +1344,7 @@ class LaporanController extends Controller
                 '1','1'
                ];
       $data = $this->SetDataPenjualanPerItem($dates);
+    
 
       $input = ['tanggal' => Carbon::now()->format('d/m/Y'), 
                 'sampai_tanggal' =>  Carbon::now()->format('d/m/Y'),
@@ -1390,7 +1395,6 @@ class LaporanController extends Controller
               ];
       $opsi = ['1' => 'ASC','2' => 'DESC'];
 
-  
       if($data[0] == $data[1]){
         $transaksi = ItemTransaksi::selectRaw("item_transaksi.item_id,
                                                 (SELECT nama_item FROM item where id = item_transaksi.item_id ) as nama_item,
@@ -1401,7 +1405,7 @@ class LaporanController extends Controller
                                         return $q->from('transaksi')
                                                   ->select('id')
                                                   ->where('status','5')
-                                                  ->whereDate('updated_at',$data[0]);
+                                                  ->whereDate('created_at',$data[0]);
                                       })->groupBy('item_transaksi.item_id')
                                       ->orderBy($sort[$data[2]], $opsi[$data[3]])
                                       ->get();
@@ -1415,8 +1419,8 @@ class LaporanController extends Controller
                                         return $q->from('transaksi')
                                                   ->select('id')
                                                   ->where('status','5')
-                                                  ->where('updated_at','>=', $data[0]." 00:00:00")
-                                                  ->where('updated_at','<=', $data[1]." 23:59:59");
+                                                  ->where('created_at','>=', $data[0]." 00:00:00")
+                                                  ->where('created_at','<=', $data[1]." 23:59:59");
                                       })->groupBy('item_transaksi.item_id')
                                       ->orderBy($sort[$data[2]], $opsi[$data[3]])
                                       ->get();
@@ -1431,6 +1435,62 @@ class LaporanController extends Controller
 
       $array = ['data' => $transaksi, 'grandTotal' => $grandTotal];
       return $array;
+
+      // return $data;
+      // $data[0] = '2020-12-01';
+      // $data[1] = '2020-12-14';
+      // if($data[0] == $data[1]){
+      //   $transaksi = Produksi::selectRaw('produksi.total_penjualan as qty,
+      //                                (select harga from item where id = produksi.item_id) as harga,
+      //                                (select code from item where id = produksi.item_id) as kode_menu,
+      //                                (select nama_item from item where id = produksi.item_id) as nama_item,
+      //                                produksi.total_penjualan * (select harga from item where id = produksi.item_id) as total
+      //                               ')
+      //                     ->whereIn('id',function($q) use ($data){
+      //                        $q->from('produksi')
+      //                        ->where('total_penjualan','>',0)
+      //                        ->selectRaw('max(produksi.id)')
+      //                        ->whereDate('produksi.created_at',$data[0])
+      //                        ->groupBy('produksi.item_id');
+
+      //                        return $q;
+      //                     })->orderBy($sort[$data[2]], $opsi[$data[3]])
+      //                       ->get();
+      // }else{
+      //    $transaksi = Produksi::selectRaw("max(id),item_id ,total_penjualan,DATE_FORMAT(created_at,'%Y-%m-%d') as tgl")
+                         
+      //                    ->where('created_at','>=', $data[0]." 00:00:00")
+      //                    ->where('created_at','<=', $data[1]." 23:59:59")
+                         
+      //                    ->get();
+      //    return $transaksi;
+      //    // $transaksi = Produksi::selectRaw('produksi.total_penjualan as qty,
+      //    //                             (select harga from item where id = produksi.item_id) as harga,
+      //    //                             (select code from item where id = produksi.item_id) as kode_menu,
+      //    //                             (select nama_item from item where id = produksi.item_id) as nama_item,
+      //    //                             produksi.total_penjualan * (select harga from item where id = produksi.item_id) as total
+      //    //                            ')
+      //    //                  ->whereIn('id',function($q) use ($data){
+      //    //                     $q->from('produksi')
+      //    //                     ->where('total_penjualan','>',0)
+      //    //                     ->selectRaw('max(produksi.id)')
+      //    //                     ->where('produksi.created_at','>=', $data[0]." 00:00:00")
+      //    //                     ->where('produksi.created_at','<=', $data[1]." 23:59:59")
+      //    //                     ->groupBy(DB::raw("DATE_FORMAT(produksi.created_at, 'Y-m-d' )"));
+
+      //    //                     return $q;
+      //    //                  })->orderBy($sort[$data[2]], $opsi[$data[3]])
+      //    //                    ->get();
+      // }
+      // $transaksi->map(function($transaksi){
+      //   $transaksi['tampil_total'] = number_format($transaksi->total,'0','','.');
+      // });
+      // $grandTotal = number_format($transaksi->sum('total'),'0','','.');
+      
+      
+
+      // $array = ['data' => $transaksi, 'grandTotal' => $grandTotal];
+      // return $array;
     } 
 
     public function ExportPenjualanPerItem(Request $request)
@@ -1636,7 +1696,7 @@ class LaporanController extends Controller
       return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username Atau Password Salah')->withInput();        
 
       $user = $request->user();
-      $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
+      $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
    
       if($role == 0)
       return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','User Tidak Punya Akses')->withInput();        
