@@ -161,7 +161,7 @@ class LaporanController extends Controller
         
         if( !empty($req['mt']) && empty($req['st']) ){
             $transaksi = Transaksi::whereDate('tgl_bayar','=',$mt)
-                                    ->where('status','!=', '3'),
+                                    ->where('status','!=', '3')
                                     ->where('top_up','=','0')
                                     ->orderBy('tgl_bayar','DESC')->get();
             
