@@ -102,7 +102,7 @@ public function store(Request $request)
         'message' => 'Invalid Username / PIN'
       ], 400);
     $user = $request->user();
-    $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
+    $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
 
     if($role > 0){
       // if(!empty($request[0]['invoice']) ){            
@@ -280,7 +280,7 @@ public function editPreorder(Request $request)
       'message' => 'Invalid Username / PIN'
     ], 400);
   $user = $request->user();
-  $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
+  $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
 
   if($role > 0){
 
@@ -423,7 +423,7 @@ public function bayarPreorder(Request $request)
     'message' => 'Invalid Username / PIN'
   ], 400);
  $user = $request->user();
- $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
+ $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
 
  if($role > 0){
    $kasir = User::findOrFail($request[0]['user_id']);
@@ -496,7 +496,7 @@ public function cancelPreorder(Request $request,$id)
     'message' => 'Invalid Username / PIN'
   ], 400);
  $user = $request->user();
- $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
+ $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
 
  if($role > 0){
 
