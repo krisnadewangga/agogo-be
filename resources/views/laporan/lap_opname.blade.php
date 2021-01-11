@@ -145,7 +145,7 @@
 									</td>
 									<td class="nowrap" align="center">	
 										
-										<input type="numeric" name="total_stock_toko_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('total_stock_toko_'.$key->id) }} @else {{$key->stock_toko}} @endif" style="width: 80px;">
+										<input type="numeric" autocomplete="off" name="total_stock_toko_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('total_stock_toko_'.$key->id) }} @else {{$key->stock_toko}} @endif" style="width: 80px;">
 										
 									</td>
 									
