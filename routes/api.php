@@ -147,6 +147,10 @@ Route::get('job_now','Api\KurirController@JobNow');
 Route::get('list_job','Api\KurirController@ListJob');
 Route::post('selesaikan_job','Api\KurirController@SelesaikanJob');
 
+Route::get('payment_channel','Api\TripayController@paymentChannel');
+Route::post('payment','Api\TripayController@Transaksi');
+Route::post('callback_tripay', 'Api\TripayController@Callback');
+
 Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
     return "Cache is cleared";
