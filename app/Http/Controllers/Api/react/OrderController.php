@@ -146,7 +146,7 @@ public function postOrder(Request $request)
 
 
         // $find->ItemTransaksi()->createMany($insItem);
-        $insert = ItemTransaksi::insert($insItem);
+        //$insert = ItemTransaksi::insert($insItem);
 
         DB::table('item')->where('id', $key['product_id'])
             ->decrement('stock', $key['qty']);  
@@ -168,6 +168,7 @@ public function postOrder(Request $request)
 
   
   $find = Transaksi::findOrFail($insertTransaksi->id);
+  $find->ItemTransaksi()->createMany($insItem);
   $find->R_Order()->create(['transaksi_id' => $insertTransaksi->id, 
    'uang_dibayar' => $req[0]['dibayar'],
    'uang_kembali' => $req[0]['kembali'],
