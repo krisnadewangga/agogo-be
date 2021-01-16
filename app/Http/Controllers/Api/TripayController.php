@@ -28,7 +28,7 @@ class TripayController extends Controller
                         ->withHeader('Authorization: '.$this->api_key)
                         ->asJson( true )
                         ->get();
-    	return $response;
+    	return response()->json($response);
     }
 
     public function Callback(Request $Request)
