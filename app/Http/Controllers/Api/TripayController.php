@@ -33,13 +33,11 @@ class TripayController extends Controller
     	$response = Curl::to('https://payment.tripay.co.id/api/merchant/payment-channel')
                         ->withHeader('Authorization: '.$this->api_key)
                         ->asJson()
-                        ->get();
-		return response()->json($response);
+						->get();
+						
+						
+    	return response()->json($response);
 
-		 
-
-
-    	
     }
 
     public function Callback(Request $Request)
