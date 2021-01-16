@@ -61,12 +61,12 @@ class PengirimanController extends Controller
             return redirect()->back()->withErrors($validator)->with('gagal','simpan');
         }
 
-        $cek_kurir = Pengiriman::where('kurir_id','=',$req['kurir_id'])->where('status','=','0')
-                               ->count();
+        // $cek_kurir = Pengiriman::where('kurir_id','=',$req['kurir_id'])->where('status','=','0')
+        //                        ->count();
 
-        if($cek_kurir > 0){
-            return redirect()->back()->with('gagal','kurir')->with("error","Kurir Yang Anda Pilih Sementara Melakukan Pengiriman");
-        }
+        // if($cek_kurir > 0){
+        //     return redirect()->back()->with('gagal','kurir')->with("error","Kurir Yang Anda Pilih Sementara Melakukan Pengiriman");
+        // }
 
         $input = ['transaksi_id' => $req['transaksi_id'],
                   'kurir_id' => $req['kurir_id'],
