@@ -5,6 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Ixudra\Curl\Facades\Curl;
+use App\LogKonfirBayar;
+use App\Transaksi;
+use App\User;
+use App\Notifikasi;
+use Carbon\Carbon;
+use App\Helpers\SendNotif;
 
 class TripayController extends Controller
 {
@@ -26,9 +32,12 @@ class TripayController extends Controller
     {
     	$response = Curl::to('https://payment.tripay.co.id/api/merchant/payment-channel')
                         ->withHeader('Authorization: '.$this->api_key)
-                        ->asJson( true )
-                        ->get();
+                        ->asJson()
+						->get();
+						
+						
     	return response()->json($response);
+
     }
 
     public function Callback(Request $Request)
@@ -55,9 +64,34 @@ class TripayController extends Controller
 		{
 		    if( $data->status == 'PAID' )
 		    {
-		    	$success = 'TRUE';
+		    	
+		    	$select = Transaksi::where('no_transaksi',$data->merchant_ref)->first();
+		    	$find = Transaksi::findOrfail($select->id);
+		    	$find->update(['status' => '1', 'tgl_bayar' => Carbon::now()->format('Y-m-d H:i:s') ]);
+		    	
+		    	$create_log = LogKonfirBayar::create(['transaksi_id' => $find->id,'input_by' => 'Tripay' ]);
+
+		    	 SendNotif::SendNotPesan('5',['jenisNotif' => '4']);
+			     $dnotif =
+			        [
+			            'pengirim_id' => 1,
+			            'penerima_id' => $find->user_id,
+			            'judul_id' => $find->id,
+			            'judul' => 'Konfirmasi Pembayaran No. Transaksi '.$find->no_transaksi,
+			            'isi' => 'Terima Kasih Telah Melakukan Transfer Pembayaran Untuk Pesanan Nomor Transaksi '.$find->no_transaksi.' Pesanan Anda Akan Kami Proses Untuk Pengantaran Ke Rumah Anda',
+			            'jenis_notif' => 7,
+			            'dibaca' => '0'
+			        ];
+			    
+			        $notif = Notifikasi::create($dnotif);
+			        $userWa = User::findOrfail($find->user_id);
+			        SendNotif::sendNotifWa($userWa->no_hp,$notif->isi);
+			         //NotifGCM
+			        SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'transaksi', $notif->judul_id);
+
+			        $success = true;
 		    }else{
-		    	$success = 'FALSE';
+		    	$success = false;
 		    }
 		}
 
