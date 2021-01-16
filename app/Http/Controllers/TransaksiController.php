@@ -364,17 +364,25 @@ class TransaksiController extends Controller
     {
     	$transaksi = Transaksi::findOrFail($id);
       
+        // $kurir = Kurir::join('users','users.id','=','kurir.user_id')
+        //                ->where('users.status_aktif','1')
+        //                ->whereNull('deleted_at')
+        //                ->select("kurir.id","users.name as nama")
+        //                ->whereNotIn('kurir.id',function ($query) {
+        //                     $query->select('kurir_id')
+        //                           ->from('pengiriman')
+        //                           ->where('pengiriman.status','0')
+        //                           ->distinct();
+        //                })
+        //                ->get();
+
+
         $kurir = Kurir::join('users','users.id','=','kurir.user_id')
-                       ->where('users.status_aktif','1')
-                       ->whereNull('deleted_at')
-                       ->select("kurir.id","users.name as nama")
-                       ->whereNotIn('kurir.id',function ($query) {
-                            $query->select('kurir_id')
-                                  ->from('pengiriman')
-                                  ->where('pengiriman.status','0')
-                                  ->distinct();
-                       })
-                       ->get();
+                    
+        ->whereNull('deleted_at')
+        ->select("kurir.id","users.name as nama")
+        ->get();
+
     
     	
         $findNot = Notifikasi::where('judul_id',$id)->where('dibaca','0')->count();
