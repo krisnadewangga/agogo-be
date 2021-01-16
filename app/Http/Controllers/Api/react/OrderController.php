@@ -185,7 +185,6 @@ public function postOrder(Request $request)
      'message' => $no_transaksi,
     ], 500);
   }
-  
 }
 
 public function bayarTransaksiM(Request $request)
