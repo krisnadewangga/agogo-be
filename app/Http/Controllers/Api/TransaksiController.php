@@ -194,6 +194,27 @@ class TransaksiController extends Controller
 										$new_saldo = $saldo - $req['total_bayar'];
 										$this->UpdateSaldo($req['user_id'],$new_saldo);
 
+
+
+							     $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \n Dengan Metode Pembayaran melalui saldo anda sebesar ". $req['total_bayar']. "\n yang sebelumnya saldo anda ".$saldo.", sisah saldo anda sekarang ".$new_saldo;
+
+								// notif android
+								$dnotif =[
+										'pengirim_id' => '1',
+										'penerima_id' => $req['user_id'],
+										'judul_id' => $ins_transaksi->id,
+										'judul' => 'Pesanan No '.$ins_transaksi->no_transaksi,
+										'isi' => $pesanWa,
+										'jenis_notif' => 1,
+										'dibaca' => '0'
+										];
+									$a = SendNotif::sendNotifWa($sel_user->no_hp,$pesanWa);        	
+									$notif = Notifikasi::create($dnotif);
+									$sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pesanan Baru', $notif->judul_id);
+								
+								
+								
+
 										$success = 1;
 										$msg = "Berhasil Simpan Transaksi";
 										$data = '';
@@ -274,7 +295,7 @@ class TransaksiController extends Controller
 											 <td align='right'>Rp. ".number_format($ins_transaksi->total_bayar,'0','','.')."</td>
 										  </tr>";
 
-						$ongkir = ['name' => 'Ongkir', 'price' => $req['total_biaya_pengiriman'], 'quantity' => $req['jarak_tempuh'] ];
+						$ongkir = ['name' => 'Ongkir', 'price' => $req['biaya_pengiriman'], 'quantity' => $req['jarak_tempuh'] ];
 						array_push($arr_order, $ongkir);
 
 				
