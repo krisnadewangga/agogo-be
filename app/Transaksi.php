@@ -44,11 +44,11 @@ class Transaksi extends Model
       $attr = $this->metode_pembayaran;
       
       if($attr == "1"){
-         $ket = "TopUp";
+         $ket = "saldo";
       }else if($attr == "2"){
-         $ket = "Bank Transfer";
+         $ket = "Transfer";
       }else if($attr == "3"){
-         $ket = "Bayar Di Toko";
+         $ket = "Toko";
       }else{
         $ket = "";
       }
