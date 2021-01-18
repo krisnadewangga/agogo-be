@@ -15,6 +15,8 @@ use App\ItemTransaksi;
 use App\HistoriTopup;
 use App\Helpers\Acak;
 use App\Helpers\SendNotif;
+use App\Helpers\tripay;
+use Ixudra\Curl\Facades\Curl;
 use App\NotifExpired;
 use App\Otp;
 use Validator;
@@ -26,6 +28,7 @@ class TransaksiController extends Controller
 {
     public function Store(Request $request)
     {
+    
     	$req = $request->all();
 		$rules = [  'user_id' => 'required',
 					'total_transaksi' => 'required|numeric',
@@ -191,6 +194,27 @@ class TransaksiController extends Controller
 										$new_saldo = $saldo - $req['total_bayar'];
 										$this->UpdateSaldo($req['user_id'],$new_saldo);
 
+
+
+							     $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \n Dengan Metode Pembayaran melalui saldo anda sebesar ". $req['total_bayar']. "\n yang sebelumnya saldo anda ".$saldo.", sisah saldo anda sekarang ".$new_saldo;
+
+								// notif android
+								$dnotif =[
+										'pengirim_id' => '1',
+										'penerima_id' => $req['user_id'],
+										'judul_id' => $ins_transaksi->id,
+										'judul' => 'Pesanan No '.$ins_transaksi->no_transaksi,
+										'isi' => $pesanWa,
+										'jenis_notif' => 1,
+										'dibaca' => '0'
+										];
+									$a = SendNotif::sendNotifWa($sel_user->no_hp,$pesanWa);        	
+									$notif = Notifikasi::create($dnotif);
+									$sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pesanan Baru', $notif->judul_id);
+								
+								
+								
+
 										$success = 1;
 										$msg = "Berhasil Simpan Transaksi";
 										$data = '';
@@ -222,6 +246,7 @@ class TransaksiController extends Controller
 						$waktu_skrang1 = Carbon::now();
 
 						$batas_bayar = $waktu_skrang->addHours(6);
+						$timesTampBB = Carbon::parse($batas_bayar)->timestamp; 
 
 						$kirim_notif = $waktu_skrang1->addMinutes(330)->format('Y-m-d H:i:s');
 						$req_transaksi['waktu_kirim_tf'] = $req['waktu_kirim'];
@@ -238,17 +263,10 @@ class TransaksiController extends Controller
 						$itemForEmail = "";
 						$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
 						$dataItemForEmail = $selitemForEmail->ItemTransaksi()->get();
+						$signature = tripay::Signature($ins_transaksi->no_transaksi,$ins_transaksi->total_bayar);
 						$noItemForEmail = 1;
-						// foreach ( $dataItemForEmail as $key) {
-						// 	$itemForEmail .= "<tr>
-						// 					  	<td align='center'>".$noItemForEmail."</td>
-						// 					  	<td>".$key->Item->nama_item."</td>
-						// 					  	<td align='center'>".$key->jumlah." PCS</td>
-						// 					  	<td align='right'>Rp. ".number_format($key->harga,'0','','.')."</td>
-						// 					  	<td align='right'>Rp. ".number_format($key->total,'0','','.')."</td>
-						// 					  </tr>";
-						// 	$noItemForEmail++;
-						// }
+					
+						$order = [];
 						foreach ( $dataItemForEmail as $key) {
 							$itemForEmail .= "<tr>
 											  	<td align='center'>".$noItemForEmail."</td>
@@ -258,9 +276,13 @@ class TransaksiController extends Controller
 											  	<td align='right'>Rp. ".number_format($key->total,'0','','.')."</td>
 											  </tr>";
 							$noItemForEmail++;
+
+							$order['name'] = $key->Item->nama_item;
+							$order['price'] = $key->Item->harga;
+							$order['quantity'] = $key->jumlah;
+
+							$arr_order[] = $order;
 						}
-
-
 
 						$itemForEmail .= "<tr>
 											 <td align='center'>#</td>
@@ -272,85 +294,44 @@ class TransaksiController extends Controller
 											 <td colspan='3'>Total Bayar </td>
 											 <td align='right'>Rp. ".number_format($ins_transaksi->total_bayar,'0','','.')."</td>
 										  </tr>";
+
+						$ongkir = ['name' => 'Ongkir', 'price' => $req['biaya_pengiriman'], 'quantity' => $req['jarak_tempuh'] ];
+						array_push($arr_order, $ongkir);
+
+				
+						$data = ['method' => $req['method'] ,
+				                 'merchant_ref' => $ins_transaksi->no_transaksi,
+					             'amount'=> $ins_transaksi->total_bayar,
+					             'customer_name' => $sel_user->name,
+					             'customer_email' => $sel_user->email,
+					             'customer_phone' => $sel_user->no_hp,
+					             'order_items' => $arr_order,
+					             'callback_url' => '',
+					             'return_url' => '',
+					             'expired_time' => $timesTampBB,
+					             'signature' => $signature,
+								];
 						
-						//setNotifExpired
-						$dataNE = ['transaksi_id' => $ins_transaksi->id, 
-								   'email' => $sel_user->email,
-								   'waktu_kirim' => $kirim_notif ,
-								   'item' => $itemForEmail,
-								   'status' => '0'];
-						$insDataNE = NotifExpired::create($dataNE);
 
-						// kirim email
-						$email_body = "<div style='padding:10px;'>
-										<div>
-											Anda Baru Saja Melakukan Pemesanan Di Agogobakery.com <br/>
-											Dengan No Transaksi <b class='fg-red'>".$ins_transaksi->no_transaksi."</b> Dan List Pemesanan Sebagai Berikut
-									    </div>
+								// real production
+								$sendData = Curl::to('https://payment.tripay.co.id/api/transaction/create')
+								->withData( $data )
+								->withHeader('Authorization: Bearer 4synTlbXG2qsABvPRz7aT16aeq88fP4fhJKz3a1D')
+								->asJson()
+								->post();
 
-								        <table class='blueTable' style='margin-top:10px; margin-bottom:10px;'>
-											<thead>
-												<th style='width:10px;'>No</th>
-												<th>Item</th>
-												<th>Jumlah</th>
-												<th>Harga</th>
-												<th>Total</th>
-											</thead>
-											<tbody>
-												".$itemForEmail."
-											</tbody>
-										</table>
-										<div>
-											Segera Lakukan Pembayaran <br/>
-											Dengan Mentransfer Ke Salah Satu Rekening Dibawah Ini :
-										</div>
+					     #mode development		
+				       	// $sendData = Curl::to('https://payment.tripay.co.id/api-sandbox/transaction/create')
+				        //                 ->withData( $data )
+				        //                 ->withHeader('Authorization: Bearer DEV-kLKOWQyiJfC2GUJq0myEhEldoUKORxYUGSLg5eeg')
+				        //                 ->asJson()
+						//                 ->post();
+						
 
-										<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; background:#ededed'>
-											<h2 style='margin:0px'>BRI</h2>
-											<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
-											<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
-										</div>
-										<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; background:#ededed;'>
-											<h2 style='margin:0px'>BNI</h2>
-											<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
-											<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
-										</div>
-										<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; background:#ededed;'>
-											<h2 style='margin:0px'>BCA</h2>
-											<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
-											<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
-										</div>
-										<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; background:#ededed'>
-											<h2 style='margin:0px'>MANDIRI</h2>
-											<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
-											<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
-										</div>
-										<div style='padding:10px; border:1px solid #ededed; text-align:center; margin-top:10px; margin-bottom:20px;  background:#ededed;'>
-											<h2 style='margin:0px'>SULUTGO</h2>
-											<h2 style='margin:0px'>An: Fulan Bin Fulan</h2>
-											<h2 style='margin:0px'>0168 01 0000 2222 2</h2>
-										</div>
 
-										<div syle='margin-top:10px; '>
-											Batas Transfer Pembayaran Sampai : 
-											<h2 style='margin-top:3px; margin-bottom:3px;'>".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A')."</h2>
-											<i style='font-size:12px;'>*) Pesanan Akan Dibatalkan Apabila Sampai Dengan Batas Waktu Yang Telah Ditentukan Anda Belum Melakukan Transfer Pembayaran </i>
-										</div>
 
-										<div style='margin-top:20px; margin-bottom:20px; text-align:center'>
-											<a href='https://api.whatsapp.com/send?phone=6282343965747&text=Halo Admin, Saya Mau Konfirmasi Pembayaran, Untuk Pesanan Nomor Transaksi ".$ins_transaksi->no_transaksi."'><button class='myButton'>Konfirmasi Pembayaran</button></a>
-										</div>
-
-										<hr />
-									   </div>
-								      ";
-					    $email = $sel_user->email;
-						$data = ['name' => $sel_user->name,
-					             'email_body' => $email_body
-					            ];
-						    $subject = "Invoice Pembayaran Agogobakery.com";
-					    //$a = SendNotif::kirimEmail($email,$data,$subject);
-					    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke Nomor Rekening : \n(BRI) 0168  \n(BNI) 000000  \n(MANDIRI) 000000  \n(BCA) 000000 \nAN ALex Ferdiansyah, Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A');
+					 $ff = $sendData->data;
+				    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim->format('d/m/Y H:i A');
 
 
 					    // notif android
@@ -364,7 +345,13 @@ class TransaksiController extends Controller
 				                'dibaca' => '0'
 				                ];
 
-				               
+				        //setNotifExpired
+						$dataNE = ['transaksi_id' => $ins_transaksi->id, 
+								   'email' => $sel_user->email,
+								   'waktu_kirim' => $kirim_notif ,
+								   'item' => $itemForEmail,
+								   'status' => '0'];
+						$insDataNE = NotifExpired::create($dataNE);
 	                     
 
 				        $notif = Notifikasi::create($dnotif);
@@ -374,14 +361,11 @@ class TransaksiController extends Controller
 
 						$success = 1;
 						$msg = "Berhasil Simpan Transaksi";
-						$data = '';
+						$data =  response()->json($sendData);
 						
 					}else if($req['metode_pembayaran'] == "3"){
 					
-				
 						$waktu_skrang = Carbon::parse($req_transaksi['waktu_kirim']);
-
-
 						$batas_bayar = $waktu_skrang->addHours(6);
 						
 
@@ -392,7 +376,8 @@ class TransaksiController extends Controller
 						$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
 						$dataItemForEmail = $selitemForEmail->ItemTransaksi()->get();
 						$noItemForEmail = 1;
-						
+					
+						// $order = [];
 						foreach ( $dataItemForEmail as $key) {
 							$itemForEmail .= "<tr>
 											  	<td align='center'>".$noItemForEmail."</td>
@@ -402,8 +387,11 @@ class TransaksiController extends Controller
 											  	<td align='right'>Rp. ".number_format($key->total,'0','','.')."</td>
 											  </tr>";
 							$noItemForEmail++;
+
+							
 						}
 
+						
 						$itemForEmail .= "<tr>
 											 <td align='center'>#</td>
 											 <td colspan='3'>Ongkir </td>
@@ -457,9 +445,9 @@ class TransaksiController extends Controller
 						$data = ['name' => $sel_user->name,
 					             'email_body' => $email_body
 					            ];
-						    $subject = "Pesanan Agogobakery.com";
-					   // $a = SendNotif::kirimEmail($email,$data,$subject);
+						$subject = "Pesanan Agogobakery.com";
 
+						// $a = SendNotif::kirimEmail($email,$data,$subject);
 
 					    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nDengan Metode Pembayaran Bayar Di Toko . Batas Waktu Pengambilan Pesanan ".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A');
 
@@ -480,7 +468,7 @@ class TransaksiController extends Controller
 
 						$success = 1;
 						$msg = "Berhasil Simpan Transaksi";
-						$data = '';
+						$data = $sendData;
 					}
 				}else{
 					$success = 2;
