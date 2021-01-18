@@ -246,7 +246,7 @@ class TransaksiController extends Controller
 						$waktu_skrang1 = Carbon::now();
 
 						$batas_bayar = $waktu_skrang->addHours(6);
-						
+						$timesTampBB = Carbon::parse($batas_bayar)->timestamp; 
 
 						$kirim_notif = $waktu_skrang1->addMinutes(330)->format('Y-m-d H:i:s');
 						$req_transaksi['waktu_kirim_tf'] = $req['waktu_kirim'];
@@ -308,7 +308,7 @@ class TransaksiController extends Controller
 					             'order_items' => $arr_order,
 					             'callback_url' => '',
 					             'return_url' => '',
-					             'expired_time' => (time()+(6*60*60)),
+					             'expired_time' => $timesTampBB,
 					             'signature' => $signature,
 								];
 						
@@ -331,7 +331,7 @@ class TransaksiController extends Controller
 
 
 					 $ff = $sendData->data;
-				    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A');
+				    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim->format('d/m/Y H:i A');
 
 
 					    // notif android
