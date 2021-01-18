@@ -194,6 +194,27 @@ class TransaksiController extends Controller
 										$new_saldo = $saldo - $req['total_bayar'];
 										$this->UpdateSaldo($req['user_id'],$new_saldo);
 
+
+
+							     $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \n Dengan Metode Pembayaran melalui saldo anda sebesar ". $req['total_bayar']. "\n yang sebelumnya saldo anda ".$saldo.", sisah saldo anda sekarang ".$new_saldo;
+
+								// notif android
+								$dnotif =[
+										'pengirim_id' => '1',
+										'penerima_id' => $req['user_id'],
+										'judul_id' => $ins_transaksi->id,
+										'judul' => 'Pesanan No '.$ins_transaksi->no_transaksi,
+										'isi' => $pesanWa,
+										'jenis_notif' => 1,
+										'dibaca' => '0'
+										];
+									$a = SendNotif::sendNotifWa($sel_user->no_hp,$pesanWa);        	
+									$notif = Notifikasi::create($dnotif);
+									$sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pesanan Baru', $notif->judul_id);
+								
+								
+								
+
 										$success = 1;
 										$msg = "Berhasil Simpan Transaksi";
 										$data = '';
@@ -274,10 +295,10 @@ class TransaksiController extends Controller
 											 <td align='right'>Rp. ".number_format($ins_transaksi->total_bayar,'0','','.')."</td>
 										  </tr>";
 
-						$ongkir = ['name' => 'Ongkir', 'price' => $req['total_biaya_pengiriman'], 'quantity' => $req['jarak_tempuh'] ];
+						$ongkir = ['name' => 'Ongkir', 'price' => $req['biaya_pengiriman'], 'quantity' => $req['jarak_tempuh'] ];
 						array_push($arr_order, $ongkir);
 
-						
+				
 						$data = ['method' => $req['method'] ,
 				                 'merchant_ref' => $ins_transaksi->no_transaksi,
 					             'amount'=> $ins_transaksi->total_bayar,
@@ -289,24 +310,28 @@ class TransaksiController extends Controller
 					             'return_url' => '',
 					             'expired_time' => $timesTampBB,
 					             'signature' => $signature,
-					            ];
-				       	$sendData = Curl::to('https://payment.tripay.co.id/api-sandbox/transaction/create')
-				                        ->withData( $data )
-				                        ->withHeader('Authorization: Bearer DEV-kLKOWQyiJfC2GUJq0myEhEldoUKORxYUGSLg5eeg')
-				                        ->asJson()
-				                        ->post();
+								];
+						
+
+								// real production
+								$sendData = Curl::to('https://payment.tripay.co.id/api/transaction/create')
+								->withData( $data )
+								->withHeader('Authorization: Bearer 4synTlbXG2qsABvPRz7aT16aeq88fP4fhJKz3a1D')
+								->asJson()
+								->post();
+
+					     #mode development		
+				       	// $sendData = Curl::to('https://payment.tripay.co.id/api-sandbox/transaction/create')
+				        //                 ->withData( $data )
+				        //                 ->withHeader('Authorization: Bearer DEV-kLKOWQyiJfC2GUJq0myEhEldoUKORxYUGSLg5eeg')
+				        //                 ->asJson()
+						//                 ->post();
+						
 
 
 
 					 $ff = $sendData->data;
-
-
-					
-					 
-			
-
-
-					    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A');
+				    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim->format('d/m/Y h:i A');
 
 
 					    // notif android

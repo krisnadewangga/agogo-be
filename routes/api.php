@@ -157,10 +157,5 @@ Route::get('/clear-cache', function() {
     return "Cache is cleared";
 });
 
-Route::get('/woy', function() {
-    $fb = Transaksi::where('no_transaksi','TK-130')->orderBy('id','desc')->first();
-    return $fb->id;
-});
-
 
 
