@@ -161,7 +161,7 @@ public function store(Request $request)
           }
 
 
-          $cek = Transaksi::where('no_transaksi',$no_transaksi)->first();
+          $cek = Transaksi::where('no_transaksi',$no_transaksi)->orderBy('id','desc')->first();
           if(empty($cek->id)){
               $insertTransaksi = Transaksi::create($req_transaksi);
               $find = Transaksi::findOrFail($insertTransaksi->id);

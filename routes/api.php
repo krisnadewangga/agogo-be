@@ -158,4 +158,11 @@ Route::get('/clear-cache', function() {
 });
 
 
+Route::get('/time', function() {
+
+    return time()+(6*60*60);
+});
+
+
+
 

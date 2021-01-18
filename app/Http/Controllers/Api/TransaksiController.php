@@ -246,7 +246,7 @@ class TransaksiController extends Controller
 						$waktu_skrang1 = Carbon::now();
 
 						$batas_bayar = $waktu_skrang->addHours(6);
-						$timesTampBB = Carbon::parse($batas_bayar)->timestamp; 
+						
 
 						$kirim_notif = $waktu_skrang1->addMinutes(330)->format('Y-m-d H:i:s');
 						$req_transaksi['waktu_kirim_tf'] = $req['waktu_kirim'];
@@ -308,7 +308,7 @@ class TransaksiController extends Controller
 					             'order_items' => $arr_order,
 					             'callback_url' => '',
 					             'return_url' => '',
-					             'expired_time' => $timesTampBB,
+					             'expired_time' => (time()+(6*60*60)),
 					             'signature' => $signature,
 								];
 						
