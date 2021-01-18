@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use App\Http\Resources\UserCollection;
 use App\User;
+use App\Transaksi;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -155,4 +156,11 @@ Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
     return "Cache is cleared";
 });
+
+Route::get('/woy', function() {
+    $fb = Transaksi::where('no_transaksi','TK-130')->orderBy('id','desc')->first();
+    return $fb->id;
+});
+
+
 
