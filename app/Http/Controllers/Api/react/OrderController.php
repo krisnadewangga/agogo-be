@@ -11,6 +11,7 @@ use App\User;
 use App\Item;
 use App\Notifikasi;
 use App\Helpers\SendNotif;
+use App\Helpers\Acak;
 use App\Role;
 use Illuminate\Support\Facades\Auth;
 use DB;
@@ -21,21 +22,35 @@ class OrderController extends Controller
 {
 	public function generateInvoice($opsi)
 	{
-		if($opsi == "1"){
-			$string_awal = "TK-";
-			$select = Transaksi::where('jalur','2')->orderBy('id','DESC');
-		}
 
-		if($select->count() > 0){
-			$first = $select->first();
-			$explode = explode('-',$first->no_transaksi);
-			$nextCode = $explode[1] + 1;
-			$invoice = $string_awal.$nextCode;
-		}else{
-			$invoice = $string_awal."1";
-		}
+    $forCode = Carbon::now()->format('ymd');
+    
+    $maxKD = Transaksi::where('no_transaksi','LIKE','TK-'.$forCode.'%')->orderBy('id','DESC')->first();
+    if(!empty($maxKD->id)){
+        $nexKD = Acak::AmbilId($maxKD['no_transaksi'],'TK-'.$forCode,9,3);  
+    }else{
+        $nexKD = 'TK-'.$forCode.'001';
+    }
+    return $nexKD;
+  //   $req_transaksi['no_transaksi'] = $nexKD;
 
-		return $invoice;
+		// if($opsi == "1"){
+		// 	$string_awal = "TK-";
+		// 	$select = Transaksi::where('jalur','2')
+  //                         ->where('for_ps','0')
+  //                         ->orderBy('id','DESC');
+		// }
+
+		// if($select->count() > 0){
+		// 	$first = $select->first();
+		// 	$explode = explode('-',$first->no_transaksi);
+		// 	$nextCode = $explode[1] + 1;
+		// 	$invoice = $string_awal.$nextCode;
+		// }else{
+		// 	$invoice = $string_awal."1";
+		// }
+
+		
 	}
 
  public function generateInvoiceRefunds()
@@ -78,6 +93,10 @@ public function checkLastInvoice()
 
 public function postOrder(Request $request)
 {
+
+
+  $no_transaksi = $this->generateInvoice('1');
+
   $req = $request->all();
 
   if(!empty($request[0]['invoice']) ){            
@@ -113,18 +132,16 @@ public function postOrder(Request $request)
   }
 
 
-  // $sel = Transaksi::where([ 
-  //                           ['no_transaksi', '=', $no_transaksi],
-  //                           ['user_id' ,'=', $req[0]['user_id'] ]
-  //                         ])->first();
-  // if(isset($sel->id)){
-  //   $find_delete = Transaksi::findOrFail($sel->id);
-  //   $find_delete->delete(); 
-  // }
+  $sel = Transaksi::where([['no_transaksi', '=', $req[0]['r_code']],
+                            ['user_id' ,'=', $req[0]['user_id'] ]
+                          ])->orderBy('id','desc')->first();
 
-  $insertTransaksi = Transaksi::create($req_transaksi);
 
-  $insItem = [];
+  if(!isset($sel)){
+
+   $insertTransaksi = Transaksi::create($req_transaksi);
+
+  $insItem = [];  
   foreach ($req as $key) {
     $array = [];
     // $array['transaksi_id'] =  $insertTransaksi->id;
@@ -185,6 +202,16 @@ public function postOrder(Request $request)
      'message' => $no_transaksi,
     ], 500);
   }
+
+  }else{
+
+    return response()->json([
+     'status' => 'failed',
+     'message' => 'error',
+    ], 500);
+  }
+
+  
 }
 
 public function bayarTransaksiM(Request $request)

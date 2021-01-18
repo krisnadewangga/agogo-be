@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use App\Http\Resources\UserCollection;
 use App\User;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes

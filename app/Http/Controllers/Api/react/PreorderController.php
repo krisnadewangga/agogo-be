@@ -13,6 +13,9 @@ use App\ItemTransaksi;
 use App\Role;
 use App\Item;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use App\Helpers\Acak;
+
 class PreorderController extends Controller
 {
     //
@@ -21,31 +24,49 @@ class PreorderController extends Controller
 
  public function generateInvoice()
  {
-  $preorder = Transaksi::where('jenis',2)->orderBy('id', 'DESC');
-  if ($preorder->count() > 0) {
-    $preorder = $preorder->first();
-    $explode = explode('-', $preorder->no_transaksi);
-    $count = $explode[1] + 1;
-    return 'PS-' . $count;
-  }
-  return 'PS-1';
+    $forCode = Carbon::now()->format('ymd');
+    
+    $maxKD = Transaksi::where('no_transaksi','LIKE','PS-'.$forCode.'%')->orderBy('id','DESC')->first();
+    if(!empty($maxKD->id)){
+        $nexKD = Acak::AmbilId($maxKD['no_transaksi'],'PS-'.$forCode,9,3);  
+    }else{
+        $nexKD = 'PS-'.$forCode.'001';
+    }
+    return $nexKD;
+
+  // $preorder = Transaksi::where('jenis',2)
+  //                       ->where('for_ps','1')
+  //                       ->orderBy('id', 'DESC');
+
+  // if ($preorder->count() > 0) {
+  //   $preorder = $preorder->first();
+  //   $explode = explode('-', $preorder->no_transaksi);
+  //   $count = $explode[1] + 1;
+  //   return 'PS-' . $count;
+  // }
+  // return 'PS-1';
 }
 
 
 public function checkLastInvoicePesanan()
 {
-  $preorder = Transaksi::where('jenis',2)->orderBy('id', 'DESC');
-  if ($preorder->count() > 0) {
-    $preorder = $preorder->first();
-    $explode = explode('-', $preorder->no_transaksi);
-    $count = $explode[1] + 1;
-    $result =  'PS-' . $count;
-    return response()->json(array(
-      'current_invoice' => $result), 200);        
-  }
-  $result = 'PS-1';
+  $res = $this->generateInvoice();
   return response()->json(array(
-    'current_invoice' => $result), 200);
+      'current_invoice' => $res), 200);  
+
+  // return response()->json(['current_invoice' => $res],200);
+  // $preorder = Transaksi::where('jenis',2)->orderBy('id', 'DESC');
+  // if ($preorder->count() > 0) {
+  //   $preorder = $preorder->first();
+  //   $explode = explode('-', $preorder->no_transaksi);
+  //   $count = $explode[1] + 1;
+  //   $result =  'PS-' . $count;
+  //   return response()->json(array(
+  //     'current_invoice' => $result), 200);        
+  // }
+  // $result = 'PS-1';
+  // return response()->json(array(
+  //   'current_invoice' => $result), 200);
 
 }
 
