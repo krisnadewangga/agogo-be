@@ -199,7 +199,7 @@ public function postOrder(Request $request)
   }else{
      return response()->json([
      'status' => 'failed',
-     'message' => $no_transaksi,
+     'message' => 'terjadi kesalahan, silahkan refresh dan input transaksi lagi',
     ], 500);
   }
 
@@ -208,7 +208,7 @@ public function postOrder(Request $request)
     return response()->json([
      'status' => 'failed',
      'message' => 'error',
-    ], 500);
+    ], 200);
   }
 
   
