@@ -347,7 +347,7 @@ class TransaksiController extends Controller
 
 				        //setNotifExpired
 						$dataNE = ['transaksi_id' => $ins_transaksi->id, 
-								   'email' => $sel_user->email,
+								   'email' => $sel_user->no_hp,
 								   'waktu_kirim' => $kirim_notif ,
 								   'item' => $itemForEmail,
 								   'status' => '0'];
@@ -406,7 +406,7 @@ class TransaksiController extends Controller
 						//setNotifExpired
 						$kirim_notif = date('Y-m-d H:i:s',strtotime($ins_transaksi['waktu_kirim']) - 1200);
 						$dataNE = ['transaksi_id' => $ins_transaksi->id, 
-								   'email' => $sel_user->email,
+								   'email' => $sel_user->no_hp,
 								   'waktu_kirim' => $kirim_notif ,
 								   'item' => $itemForEmail,
 								   'status' => '0'];
