@@ -64,18 +64,22 @@ class autoBatal extends Command
             foreach ($transaksi as $key ) {
                 $update = Transaksi::where('id',$key->id)->update(['status' => '3']);
                 $batal_pesanan = BatalPesanan::create(['transaksi_id' => $key->id, 'input_by' => 'Automatic System' ]);
+                $userWa = User::findOrFail($key->user_id);
+               
                 $this->setKunciTransaksi($key->user_id);
+                $pesanWa = "Pesanan Dengan Nomor Transaksi ".$key->no_transaksi." Telah Dibatalkan";
 
                 $dnotif = [
                     'pengirim_id' => 1,
                     'penerima_id' => $key->user_id,
                     'judul_id' => $key->id,
                     'judul' => 'Pembatalan Pesanan Nomor Transaksi '.$key->no_transaksi,
-                    'isi' => 'Pesanan Dengan Nomor Transaksi '.$key->no_transaksi.' Telah Dibatalkan',
+                    'isi' => $pesanWa,
                     'jenis_notif' => 6,
                     'dibaca' => '0'
                 ];
                 
+                SendNotif::sendNotifWa($userWa->no_hp,$pesanWa);        
                 $notif = Notifikasi::create($dnotif);
                 //NotifGCM
                 SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'transaksi', $notif->judul_id);
