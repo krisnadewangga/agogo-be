@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use App\Http\Resources\UserCollection;
 use App\User;
+use Carbon\Carbon;
 
 /*
 |--------------------------------------------------------------------------
@@ -160,7 +161,7 @@ Route::get('/clear-cache', function() {
 
 Route::get('/time', function() {
 
-    return time()+(6*60*60);
+    return  Carbon::now()->format('d/m/Y H:i ');
 });
 
 
