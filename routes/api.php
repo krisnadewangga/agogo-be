@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\UserCollection;
 use App\User;
 use Carbon\Carbon;
+use App\NotifExpired;
 
 /*
 |--------------------------------------------------------------------------
@@ -158,11 +159,6 @@ Route::get('/clear-cache', function() {
     return "Cache is cleared";
 });
 
-
-Route::get('/time', function() {
-
-    return  Carbon::now()->format('d/m/Y H:i ');
-});
 
 
 
