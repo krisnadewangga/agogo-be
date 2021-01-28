@@ -347,7 +347,7 @@ class TransaksiController extends Controller
 
 				        //setNotifExpired
 						$dataNE = ['transaksi_id' => $ins_transaksi->id, 
-								   'email' => $sel_user->email,
+								   'email' => $sel_user->no_hp,
 								   'waktu_kirim' => $kirim_notif ,
 								   'item' => $itemForEmail,
 								   'status' => '0'];
@@ -406,7 +406,7 @@ class TransaksiController extends Controller
 						//setNotifExpired
 						$kirim_notif = date('Y-m-d H:i:s',strtotime($ins_transaksi['waktu_kirim']) - 1200);
 						$dataNE = ['transaksi_id' => $ins_transaksi->id, 
-								   'email' => $sel_user->email,
+								   'email' => $sel_user->no_hp,
 								   'waktu_kirim' => $kirim_notif ,
 								   'item' => $itemForEmail,
 								   'status' => '0'];
@@ -568,15 +568,15 @@ class TransaksiController extends Controller
         	 
         	 $list_transaksi = Transaksi::where('user_id','=',$req['user_id'])
         	 							  ->selectRaw("id,user_id,no_transaksi,banyak_item,total_bayar,metode_pembayaran,status,created_at,updated_at")
-        	 							  ->where('status','!=','3')
-        	 							  ->where('waktu_kirim','>', Carbon::now()->format('Y-m-d H:i:s'))
+        	 							//   ->where('status','!=','3')
+        	 							//   ->where('waktu_kirim','>', Carbon::now()->format('Y-m-d H:i:s'))
         	  							  ->orderBy('transaksi.id','DESC')
 										  ->limit($dataPerpage)
 										  ->offset($offset)->get();
 
 	         $jumdat = Transaksi::where('user_id','=',$req['user_id'])
-	         					 ->where('status','!=','3')
-        	 					 ->where('waktu_kirim','>', Carbon::now()->format('Y-m-d H:i:s'))
+	         					//  ->where('status','!=','3')
+        	 					//  ->where('waktu_kirim','>', Carbon::now()->format('Y-m-d H:i:s'))
 	         					 ->count();
 
 	         $jumHal = ceil($jumdat / $dataPerpage);
@@ -616,16 +616,18 @@ class TransaksiController extends Controller
              $dataPerpage = $req['dataPerpage'];
              $offset = ($page - 1) * $dataPerpage;
 
-             $transaksi = Transaksi::where('status','!=', '3')
-             						// ->where('metode_pembayaran','1')
+             $transaksi = Transaksi::where('status','5')
+									->where('metode_pembayaran','1')
+									->orWhere('top_up','1')
              						->where('user_id',$req['user_id'])
              						->selectRaw("id,user_id,no_transaksi,banyak_item,total_bayar,metode_pembayaran,status,created_at as waktu,top_up")
          						    ->orderBy('transaksi.id','DESC')
 									->limit($dataPerpage)
 									->offset($offset)->get();
             
-            $jumdat =  Transaksi::where('status','!=', '3')
-             						// ->where('metode_pembayaran','1')
+            $jumdat =  Transaksi::where('status','5')
+									 ->where('metode_pembayaran','1')
+									 ->orWhere('top_up','1')
              						->where('user_id',$req['user_id'])
 	         					    ->count();
 

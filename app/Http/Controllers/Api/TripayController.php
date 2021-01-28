@@ -11,6 +11,7 @@ use App\User;
 use App\Notifikasi;
 use Carbon\Carbon;
 use App\Helpers\SendNotif;
+use App\NotifExpired;
 
 class TripayController extends Controller
 {
@@ -66,7 +67,7 @@ class TripayController extends Controller
 		    	$select = Transaksi::where('no_transaksi',$data->merchant_ref)->first();
 		    	$find = Transaksi::findOrfail($select->id);
 		    	$find->update(['status' => '1', 'tgl_bayar' => Carbon::now()->format('Y-m-d H:i:s') ]);
-		    	
+				NotifExpired::where('transaksi_id',$select->id)->update(['status' => '1']);
 		    	$create_log = LogKonfirBayar::create(['transaksi_id' => $find->id,'input_by' => 'Tripay' ]);
 
 		    	 SendNotif::SendNotPesan('5',['jenisNotif' => '4']);
