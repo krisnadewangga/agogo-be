@@ -10,6 +10,7 @@ use App\User;
 use App\Notifikasi;
 use Carbon\Carbon;
 use App\Helpers\SendNotif;
+use App\NotifExpired;
 use DB;
 use Auth;
 
@@ -576,6 +577,8 @@ class TransaksiController extends Controller
         $find->update(['status' => '1', 'tgl_bayar' => Carbon::now() ]);
         $find->LogKonfirBayar()->create(['input_by' => Auth::User()->name ]);
 
+        NotifExpired::where('transaksi_id',$find->id)->update(['status' => '1']);
+
         SendNotif::SendNotPesan('5',['jenisNotif' => '4']);
         $dnotif =
         [
@@ -587,6 +590,10 @@ class TransaksiController extends Controller
             'jenis_notif' => 7,
             'dibaca' => '0'
         ];
+
+
+
+
     
         $notif = Notifikasi::create($dnotif);
         $userWa = User::findOrfail($find->user_id);
