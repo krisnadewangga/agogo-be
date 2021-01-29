@@ -37,6 +37,17 @@ class TripayController extends Controller
 						->get();
     	return response()->json($response);
 
+	}
+	
+	public function kalkulator(Request $Request)
+    {
+		$req = $Request->all();
+    	$response = Curl::to('https://payment.tripay.co.id/api/merchant/fee-calculator')
+						->withHeader('Authorization: '.$this->api_key)
+						->withData( array( 'amount' => $req['amount'], 'code' => $req['code']) )
+                        ->asJson()
+						->get();
+    	return response()->json(["fee" => $response->data[0]->total_fee->customer]);
     }
 
     public function Callback(Request $Request)
