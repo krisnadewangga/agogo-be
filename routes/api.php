@@ -151,6 +151,8 @@ Route::get('list_job','Api\KurirController@ListJob');
 Route::post('selesaikan_job','Api\KurirController@SelesaikanJob');
 
 Route::get('payment_channel','Api\TripayController@paymentChannel');
+
+Route::get('kalkulator','Api\TripayController@kalkulator');
 Route::post('payment','Api\TripayController@Transaksi');
 Route::post('callback_tripay', 'Api\TripayController@Callback');
 
