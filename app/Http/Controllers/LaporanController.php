@@ -1719,26 +1719,34 @@ class LaporanController extends Controller
                                      'tanggal' => $req['tanggal']
                                     ]);
           }
+        
+        
           
           $findProduksi = Produksi::where('item_id',$key->id)
                                     ->whereDate('created_at',$req['tanggal'])
                                     ->orderBy('id','DESC')->first();
 
-          $stokAwalProduksi = $findProduksi->stock_awal;
-          $stokAkhirProduksi = $findProduksi->sisa_stock;
+                                      try {
+                                        $stokAwalProduksi = $findProduksi->stock_awal;
+                                        $stokAkhirProduksi = $findProduksi->sisa_stock;
+                              
+                                        if($req['total_stock_toko_'.$key->id] > $stokAwalProduksi){
+                                          $selisih = $req['total_stock_toko_'.$key->id] - $stokAwalProduksi;
+                                          $fix_sisa_stok = $stokAkhirProduksi + $selisih;
+                                        }else{
+                                          $selisih = $stokAwalProduksi - $req['total_stock_toko_'.$key->id];
+                                          $fix_sisa_stok =  $stokAkhirProduksi - $selisih;
+                                        }
+                              
+                                        $updateProduksi = Produksi::where('id',$findProduksi->id)->update(['stock_awal' => $req['total_stock_toko_'.$key->id],
+                                                                                                           'sisa_stock' => $fix_sisa_stok
+                                                                                                          ]);
+                                        $updateItemStock = Item::where('id',$key->id)->update(['stock' => $fix_sisa_stok ]);//code...
+                                      } catch (\Throwable $th) {
+                                        //throw $th;
+                                      }                          
 
-          if($req['total_stock_toko_'.$key->id] > $stokAwalProduksi){
-            $selisih = $req['total_stock_toko_'.$key->id] - $stokAwalProduksi;
-            $fix_sisa_stok = $stokAkhirProduksi + $selisih;
-          }else{
-            $selisih = $stokAwalProduksi - $req['total_stock_toko_'.$key->id];
-            $fix_sisa_stok =  $stokAkhirProduksi - $selisih;
-          }
-
-          $updateProduksi = Produksi::where('id',$findProduksi->id)->update(['stock_awal' => $req['total_stock_toko_'.$key->id],
-                                                                             'sisa_stock' => $fix_sisa_stok
-                                                                            ]);
-          $updateItemStock = Item::where('id',$key->id)->update(['stock' => $fix_sisa_stok ]);
+      
         }
         
       }
