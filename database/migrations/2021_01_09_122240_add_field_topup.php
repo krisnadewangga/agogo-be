@@ -26,7 +26,7 @@ class AddFieldTopup extends Migration
     public function down()
     {
         Schema::table('transaksi', function (Blueprint $table) {
-            $table->dropColumn('top_up');
+            $table->integer('top_up')->default(0);
         });
     }
 }
