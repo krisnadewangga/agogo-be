@@ -73,7 +73,7 @@ class UserController extends Controller
 
             $hp = $register->no_hp;
 
-            $pesan ="Selamat " .$register->name. " pendaftaran anda berhasil Silahkan klik link dibawah ini untuk aktifasi akun anda \n http://".$_SERVER['HTTP_HOST']."/atur/aktifasi/".$no_aktifasi;
+            $pesan ="Selamat " .$register->name. " pendaftaran anda berhasil Silahkan klik link dibawah ini untuk aktifasi akun anda \n http://".$_SERVER['HTTP_HOST']."/agogo/aktifasi/".$no_aktifasi;
 
             
 
