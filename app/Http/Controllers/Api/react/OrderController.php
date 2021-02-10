@@ -13,6 +13,7 @@ use App\Notifikasi;
 use App\Helpers\SendNotif;
 use App\Helpers\Acak;
 use App\Role;
+use App\Aproval;
 use Illuminate\Support\Facades\Auth;
 use DB;
 use App\Refund;
@@ -535,7 +536,8 @@ public function keepOrder(Request $request)
           'message' => 'Invalid Username / PIN'
         ], 400);
        $user = $request->user();
-       $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+       // $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+       $role = Aproval::where('user_id',$user->id)->where('rule','1')->count();
 
 
        if($role > 0){

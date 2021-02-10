@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="{{ asset('assets/bower_components/font-awesome/css/font-awesome.min.css') }}">
      <!-- bootstrap datepicker -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }} ">
-
+    
     <!-- Ionicons -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/Ionicons/css/ionicons.min.css') }}">
     <!-- DataTables -->
@@ -30,7 +30,7 @@
          folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="{{ asset('assets/dist/css/skins/_all-skins.min.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('assets/dist/css/style_message.css') }}"
+    <link rel="stylesheet" href="{{ asset('assets/dist/css/style_message.css') }}" >
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -50,37 +50,37 @@
         padding:20px;
       }
 
-       .fileUpload {
+      .fileUpload {
               position: relative;
               overflow: hidden;
               margin: 10px;
-          }
+      }
           
-          .fileUpload input.upload {
-              position: absolute;
-              top: 0;
-              right: 0;
-              margin: 0;
-              padding: 0;
-              font-size: 20px;
-              cursor: pointer;
-              opacity: 0;
-              filter: alpha(opacity=0);
-          }
+      .fileUpload input.upload {
+          position: absolute;
+          top: 0;
+          right: 0;
+          margin: 0;
+          padding: 0;
+          font-size: 20px;
+          cursor: pointer;
+          opacity: 0;
+          filter: alpha(opacity=0);
+      }
           
-          .table-galeri td{
-            height: 35px;
-            padding:5px;
-          }
+      .table-galeri td{
+        height: 35px;
+        padding:5px;
+      }
 
-          .list-gambar td{
-            
-              padding:5px;
-           
-              border : 1px solid #CCC;
-          }
+      .list-gambar td{
+        
+          padding:5px;
+       
+          border : 1px solid #CCC;
+      }
 
-           .nowrap { white-space: nowrap } 
+      .nowrap { white-space: nowrap } 
     
     </style>
 
