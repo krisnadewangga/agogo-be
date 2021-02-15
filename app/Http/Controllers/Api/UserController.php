@@ -28,7 +28,7 @@ class UserController extends Controller
                  ];
 
   		$rules = ['name' => 'required',
-  		            'no_hp' => 'required|unique:users',
+  		            'no_hp' => 'required|numeric|unique:users',
   		            'email' => 'required|unique:users',
   		            'password' => 'required',
   		         ];
@@ -73,8 +73,9 @@ class UserController extends Controller
 
             $hp = $register->no_hp;
 
-            $pesan ="Selamat " .$register->name. " pendaftaran anda berhasil Silahkan klik link dibawah ini untuk aktifasi akun anda \n http://".$_SERVER['HTTP_HOST']."/agogo/aktifasi/".$no_aktifasi;
+            $pesan ="Selamat " .$register->name. " pendaftaran anda hanya tinggal aktivasi akun melalui WA ini. \n Mohon daftarkan lebih dahulu nomor kontak kami ini ke dalam daftar kontak HP anda sebelum anda dapat klik link aktivasi akun anda dibawah ini : \n http://".$_SERVER['HTTP_HOST']."/agogo/aktifasi/".$no_aktifasi;
 
+              
             
 
 
