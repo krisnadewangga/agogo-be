@@ -31,6 +31,7 @@
                   <li id="sm_level"><a href="{{ route('level.index') }}"><i class="fa fa-circle-o"></i>Level</a></li>
                 @endif
                 <li id="sm_admin"><a href="{{ route('administrator.index') }}"><i class="fa fa-circle-o"></i>User</a></li>
+                <li id="sm_aproval"><a href="{{ route('aproval.index') }}"><i class="fa fa-circle-o"></i>Aproval</a></li>
                   
                  <li id="sm_kurir"><a href="{{ route('kurir.index') }}"><i class="fa fa-circle-o"></i>Kurir</a></li>
                 

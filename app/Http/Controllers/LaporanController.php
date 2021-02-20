@@ -15,6 +15,7 @@ use App\Opname;
 use Carbon\Carbon;
 use App\Kategori;
 use App\Role;
+use App\Aproval;
 use PDF;
 use Auth;
 use DB;
@@ -1696,7 +1697,8 @@ class LaporanController extends Controller
       return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username Atau Password Salah')->withInput();        
 
       $user = $request->user();
-      $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+      // $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+      $role = Aproval::where('user_id',$user->id)->where('rule','4')->count();
    
       if($role == 0)
       return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','User Tidak Punya Akses')->withInput();        

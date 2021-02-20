@@ -36,6 +36,7 @@ Route::POST('/submit_ganti_fp','ProfilController@gantiFotoProfil')->name('submit
 Route::get('/aktifasi/{id}','AktifasiAkunController@Aktifasi')->name('aktifasi');
 Route::resource('level','LevelController');
 Route::resource('administrator','AdministratorController');
+Route::resource('aproval','AprovalController');
 Route::resource('kategori','KategoriController');
 Route::resource('item','ItemController');
 Route::resource('/versi','VersiController');
