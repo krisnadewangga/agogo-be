@@ -44,8 +44,9 @@ class TransaksiController extends Controller
 											Rule::in(['1', '2', '3'])],
 					'banyak_item' => 'required',
 					'waktu_kirim' => 'required',
-					'confirm_stock' => 'required',
-					'confirm_operasional' => 'required',
+					// 'confirm_stock' => 'required',
+					// 'confirm_operasional' => 'required',
+					'confirm_error' => 'required'
 		         ];
 	
 		$sel_user = User::findOrFail($req['user_id']);
@@ -56,6 +57,8 @@ class TransaksiController extends Controller
     	// }
 		
 		// if($sel_user->DetailKonsumen->kunci_transaksi == 0){
+	
+
 		if($transaksi_berlangsung < '3'){
 
 			$itemTransaksi = [];
@@ -144,6 +147,7 @@ class TransaksiController extends Controller
 			}else{
 				$confirm_error = 1;
 				$msg = "";
+				$data = "";
 			}
 
 		
@@ -153,7 +157,7 @@ class TransaksiController extends Controller
 		        $success = 0;
 		        $msg = $validator->messages()->all();
 		        $response = $msg;
-
+		        $data = "";
 		    }else{
 				$req_transaksi = $request->only('user_id',
 												'total_transaksi',
@@ -249,9 +253,10 @@ class TransaksiController extends Controller
 						$timesTampBB = Carbon::parse($batas_bayar)->timestamp; 
 
 						$kirim_notif = $waktu_skrang1->addMinutes(330)->format('Y-m-d H:i:s');
-						$req_transaksi['waktu_kirim_tf'] = $req['waktu_kirim'];
+						$req_transaksi['waktu_kirim_tf'] = $batas_bayar;
+						$req_transaksi['waktu_kirim'] = $req['waktu_kirim'];
 
-						$req_transaksi['waktu_kirim'] = $batas_bayar;
+						
 
 						// return $req_transaksi;	
 						$req_transaksi['status'] = '6';
@@ -312,13 +317,14 @@ class TransaksiController extends Controller
 					             'signature' => $signature,
 								];
 						
-
+						
 								// real production
 								$sendData = Curl::to('https://payment.tripay.co.id/api/transaction/create')
 								->withData( $data )
 								->withHeader('Authorization: Bearer 4synTlbXG2qsABvPRz7aT16aeq88fP4fhJKz3a1D')
 								->asJson()
 								->post();
+							
 
 					     #mode development		
 				       	// $sendData = Curl::to('https://payment.tripay.co.id/api-sandbox/transaction/create')
@@ -331,7 +337,7 @@ class TransaksiController extends Controller
 
 
 					 $ff = $sendData->data;
-				    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + (int) $req['fee'] ,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim->format('d/m/Y H:i A');
+				    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + (int) $req['fee'] ,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim_tf->format('d/m/Y H:i A');
 				    $pesanAndro = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + (int) $req['fee'] ,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini <a href='".$ff->checkout_url."'>".$ff->checkout_url."</a> Batas Waktu Pembayaran".$ins_transaksi->waktu_kirim->format('d/m/Y H:i A');
 
 
@@ -501,6 +507,7 @@ class TransaksiController extends Controller
 			$msg = 'Maaf! Maksimal Pesanan Sebanyak 3, Silahkan Selesaikan Terlebih Dahulu Pesanan Yang Sedang Berlangsung';
 			$data = '';
 		}
+
 
 	    return response()->json(['success' => $success,'msg' => $msg, 'data' => $data],200);
 
