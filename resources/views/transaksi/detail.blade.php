@@ -177,9 +177,9 @@
 													<td>{{ $transaksi->User->no_hp }}</td>
 													<td>
 														@if($transaksi->metode_pembayaran == '2')
-															{{ $transaksi->waktu_kirim_tf->format('d M Y H:i A') }}
+															{{ $transaksi->waktu_kirim->format('d M Y h:i A') }}
 														@else
-															{{ $transaksi->waktu_kirim->format('d M Y H:i A') }}
+															{{ $transaksi->waktu_kirim->format('d M Y h:i A') }}
 														@endif
 													</td>
 													<td align="center">
@@ -379,14 +379,14 @@
 									@endphp
 
 									@if( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '6') )
-										<label class="label label-danger">Pembayaran Expired</label>&nbsp;<label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim->format('d/m/Y h:i A') }} </label>
+										<label class="label label-danger">Pembayaran Expired</label>&nbsp;<label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim_tf->format('d/m/Y h:i A') }} </label>
 									@elseif( ($waktu_skrang > $batas_ambe) && ($transaksi->status == '3') )
 										<label class="label label-danger">Pesanan Dibatalkan</label>
 									@elseif( ($waktu_skrang < $batas_ambe) && ($transaksi->status == '3') )
 										<label class="label label-danger">Pesanan Dibatalkan</label>
 									@else
 										@if($transaksi->status == '6' )
-											&nbsp  <label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim->format('d/m/Y h:i A') }} </label>
+											&nbsp  <label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim_tf->format('d/m/Y h:i A') }} </label>
 										@elseif($transaksi->status == '4')
 											&nbsp <label class="label label-default">BATAS TRANSFER : {{ $transaksi->waktu_kirim->format('d/m/Y h:i A') }} </label>
 										@else
