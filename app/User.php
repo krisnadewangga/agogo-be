@@ -135,5 +135,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Otp::class);
     }
+
+    public function Aproval()
+    {
+        return $this->hasMany(Aproval::class);
+    }
     
 }

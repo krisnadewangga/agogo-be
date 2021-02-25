@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 Use App\Kas;
 use App\Role;
+use App\Aproval;
 use DB;
 use Illuminate\Support\Facades\Auth;
 use App\Transaksi;
@@ -16,8 +17,6 @@ class KasController extends Controller
     //
 
 	public function cekKas($id){
-
-
    		$kas = Kas::where('user_id',$id)->where('status','0')->orderBy('id','DESC')->first();
 
 		if($kas){
@@ -57,9 +56,9 @@ class KasController extends Controller
 				'message' => 'Invalid Username / PIN'
 			], 400);
 		$user = $request->user();
-		$role = Role::where('user_id',$user->id)
-                    ->whereIn('level_id',['1','2','7'])->count();
-
+		// $role = Role::where('user_id',$user->id)
+  //                   ->whereIn('level_id',['1','2','7'])->count();
+        $role = Aproval::where('user_id',$user->id)->where('rule','1')->count();
         
 
 		if($role > 0){
@@ -196,7 +195,8 @@ class KasController extends Controller
 				'message' => 'Invalid Username / PIN'
 			], 200);
 		$user = $request->user();
-		$role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+		// $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+        $role = Aproval::where('user_id',$user->id)->where('rule','1')->count();
 
 		if($role > 0){
             return response()->json([
@@ -221,7 +221,8 @@ class KasController extends Controller
 				'message' => 'Invalid Username / PIN'
 			], 200);
 		$user = $request->user();
-		$role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+		// $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+        $role = Aproval::where('user_id',$user->id)->where('rule','1')->count();
 
 		if($role > 0){
         
