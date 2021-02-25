@@ -268,7 +268,7 @@ class TransaksiController extends Controller
           $transaksi['nama'] = $transaksi->User->name;
           $transaksi['jum_pesanan'] = $transaksi->ItemTransaksi()->count();
           $transaksi['total_bayar'] = number_format($transaksi->total_bayar,'0','','.');
-          $transaksi['waktu_tampil'] = $transaksi->updated_at->format("d M Y h:i A");
+          $transaksi['waktu_tampil'] = $transaksi->created_at->format("d M Y h:i A");
           if($transaksi['metode_pembayaran'] == "1"){
               $tampil_jt = "<span class='label label-warning '>TopUp</span>";
               $marker_jt = "TopUp";
@@ -276,7 +276,7 @@ class TransaksiController extends Controller
           }else if($transaksi['metode_pembayaran'] == "2"){
               $tampil_jt = "<span class='label label-info'>Bank Transfer</span>";
               $marker_jt = "Bank Transfer";
-              $waktu_kirim = $transaksi->waktu_kirim_tf->format("d M Y h:i A");
+              $waktu_kirim = $transaksi->waktu_kirim->format("d M Y h:i A");
           }else if($transaksi['metode_pembayaran'] == "3"){
               $tampil_jt = "<span class='label label-success'>Bayar Di Toko</span>";
               $marker_jt = "Bayar Di Toko";
