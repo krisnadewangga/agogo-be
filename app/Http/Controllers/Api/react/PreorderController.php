@@ -11,6 +11,7 @@ use App\Preorders;
 use App\DetailPreorder;
 use App\ItemTransaksi;
 use App\Role;
+use App\Aproval;
 use App\Item;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -123,7 +124,8 @@ public function store(Request $request)
         'message' => 'Invalid Username / PIN'
       ], 400);
     $user = $request->user();
-    $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+    // $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+    $role = Aproval::where('user_id',$user->id)->where('rule','2')->count();
 
     if($role > 0){
       // if(!empty($request[0]['invoice']) ){            
@@ -301,7 +303,8 @@ public function editPreorder(Request $request)
       'message' => 'Invalid Username / PIN'
     ], 400);
   $user = $request->user();
-  $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+  // $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+  $role = Aproval::where('user_id',$user->id)->where('rule','2')->count();
 
   if($role > 0){
 
@@ -444,7 +447,8 @@ public function bayarPreorder(Request $request)
     'message' => 'Invalid Username / PIN'
   ], 400);
  $user = $request->user();
- $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+ // $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+ $role = Aproval::where('user_id',$user->id)->where('rule','2')->count();
 
  if($role > 0){
    $kasir = User::findOrFail($request[0]['user_id']);
@@ -517,7 +521,8 @@ public function cancelPreorder(Request $request,$id)
     'message' => 'Invalid Username / PIN'
   ], 400);
  $user = $request->user();
- $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+ // $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+ $role = Aproval::where('user_id',$user->id)->where('rule','2')->count();
 
  if($role > 0){
 

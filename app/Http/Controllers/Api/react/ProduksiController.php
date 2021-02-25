@@ -8,6 +8,7 @@ use DB;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Role;
+use App\Aproval;
 use App\Produksi;
 class ProduksiController extends Controller
 {
@@ -267,9 +268,10 @@ public function postProduction(Request $request)
           'message' => 'Invalid Username / PIN'
       ], 400);
     $user = $request->user();
-    $role = Role::where('user_id',$user->id)
-                 ->whereIn('level_id',['1','2','7'])
-                 ->count();
+    // $role = Role::where('user_id',$user->id)
+    //              ->whereIn('level_id',['1','2','7'])
+    //              ->count();
+    $role = Aproval::where('user_id',$user->id)->where('rule','3')->count();
 
     if($role > 0){
 
