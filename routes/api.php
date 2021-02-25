@@ -5,6 +5,7 @@ use App\Http\Resources\UserCollection;
 use App\User;
 use Carbon\Carbon;
 use App\NotifExpired;
+use App\Helpers\SendNotif;
 
 /*
 |--------------------------------------------------------------------------
@@ -160,6 +161,12 @@ Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
     return "Cache is cleared";
 });
+
+
+Route::get('/kirimm',function(){
+    SendNotif::sendNotifWa('082343965747',"cantik");
+});
+
 
 
 
