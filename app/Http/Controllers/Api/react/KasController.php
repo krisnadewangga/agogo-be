@@ -149,7 +149,7 @@ class KasController extends Controller
 
        
 
-             //total pelunasan pesanan
+       //total pelunasan pesanan
         $sumPreordersPelunasan = DB::table('transaksi')->join('preorders','preorders.transaksi_id','=','transaksi.id')
                                 ->where('transaksi.tgl_bayar','>',$waktu)
                                 ->where('preorders.pencatat_pengambilan',$id)
