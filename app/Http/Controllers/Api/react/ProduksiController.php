@@ -180,20 +180,22 @@ public function getTrxByProduct($id) {
         $end_date = Carbon::parse($curent_date)->format('Y-m-d') . ' 23:59:59';
 
 
-
+        
         $order = DB::table('item_transaksi')
         ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
         ->where('item_transaksi.item_id', $id)
-        ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
+        ->whereBetween('transaksi.tgl_bayar', [$start_date, $end_date])
         ->where('transaksi.status','5')
         ->where('transaksi.jenis','1')
             // ->get();
         ->sum('jumlah');
 
+
+
         $orderDalamPengantaran = DB::table('item_transaksi')
         ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
         ->where('item_transaksi.item_id', $id)
-        ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
+        ->whereBetween('transaksi.tgl_bayar', [$start_date, $end_date])
         ->where('transaksi.status','2')
         ->where('transaksi.jenis','1')
             // ->get();
@@ -202,19 +204,21 @@ public function getTrxByProduct($id) {
         $preorder = DB::table('item_transaksi')
         ->join('transaksi','item_transaksi.transaksi_id', '=', 'transaksi.id')
         ->where('item_id', $id)
-        ->whereBetween('item_transaksi.created_at', [$start_date, $end_date])
+        ->whereBetween('transaksi.tgl_bayar', [$start_date, $end_date])
         ->where('transaksi.status','5')
         ->where('transaksi.jenis','2')            
             // ->where('status','PAID')
         ->sum('jumlah');
 
-            //Abil stok awal dari table prosuksi jika data produksi sudah ada
+      //Ambil stok awal dari table prosuksi jika data produksi sudah ada
         $getStock = DB::table('produksi')
         ->select('stock_awal')            
         ->where('item_id', $id) 
         ->whereBetween('created_at', [$start_date, $end_date])
         ->orderBy('created_at', 'ASC')
         ->first();
+
+        
         $stock_awal = $getStock->stock_awal;
 
             // dd($curent_date);
