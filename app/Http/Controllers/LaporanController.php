@@ -1406,7 +1406,7 @@ class LaporanController extends Controller
                                         return $q->from('transaksi')
                                                   ->select('id')
                                                   ->where('status','5')
-                                                  ->whereDate('created_at',$data[0]);
+                                                  ->whereDate('tgl_bayar',$data[0]);
                                       })->groupBy('item_transaksi.item_id')
                                       ->orderBy($sort[$data[2]], $opsi[$data[3]])
                                       ->get();
@@ -1420,8 +1420,8 @@ class LaporanController extends Controller
                                         return $q->from('transaksi')
                                                   ->select('id')
                                                   ->where('status','5')
-                                                  ->where('created_at','>=', $data[0]." 00:00:00")
-                                                  ->where('created_at','<=', $data[1]." 23:59:59");
+                                                  ->where('tgl_bayar','>=', $data[0]." 00:00:00")
+                                                  ->where('tgl_bayar','<=', $data[1]." 23:59:59");
                                       })->groupBy('item_transaksi.item_id')
                                       ->orderBy($sort[$data[2]], $opsi[$data[3]])
                                       ->get();
