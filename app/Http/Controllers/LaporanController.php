@@ -985,23 +985,23 @@ class LaporanController extends Controller
                             return $q->where('transaksi.jenis','2')
                                      ->whereIn('transaksi.status',['1','5'])
                                      ->where('for_ps','1')
-                                     ->whereDate('transaksi.created_at',$data1[0]);
+                                     ->whereDate('transaksi.updated_at',$data1[0]);
                           })
                           ->orWhere(function($b) use($data1){
                             return $b->where('transaksi.jenis','1')
                                      ->whereIn('transaksi.metode_pembayaran',['1','2'])
                                      ->whereIn('transaksi.status',['1','2','5'])
                                      ->where('for_ps','1')
-                                     ->whereDate('transaksi.created_at',$data1[0]);
+                                     ->whereDate('transaksi.updated_at',$data1[0]);
                           })
                           ->orWhere(function($c) use($data1){
                             return $c->where('transaksi.jenis','1')
                                      ->where('transaksi.metode_pembayaran','3')
                                      ->whereIn('transaksi.status',['1','5'])
                                      ->where('for_ps','1')
-                                     ->whereDate('transaksi.created_at',$data1[0]);
+                                     ->whereDate('transaksi.updated_at',$data1[0]);
                           });
-           $data_cancel = Transaksi::where('status','3') ->whereDate('transaksi.created_at',$data1[0])->get();
+           $data_cancel = Transaksi::where('status','3') ->whereDate('transaksi.updated_at',$data1[0])->get();
                           
                  
       }else{
@@ -1011,8 +1011,8 @@ class LaporanController extends Controller
                             return $q->where('transaksi.jenis','2')
                                      ->whereIn('transaksi.status',['1','5'])
                                      ->where('for_ps','1')
-                                     ->where('transaksi.created_at','>=', $data1[0]." 00:00:00")
-                                     ->where('transaksi.created_at','<=', $data1[1]." 23:59:59");
+                                     ->where('transaksi.updated_at','>=', $data1[0]." 00:00:00")
+                                     ->where('transaksi.updated_at','<=', $data1[1]." 23:59:59");
                                      // ->whereBetween('transaksi.created_at',$data1);
                           })
                           ->orWhere(function($b) use($data1){
@@ -1021,8 +1021,8 @@ class LaporanController extends Controller
                                      ->whereIn('transaksi.status',['1','2','5'])
                                      ->where('for_ps','1')
                                      // ->whereBetween('transaksi.created_at',$data1);
-                                     ->where('transaksi.created_at','>=',$data1[0]." 00:00:00")
-                                     ->where('transaksi.created_at','<=',$data1[1]." 23:59:59");
+                                     ->where('transaksi.updated_at','>=',$data1[0]." 00:00:00")
+                                     ->where('transaksi.updated_at','<=',$data1[1]." 23:59:59");
                           })
                           ->orWhere(function($c) use($data1){
                             return $c->where('transaksi.jenis','1')
@@ -1030,8 +1030,8 @@ class LaporanController extends Controller
                                      ->whereIn('transaksi.status',['1','5'])
                                      ->where('for_ps','1')
                                      // ->whereBetween('transaksi.created_at',$data1);
-                                     ->where('transaksi.created_at','>=',$data1[0]." 00:00:00")
-                                     ->where('transaksi.created_at','<=',$data1[1]." 23:59:59");
+                                     ->where('transaksi.updated_at','>=',$data1[0]." 00:00:00")
+                                     ->where('transaksi.updated_at','<=',$data1[1]." 23:59:59");
                           });
            $data_cancel = Transaksi::where('status','3')->whereBetween('transaksi.created_at',$data1)->get();              
       }
@@ -1406,7 +1406,7 @@ class LaporanController extends Controller
                                         return $q->from('transaksi')
                                                   ->select('id')
                                                   ->where('status','5')
-                                                  ->whereDate('created_at',$data[0]);
+                                                  ->whereDate('updated_at',$data[0]);
                                       })->groupBy('item_transaksi.item_id')
                                       ->orderBy($sort[$data[2]], $opsi[$data[3]])
                                       ->get();
@@ -1420,8 +1420,8 @@ class LaporanController extends Controller
                                         return $q->from('transaksi')
                                                   ->select('id')
                                                   ->where('status','5')
-                                                  ->where('created_at','>=', $data[0]." 00:00:00")
-                                                  ->where('created_at','<=', $data[1]." 23:59:59");
+                                                  ->where('updated_at','>=', $data[0]." 00:00:00")
+                                                  ->where('updated_at','<=', $data[1]." 23:59:59");
                                       })->groupBy('item_transaksi.item_id')
                                       ->orderBy($sort[$data[2]], $opsi[$data[3]])
                                       ->get();

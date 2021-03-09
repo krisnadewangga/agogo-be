@@ -481,10 +481,7 @@ public function bayarPreorder(Request $request)
       DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $row['qty']);
       DB::table('produksi')->where('item_id', $row['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $row['qty']);  
     
-    
-
-
-
+  
     $db->update(['status' => '5','tgl_bayar' => date("Y-m-d H:i:s"),'kasir_id' => $request[0]['user_id']]);
 
   }
