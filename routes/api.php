@@ -6,6 +6,7 @@ use App\User;
 use Carbon\Carbon;
 use App\NotifExpired;
 use App\Helpers\SendNotif;
+use App\Produksi;
 
 /*
 |--------------------------------------------------------------------------
@@ -164,7 +165,17 @@ Route::get('/clear-cache', function() {
 
 
 Route::get('/kirimm',function(){
-    SendNotif::sendNotifWa('082343965747',"cantik");
+   // SendNotif::sendNotifWa('082343965747',"cantik");
+
+
+   
+   $cari = Produksi::where('item_id',35)->orderBy('id','DESC')->first();
+
+            if(Carbon::parse($cari->created_at)->format('Y-m-d H:i:s') < Carbon::now()->format('Y-m-d H:i:s')){
+
+               
+            return "1";
+            }
 });
 
 
