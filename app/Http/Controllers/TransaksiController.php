@@ -100,7 +100,7 @@ class TransaksiController extends Controller
     public function setFilter($jenis_transaksi,$status_transaksi)
     {
       if($jenis_transaksi == "0"){
-          $queryWhere = ['1','2','3'];
+          $queryWhere = ['1','2','3','4'];
       }else{
           $queryWhere = $jenis_transaksi;
       }
@@ -139,7 +139,7 @@ class TransaksiController extends Controller
       //                             ->orderBy('updated_at','desc')->get();
       }else if($jenis_transaksi == "0" && $status_transaksi == "1"){
           // menunggu pengiriman dan pengambilan
-          $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3'])
+          $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3','4'])
                                   ->where([
                                             ['status','=','1'],
                                             ['jenis','=','1'],
@@ -155,14 +155,16 @@ class TransaksiController extends Controller
                                         ->where('jalur','1')
                                        ->orderBy('updated_at','desc')->get();
       }else if($jenis_transaksi == "0" && ($status_transaksi == "5" || $status_transaksi == "3") ){
-              $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3'])
+              // status pesanan yang terima dan di batalkan
+              $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3','4'])
                                        ->where('status',$status_transaksi)
                                         ->where('jenis','1')
                                         ->where('jalur','1')
                                        ->orderBy('updated_at','desc')->get();
                                       
       }else if($jenis_transaksi == "0" && $status_transaksi == "4"){
-              $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3'])
+              // status pesanan yang pengajuan pembatalan
+              $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3','4'])
                                        ->where([ 
                                                 ['status','=',$status_transaksi],
                                                 ['jenis','=','1'],
@@ -170,7 +172,8 @@ class TransaksiController extends Controller
                                                ])
                                        ->orderBy('updated_at','desc')->get();
       }else if($jenis_transaksi == "0"  && $status_transaksi == "2" ){
-              $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3'])
+              // status pesanan yang dikirim
+              $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3','4'])
                                        ->where([ 
                                                 ['status','=',$status_transaksi],
                                                 ['jenis','=','1'],
@@ -179,6 +182,7 @@ class TransaksiController extends Controller
                                        ->orderBy('updated_at','desc')->get();
 
       }else if($jenis_transaksi == "0"  && $status_transaksi == "6" ){
+              // status menunggu transfer
               $transaksi = Transaksi::whereIn('metode_pembayaran',['1','2','3'])
                                        ->where([ 
                                                 ['status','=',$status_transaksi],
@@ -191,6 +195,7 @@ class TransaksiController extends Controller
       }else if($jenis_transaksi != "0" && $status_transaksi == "0"){
              
               if($jenis_transaksi != '1'){
+                // jenis transaksi != topup dan status != terima dan dibatalkan
                 $transaksi = Transaksi::whereNotIn('status',['5','3'])
                                     ->where('metode_pembayaran',$jenis_transaksi)
                                     ->where('jenis','1')
@@ -198,6 +203,7 @@ class TransaksiController extends Controller
                                     ->where('waktu_kirim','>', $waktu_sekarang)
                                     ->orderBy('updated_at','desc')->get();
               }else{
+                // transaksi selain status terima dan dibatalkan dan selai mp topup
                 $transaksi = Transaksi::whereNotIn('status',['5','3'])
                                     ->where('metode_pembayaran',$jenis_transaksi)
                                     ->where('jenis','1')
@@ -281,6 +287,10 @@ class TransaksiController extends Controller
               $tampil_jt = "<span class='label label-success'>Bayar Di Toko</span>";
               $marker_jt = "Bayar Di Toko";
               $waktu_kirim = $transaksi->waktu_kirim->format("d M Y h:i A");
+          }else if($transaksi['metode_pembayaran'] == "4"){
+              $tampil_jt = "<span class='label bg-purple text-white '>COD</span>";
+              $marker_jt = "COD";
+              $waktu_kirim = $transaksi->waktu_kirim->format("d M Y h:i A");
           }
 
           if( $transaksi['status'] == "1" || $transaksi['status'] == "6"){
@@ -293,7 +303,7 @@ class TransaksiController extends Controller
               }else if(($waktu_skrang > $batas_ambe ) && $transaksi['metode_pembayaran'] == "1"){
                 $status = '<label class="label label-danger">Lewat Batas Pengiriman</label>';
                 $marker_status = 'Lewat Batas Pengiriman';
-              }else if( ($waktu_skrang < $batas_ambe ) && $transaksi['metode_pembayaran'] == "3"){
+              }else if( ($waktu_skrang < $batas_ambe ) && ( $transaksi['metode_pembayaran'] == "3" || $transaksi['metode_pembayaran'] == "4" ) ){
                   $status = '<label class="label label-info">Dikemas</label>';
                   $marker_status = 'Dikemas';
               }else if(  ($waktu_skrang < $batas_ambe )  && $transaksi['metode_pembayaran'] == "2"){
@@ -420,7 +430,6 @@ class TransaksiController extends Controller
         
         $notif = Notifikasi::create($dnotif);
         SendNotif::SendNotPesan('5',['jenisNotif' => '2']);
-
 
         $userWa = User::findOrfail($transaksi->user_id);
         SendNotif::sendNotifWa($userWa->no_hp,$notif->isi);
