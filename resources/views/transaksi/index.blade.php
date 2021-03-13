@@ -23,6 +23,7 @@
 	    						<option value="1">Topup</option>
 	    						<option value="2">Bank Transfer</option>
 	    						<option value="3">Bayar Di Toko</option>
+	    						<option value="4">Bayar Di Toko</option>
 	    					</select>
 	    				</div>
 	    			</div>

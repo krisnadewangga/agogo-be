@@ -50,7 +50,7 @@ class Transaksi extends Model
       }else if($attr == "3"){
          $ket = "Toko";
       }else{
-        $ket = "";
+        $ket = "COD";
       }
 
       return $ket;
