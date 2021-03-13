@@ -651,7 +651,7 @@ class LaporanController extends Controller
     //Penjualan Data
     public function showDataPenjualan()
     {
-      // return "konek";
+      
 
       $kop = "Data Penjualan Sampai Hari Ini / ".Carbon::now()->format('d M Y');
       $input = ['mt' => "", 'st' => "" ];
@@ -901,7 +901,8 @@ class LaporanController extends Controller
       $dates = [ Carbon::now()->format('Y-m-d'), Carbon::now()->format('Y-m-d'),'1','1'];
 
       $result = $this->SetDataPemesanan($dates);
-     
+  
+
       $input = ['mulai_tanggal' => Carbon::now()->format('d/m/Y'), 
                 'sampai_tanggal' => Carbon::now()->format('d/m/Y'),
                 'sort_by' => '1',
@@ -977,6 +978,7 @@ class LaporanController extends Controller
                   '12' => 'sisa_bayar'
 
                  ];
+     
       if($data1[0] == $data1[1]){
           $select = Transaksi::leftJoin('preorders as a', 'transaksi.id','=','a.transaksi_id')
                           ->select('transaksi.*')
@@ -996,7 +998,7 @@ class LaporanController extends Controller
                           })
                           ->orWhere(function($c) use($data1){
                             return $c->where('transaksi.jenis','1')
-                                     ->where('transaksi.metode_pembayaran','3')
+                                     ->whereIn('transaksi.metode_pembayaran',['3','4'] )
                                      ->whereIn('transaksi.status',['1','5'])
                                      ->where('for_ps','1')
                                      ->whereDate('transaksi.updated_at',$data1[0]);
@@ -1026,7 +1028,7 @@ class LaporanController extends Controller
                           })
                           ->orWhere(function($c) use($data1){
                             return $c->where('transaksi.jenis','1')
-                                     ->where('transaksi.metode_pembayaran','3')
+                                     ->whereIn('transaksi.metode_pembayaran',['3','4'])
                                      ->whereIn('transaksi.status',['1','5'])
                                      ->where('for_ps','1')
                                      // ->whereBetween('transaksi.created_at',$data1);
@@ -1095,18 +1097,27 @@ class LaporanController extends Controller
               $data['pencatat_finish'] = '-';
             }
             
+          }elseif($data->metode_pembayaran == '4'){
+            $data['tampil_metode_pembayaran'] = 'COD';
+            // $data['pencatat'] = $data->KasirM->name;
+            $data['pencatat'] = '-';
+            if($data->status == '5'){
+              $data['pencatat_finish'] = '-';
+            }else{
+              $data['pencatat_finish'] = '-';
+            }
           }
 
         }
 
         if($data->status == "5"){
-          if($data->metode_pembayaran == "1" || $data->metode_pembayaran == "2"){
+          if($data->metode_pembayaran == "1" || $data->metode_pembayaran == "2" || $data->metode_pembayaran == "4"){
             $data['status_order'] = 'Sudah Diterima';
           }else{
             $data['status_order'] = 'Sudah Diambil';
           }
         }else{
-          if($data->metode_pembayaran == "1" || $data->metode_pembayaran == "2"){
+          if($data->metode_pembayaran == "1" || $data->metode_pembayaran == "2" || $data->metode_pembayaran == "4"){
             $data['status_order'] = 'Belum Diterima';
           }else{
             $data['status_order'] = 'Belum Diambil';
@@ -1524,6 +1535,7 @@ class LaporanController extends Controller
 
     public function LaporanPendapatanHarian()
     {
+   
       $dates = [Carbon::now()->startOfMonth()->format('Y-m-d'), 
                 Carbon::now()->endOfMonth()->format('Y-m-d'),
                 '1','1'];

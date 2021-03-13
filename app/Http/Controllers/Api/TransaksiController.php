@@ -41,7 +41,7 @@ class TransaksiController extends Controller
 					'long' => 'required',
 					'detail_alamat' => 'required',
 					'metode_pembayaran' => ['required', 
-											Rule::in(['1', '2', '3'])],
+											Rule::in(['1', '2', '3','4'])],
 					'banyak_item' => 'required',
 					'waktu_kirim' => 'required',
 					// 'confirm_stock' => 'required',
@@ -337,8 +337,8 @@ class TransaksiController extends Controller
 
 
 					 $ff = $sendData->data;
-				    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + (int) $req['fee'] ,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim_tf->format('d/m/Y H:i A');
-				    $pesanAndro = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + (int) $req['fee'] ,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini <a href='".$ff->checkout_url."'>".$ff->checkout_url."</a> Batas Waktu Pembayaran".$ins_transaksi->waktu_kirim->format('d/m/Y H:i A');
+				    	$pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + (int) $req['fee'] ,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim_tf->format('d/m/Y H:i A');
+				    	$pesanAndro = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + (int) $req['fee'] ,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini <a href='".$ff->checkout_url."'>".$ff->checkout_url."</a> Batas Waktu Pembayaran".$ins_transaksi->waktu_kirim->format('d/m/Y H:i A');
 
 
 					    // notif android
@@ -475,7 +475,39 @@ class TransaksiController extends Controller
 
 						$success = 1;
 						$msg = "Berhasil Simpan Transaksi";
-						$data = $sendData;
+						$data = "";
+					}else if($req['metode_pembayaran'] == "4"){
+						
+						$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
+						// $order = [];
+						
+
+						//setNotifExpired
+						
+
+						// kirim email
+						
+
+					    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nDengan Metode Pembayaran COD ";
+
+						// notif android
+					    $dnotif =[
+				                'pengirim_id' => '1',
+				                'penerima_id' => $req['user_id'],
+				                'judul_id' => $ins_transaksi->id,
+				                'judul' => 'Pesanan No '.$ins_transaksi->no_transaksi,
+				                'isi' => 'Anda Telah Melakukan Pesanan Dengan Nomor Transaksi '.$ins_transaksi->no_transaksi.' Dengan Metode Pembayaran COD ',
+				                'jenis_notif' => 1,
+				                'dibaca' => '0'
+				                ];
+				        $a = SendNotif::sendNotifWa($sel_user->no_hp,$pesanWa);        	
+				        $notif = Notifikasi::create($dnotif);
+				        $sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pesanan Baru', $notif->judul_id);
+					    
+
+						$success = 1;
+						$msg = "Berhasil Simpan Transaksi";
+						$data = "";
 					}
 				}else{
 					$success = 2;

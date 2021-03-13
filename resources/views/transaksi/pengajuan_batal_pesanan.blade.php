@@ -40,6 +40,8 @@
 			       						<span class="label label-info">Bank Transfer</span>
 			       					@elseif($key->metode_pembayaran == 3)
 			       						<span class="label label-success">Bayar Di Toko</span>
+			       					@elseif($key->metode_pembayaran == 4)
+			       						<span class="label bg-purple">COD</span>
 			       					@endif
 								</td>
 								<td align="center">
