@@ -119,13 +119,13 @@
                         <td style="text-align:center;border-bottom:0px" >{{ $key->jam}}</td>
                         <td style="text-align:center;border-bottom:0px" >
                             @if($key->status == "5")
-                                @if($key->metode_pembayaran == "1" || $key->metode_pembayaran == "2")
+                                @if($key->metode_pembayaran == "1" || $key->metode_pembayaran == "2" || $key->metode_pembayaran == "4")
                                     Sudah Diterima
                                 @else
                                     Sudah Diambil
                                 @endif
                             @else
-                                @if($key->metode_pembayaran == "1" || $key->metode_pembayaran == "2")
+                                @if($key->metode_pembayaran == "1" || $key->metode_pembayaran == "2" || $key->metode_pembayaran == "4")
                                     Belum Diterima
                                 @else
                                     Belum Diambil
@@ -140,8 +140,10 @@
                                     TopUp
                                 @elseif($key->metode_pembayaran == "2")
                                     Bank Transfer
-                                @else
+                                @elseif($key->metode_pembayaran == "3")
                                     Bayar Ditoko
+                                @else 
+                                    COD
                                 @endif
                             @endif
                         </td>
