@@ -53,8 +53,8 @@ class PengirimanController extends Controller
     public function store(Request $request)
     {
         $req = $request->all();
-      
-        
+
+
         $validator = \Validator::make($req,['kurir_id' => 'required']);
 
         if($validator->fails()){
