@@ -23,7 +23,7 @@
 	    						<option value="1">Topup</option>
 	    						<option value="2">Bank Transfer</option>
 	    						<option value="3">Bayar Di Toko</option>
-	    						<option value="4">Bayar Di Toko</option>
+	    						<option value="4">COD</option>
 	    					</select>
 	    				</div>
 	    			</div>
@@ -64,7 +64,7 @@
 				$("#form-filter").submit(function(e){
 					e.preventDefault();
 					loadTable();
-				})
+				});
 
 			})
 
@@ -101,8 +101,11 @@
 				}else if(jenis_transaksi == "3"){
 					 // <option value="7">Pesanan Expired</option>
 					html += `<option value="1">Dikemas</option>
-							 
-							
+							 <option value="5">Terima</option>
+							 <option value="4">Pengajuan Pembatalan</option>
+							 <option value="3">Dibatalkan</option>`;
+				}else if(jenis_transaksi == "4"){
+					html += `<option value="1">Dikemas</option>
 							 <option value="5">Terima</option>
 							 <option value="4">Pengajuan Pembatalan</option>
 							 <option value="3">Dibatalkan</option>`;

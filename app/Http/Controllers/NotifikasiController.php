@@ -65,7 +65,12 @@ class NotifikasiController extends Controller
                                                ->where('metode_pembayaran','1')
                                                ->where('jenis','1')
                                                ->where('jalur','1');
-                                    })->count();
+                                    })->orWhere(function($b){ // pembayaran cod tidak expire
+                                    return $b->whereNotIn('status',['5','3'])
+                                             ->where('metode_pembayaran','4')
+                                             ->where('jenis','1')
+                                             ->where('jalur','1');
+                                  })->count();
        return $transaksi;
     }
     
