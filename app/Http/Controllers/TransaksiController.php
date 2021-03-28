@@ -114,15 +114,19 @@ class TransaksiController extends Controller
           //                         ->orderBy('updated_at','desc')->get();
 
            $transaksi = Transaksi::where(function($q) use ($waktu_sekarang){
-                                    return $q->whereNotIn('status',['5','3'])
-                                              ->whereNotIn('metode_pembayaran',['1'])
-                                              ->where('waktu_kirim','>',$waktu_sekarang)
+                                    return $q->whereNotIn('status',['5','3']) // pembayaran selain saldo,cod expire
+                                              ->whereNotIn('metode_pembayaran',['1','4'])
+                                              ->where('waktu_kirim','>',$waktu_sekarang) 
                                               ->where('jenis','1')
                                               ->where('jalur','1');
-                                  })
-                                  ->orWhere(function($a) {
+                                  })->orWhere(function($a) {
                                     return $a->whereNotIn('status',['5','3'])
-                                             ->where('metode_pembayaran','1')
+                                             ->where('metode_pembayaran','1') // pembayaran saldo tidak expire
+                                             ->where('jenis','1')
+                                             ->where('jalur','1');
+                                  })->orWhere(function($b){ // pembayaran cod tidak expire
+                                    return $b->whereNotIn('status',['5','3'])
+                                             ->where('metode_pembayaran','4')
                                              ->where('jenis','1')
                                              ->where('jalur','1');
                                   })
@@ -193,9 +197,10 @@ class TransaksiController extends Controller
                                        ->orderBy('updated_at','desc')->get();
 
       }else if($jenis_transaksi != "0" && $status_transaksi == "0"){
-             
-              if($jenis_transaksi != '1'){
-                // jenis transaksi != topup dan status != terima dan dibatalkan
+              
+              if($jenis_transaksi !== "4" && $jenis_transaksi !== "1"){
+               
+                // jenis transaksi != topup & cod dan status != terima dan dibatalkan
                 $transaksi = Transaksi::whereNotIn('status',['5','3'])
                                     ->where('metode_pembayaran',$jenis_transaksi)
                                     ->where('jenis','1')
@@ -209,7 +214,9 @@ class TransaksiController extends Controller
                                     ->where('jenis','1')
                                     ->where('jalur','1')
                                     ->orderBy('updated_at','desc')->get();
+
               }
+
 
 
       }else if($jenis_transaksi != "0" &&  ($status_transaksi == "5" || $status_transaksi == "3") ){
@@ -300,9 +307,9 @@ class TransaksiController extends Controller
               if( ($waktu_skrang < $batas_ambe ) && $transaksi['metode_pembayaran'] == "1"){
                   $status = '<label class="label label-info">Dikemas</label>';
                   $marker_status = 'Dikemas';
-              }else if(($waktu_skrang > $batas_ambe ) && $transaksi['metode_pembayaran'] == "1"){
-                $status = '<label class="label label-danger">Lewat Batas Pengiriman</label>';
-                $marker_status = 'Lewat Batas Pengiriman';
+              }else if(($waktu_skrang > $batas_ambe ) && ($transaksi['metode_pembayaran'] == "1" || $transaksi['metode_pembayaran'] == "4") ){ //pembayaran transfer deng cod expire
+                $status = '<label class="label label-info">Dikemas</label><br/><label class="label label-danger">Lewat Batas Pengiriman</label>';
+                $marker_status = 'Dikemas (Lewat Batas Pengiriman)';
               }else if( ($waktu_skrang < $batas_ambe ) && ( $transaksi['metode_pembayaran'] == "3" || $transaksi['metode_pembayaran'] == "4" ) ){
                   $status = '<label class="label label-info">Dikemas</label>';
                   $marker_status = 'Dikemas';
