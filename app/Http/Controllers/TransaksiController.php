@@ -437,6 +437,8 @@ class TransaksiController extends Controller
         
         $notif = Notifikasi::create($dnotif);
         SendNotif::SendNotPesan('5',['jenisNotif' => '2']);
+        // Kirim Notif Ke Web User
+        SendNotif::SendNotPesan('1','',[$transaksi->user_id]);
 
         $userWa = User::findOrfail($transaksi->user_id);
         SendNotif::sendNotifWa($userWa->no_hp,$notif->isi);
