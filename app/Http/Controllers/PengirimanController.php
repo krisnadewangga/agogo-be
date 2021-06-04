@@ -54,7 +54,6 @@ class PengirimanController extends Controller
     {
         $req = $request->all();
 
-
         $validator = \Validator::make($req,['kurir_id' => 'required']);
 
         if($validator->fails()){
@@ -75,6 +74,8 @@ class PengirimanController extends Controller
         // return $input;
         $insert = Pengiriman::create($input);
         $find = Transaksi::findOrfail($req['transaksi_id']);
+        
+        
         $find->update(['status' => '2']);   
         $min_stock_item = $this->UpdateStock($find->no_transaksi);
         
@@ -93,6 +94,9 @@ class PengirimanController extends Controller
         $notif = Notifikasi::create($dnotif);
 
         SendNotif::SendNotPesan('5',['jenisNotif' => '2']);
+
+        // Kirim Notif Ke Web User
+        SendNotif::SendNotPesan('1','',[$find->user_id]);
 
         $userWa = User::findOrfail($find->user_id);
         SendNotif::sendNotifWa($userWa->no_hp,$notif->isi);

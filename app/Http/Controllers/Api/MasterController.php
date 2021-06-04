@@ -22,6 +22,14 @@ class MasterController extends Controller
   	   $success = 1;
   	   return response()->json(['success' => $success, 'msg' => $Kategori], 200);
 	}  
+
+  public function DetailKategori(Request $request)
+  {
+    $req = $request->all();
+    $kategori = Kategori::where('id',$req['kategori_id'])->first();
+    return response()->json(['success' => '1', 'msg' => $kategori],200);
+  }
+
 	
 	public function ListItemAll(Request $request)
 	{
@@ -139,7 +147,7 @@ class MasterController extends Controller
           $msg = $item;
           $kr = 200;
         }
-        return response()->json(['success' => $success,'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'msg' => $msg], $kr);
+        return response()->json(['success' => $success,'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'jumHal' => $jumHal, 'msg' => $msg], $kr);
 	}
 
 	public function DetailItem(Request $request)
@@ -154,7 +162,7 @@ class MasterController extends Controller
         $msg = $validator->messages()->all();
         $kr = 400;
     }else{
-
+      
     	$item = Item::selectRaw(" item.*,
     							  (select gambar from gambar_item 
     							  where item_id = item.id and utama = '1') as gambar_utama"
@@ -165,8 +173,8 @@ class MasterController extends Controller
     	$item['gambar_item'] = $item->GambarItem()->get();
     	
     	$success = 1;
-      	$msg = $item;
-      	$kr = 200;
+      $msg = $item;
+      $kr = 200;
 
     }
     return response()->json(['success' => $success,'msg' => $msg], $kr);
@@ -292,6 +300,27 @@ class MasterController extends Controller
 
     }
     return response()->json(['success' => $success,'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'msg' => $msg], $kr);
+  }
+
+  public function DetailPromo(Request $request)
+  {
+     $req = $request->all();
+     $messsages = ['id.required' => 'Id Tidak Bisa Kosong'];
+     
+     $rules = ['id' => 'required'];
+     $validator = Validator::make($req, $rules,$messsages);
+     if($validator->fails()){
+        $success = 0;
+        $msg = $validator->messages()->all();
+        $kr = 400;
+     }else{
+        $promo = Promo::where('id',$req['id'])->first();
+
+        $success = 1;
+        $msg = $promo;
+        $kr = 200;
+     }
+    return response()->json(['success' => $success, 'msg' => $msg], $kr);
   }
 
   public function CekVersi(Request $request)
