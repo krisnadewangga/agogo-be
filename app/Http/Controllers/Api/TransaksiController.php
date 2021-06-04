@@ -183,6 +183,11 @@ class TransaksiController extends Controller
 												'catatan',
 												'waktu_kirim');	
 
+				if($req['metode_pembayaran'] == "2"){
+					$req_transaksi['opsi_bt'] = $request->opsi_bt;
+					$req_transaksi['biaya_admin'] = $request->biaya_admin;
+				}
+
 				$saldo = $sel_user->DetailKonsumen->saldo;
 				$status_member = $sel_user->DetailKonsumen->status_member;
 				
