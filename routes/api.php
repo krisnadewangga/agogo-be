@@ -39,7 +39,9 @@ Route::post('baca_pesan_tiap_id','Api\PesanController@bacaPesanTiapId');
 Route::post('hapus_pesan','Api\PesanController@hapusPesan');
 
 Route::get('list_promo','Api\MasterController@listPromo');
+Route::get('detail_promo','Api\MasterController@DetailPromo');
 Route::get('list_kategori','Api\MasterController@ListKategori');
+Route::get('detail_kategori','Api\MasterController@DetailKategori');
 Route::get('list_item_all','Api\MasterController@ListItemAll');
 Route::get('list_item_perkat','Api\MasterController@ListItemPerKat');
 Route::get('cari_item','Api\MasterController@CariItem');
@@ -56,6 +58,8 @@ Route::get('list_penggunaan_saldo','Api\TransaksiController@ListPenggunaanSaldo'
 
 //notifikasi
 Route::get('list_notifikasi', 'Api\NotifikasiController@tampilNotifikasi');
+Route::get('jum_notif','Api\NotifikasiController@JumNotif');
+Route::get('detail_notifikasi','Api\NotifikasiController@DetailNotifikasi');
 Route::POST('read_notifiikasi', 'Api\NotifikasiController@readNotifikasi');
 
 Route::get('cek_versi','Api\MasterController@CekVersi');
