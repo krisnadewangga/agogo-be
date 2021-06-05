@@ -167,8 +167,8 @@ class SendNotif{
 
     }
 
-    public static function SendNotPesan($type,$message){
-        event(new PusherEvent($type,$message));
+    public static function SendNotPesan($type,$message,$userID = null){
+        event(new PusherEvent($type,$message,$userID));
     }
     
     public  function simpanNotif()
