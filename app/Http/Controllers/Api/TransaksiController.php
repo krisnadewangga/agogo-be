@@ -281,7 +281,7 @@ class TransaksiController extends Controller
 						$itemForEmail = "";
 						$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
 						$dataItemForEmail = $selitemForEmail->ItemTransaksi()->get();
-						$signature = tripay::Signature($ins_transaksi->no_transaksi,$ins_transaksi->total_bayar);
+						$signature = tripay::Signature($ins_transaksi->no_transaksi,$ins_transaksi->total_transaksi + $ins_transaksi->total_biaya_pengiriman);
 						$noItemForEmail = 1;
 					
 						$order = [];
@@ -313,13 +313,15 @@ class TransaksiController extends Controller
 											 <td align='right'>Rp. ".number_format($ins_transaksi->total_bayar,'0','','.')."</td>
 										  </tr>";
 
-						$ongkir = ['name' => 'Ongkir', 'price' => $req['biaya_pengiriman'], 'quantity' => $req['jarak_tempuh'] ];
+						$ongkir = ['name' => 'Ongkir', 
+									'price' => $req['biaya_pengiriman'], 
+								   'quantity' => $req['jarak_tempuh'] ];
+						
 						array_push($arr_order, $ongkir);
-
 				
 						$data = ['method' => $req['method'] ,
 				                 'merchant_ref' => $ins_transaksi->no_transaksi,
-					             'amount'=> $ins_transaksi->total_bayar,
+					             'amount'=> $req['total_transaksi'] + $req['total_biaya_pengiriman'],
 					             'customer_name' => $sel_user->name,
 					             'customer_email' => $sel_user->email,
 					             'customer_phone' => $sel_user->no_hp,
@@ -338,7 +340,6 @@ class TransaksiController extends Controller
 								->asJson()
 								->post();
 							
-
 					     #mode development		
 				       	// $sendData = Curl::to('https://payment.tripay.co.id/api-sandbox/transaction/create')
 				        //                 ->withData( $data )
@@ -346,12 +347,10 @@ class TransaksiController extends Controller
 				        //                 ->asJson()
 						//                 ->post();
 						
-
-
-
-					 $ff = $sendData->data;
-				    	$pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + (int) $req['fee'] ,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim_tf->format('d/m/Y H:i A');
-				    	$pesanAndro = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + (int) $req['fee'] ,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini <a href='".$ff->checkout_url."'>".$ff->checkout_url."</a> Batas Waktu Pembayaran".$ins_transaksi->waktu_kirim->format('d/m/Y H:i A');
+					
+						$ff = $sendData->data;
+				    	$pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim_tf->format('d/m/Y H:i A');
+				    	$pesanAndro = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini <a href='".$ff->checkout_url."'>".$ff->checkout_url."</a> Batas Waktu Pembayaran".$ins_transaksi->waktu_kirim->format('d/m/Y H:i A');
 
 
 					    // notif android
