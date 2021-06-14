@@ -495,6 +495,12 @@
    						<button onclick="hapus_pesanan('{{ $transaksi->id }}')" id="btn-hapus" class=' btn btn-danger '>Hapus Pesanan</button>
    					</div>
 				@endif
+
+				@if($transaksi->status == '4' && $transaksi->metode_pembayaran == '4')
+   					<div style="margin-top: 10px;"> 
+   					<a href="{{ route('batal_transaksi',['transaksi_id' => $transaksi->id]) }}" onclick="return confirm('Apakah Anda Yakin Membatalkan Pesanan ?') "><button class="btn btn-danger">Batalkan Pesanan</button></a>	
+					</div>
+				@endif
 			</div>
 		</div>	
 
