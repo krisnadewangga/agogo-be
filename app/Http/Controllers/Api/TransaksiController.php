@@ -30,6 +30,8 @@ class TransaksiController extends Controller
     {
     
     	$req = $request->all();
+    	// return $req['metode_pembayaran'];
+
 		$rules = [  'user_id' => 'required',
 					'total_transaksi' => 'required|numeric',
 					'biaya_pengiriman' => 'required|numeric',
@@ -48,16 +50,21 @@ class TransaksiController extends Controller
 					// 'confirm_operasional' => 'required',
 					'confirm_error' => 'required'
 		         ];
-	
+		// return $req['metode_pembayaran'];
+		if($req['metode_pembayaran'] == "2"){
+			$rules['method'] = 'required';
+			$rules['opsi_bt'] = 'required';
+			$rules['biaya_admin'] = 'required';
+		}
+		
 		$sel_user = User::findOrFail($req['user_id']);
 		$transaksi_berlangsung = $sel_user->Transaksi->whereNotIn('status',['5','3'] )
-		->where('waktu_kirim','>',date('Y-m-d H:i:s'))->count();
+		->where('created_at','<',date('Y-m-d H:i:s'))->count();
     	// if($transaksi_berlangsung == '3'){
     	// 	$sel_user->DetailKonsumen()->update(['kunci_transaksi' => '1']);
     	// }
 		
 		// if($sel_user->DetailKonsumen->kunci_transaksi == 0){
-	
 
 		if($transaksi_berlangsung < '3'){
 
@@ -176,6 +183,11 @@ class TransaksiController extends Controller
 												'catatan',
 												'waktu_kirim');	
 
+				if($req['metode_pembayaran'] == "2"){
+					$req_transaksi['opsi_bt'] = $request->opsi_bt;
+					$req_transaksi['biaya_admin'] = $request->biaya_admin;
+				}
+
 				$saldo = $sel_user->DetailKonsumen->saldo;
 				$status_member = $sel_user->DetailKonsumen->status_member;
 				
@@ -200,35 +212,35 @@ class TransaksiController extends Controller
 
 
 
-							     $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \n Dengan Metode Pembayaran melalui saldo anda sebesar ". $req['total_bayar']. "\n yang sebelumnya saldo anda ".$saldo.", sisah saldo anda sekarang ".$new_saldo;
+									     $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \n Dengan Metode Pembayaran melalui saldo anda sebesar ". $req['total_bayar']. "\n yang sebelumnya saldo anda ".$saldo.", sisah saldo anda sekarang ".$new_saldo;
 
-								// notif android
-								$dnotif =[
-										'pengirim_id' => '1',
-										'penerima_id' => $req['user_id'],
-										'judul_id' => $ins_transaksi->id,
-										'judul' => 'Pesanan No '.$ins_transaksi->no_transaksi,
-										'isi' => $pesanWa,
-										'jenis_notif' => 1,
-										'dibaca' => '0'
-										];
-									$a = SendNotif::sendNotifWa($sel_user->no_hp,$pesanWa);        	
-									$notif = Notifikasi::create($dnotif);
-									$sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pesanan Baru', $notif->judul_id);
-								
-								
-								
+										// notif android
+										$dnotif =[
+												'pengirim_id' => '1',
+												'penerima_id' => $req['user_id'],
+												'judul_id' => $ins_transaksi->id,
+												'judul' => 'Pesanan No '.$ins_transaksi->no_transaksi,
+												'isi' => $pesanWa,
+												'jenis_notif' => 1,
+												'dibaca' => '0'
+												];
+										$a = SendNotif::sendNotifWa($sel_user->no_hp,$pesanWa);        	
+										$notif = Notifikasi::create($dnotif);
+										$sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pesanan Baru', $notif->judul_id);
+									
+									
+									
 
-										$success = 1;
-										$msg = "Berhasil Simpan Transaksi";
-										$data = '';
-									}else{
-										$success = 0;
-										$msg = "Kode Otp Yang Dmasukan Salah";
-										$data = '';
-									}
+											$success = 1;
+											$msg = "Berhasil Simpan Transaksi";
+											$data = '';
+										}else{
+											$success = 0;
+											$msg = "Kode Otp Yang Dmasukan Salah";
+											$data = '';
+										}
 								}else{
-									$success = 0;
+									$success = 3;
 									$msg = "Masukan Kode Otp";
 									$data = '';
 								}
@@ -244,6 +256,7 @@ class TransaksiController extends Controller
 							$msg = "Maaf! Silahkan Daftarkan Akun Anda Menjadi Member";
 							$data = '';
 						}
+
 					}else if($req['metode_pembayaran'] == "2"){
 					
 						$waktu_skrang = Carbon::now();
@@ -268,7 +281,7 @@ class TransaksiController extends Controller
 						$itemForEmail = "";
 						$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
 						$dataItemForEmail = $selitemForEmail->ItemTransaksi()->get();
-						$signature = tripay::Signature($ins_transaksi->no_transaksi,$ins_transaksi->total_bayar);
+						$signature = tripay::Signature($ins_transaksi->no_transaksi,$ins_transaksi->total_transaksi + $ins_transaksi->total_biaya_pengiriman);
 						$noItemForEmail = 1;
 					
 						$order = [];
@@ -300,13 +313,15 @@ class TransaksiController extends Controller
 											 <td align='right'>Rp. ".number_format($ins_transaksi->total_bayar,'0','','.')."</td>
 										  </tr>";
 
-						$ongkir = ['name' => 'Ongkir', 'price' => $req['biaya_pengiriman'], 'quantity' => $req['jarak_tempuh'] ];
+						$ongkir = ['name' => 'Ongkir', 
+									'price' => $req['biaya_pengiriman'], 
+								   'quantity' => $req['jarak_tempuh'] ];
+						
 						array_push($arr_order, $ongkir);
-
 				
 						$data = ['method' => $req['method'] ,
 				                 'merchant_ref' => $ins_transaksi->no_transaksi,
-					             'amount'=> $ins_transaksi->total_bayar,
+					             'amount'=> $req['total_transaksi'] + $req['total_biaya_pengiriman'],
 					             'customer_name' => $sel_user->name,
 					             'customer_email' => $sel_user->email,
 					             'customer_phone' => $sel_user->no_hp,
@@ -325,7 +340,6 @@ class TransaksiController extends Controller
 								->asJson()
 								->post();
 							
-
 					     #mode development		
 				       	// $sendData = Curl::to('https://payment.tripay.co.id/api-sandbox/transaction/create')
 				        //                 ->withData( $data )
@@ -333,12 +347,10 @@ class TransaksiController extends Controller
 				        //                 ->asJson()
 						//                 ->post();
 						
-
-
-
-					 $ff = $sendData->data;
-				    	$pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + (int) $req['fee'] ,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim_tf->format('d/m/Y H:i A');
-				    	$pesanAndro = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + (int) $req['fee'] ,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini <a href='".$ff->checkout_url."'>".$ff->checkout_url."</a> Batas Waktu Pembayaran".$ins_transaksi->waktu_kirim->format('d/m/Y H:i A');
+					
+						$ff = $sendData->data;
+				    	$pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim_tf->format('d/m/Y H:i A');
+				    	$pesanAndro = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini <a href='".$ff->checkout_url."'>".$ff->checkout_url."</a> Batas Waktu Pembayaran".$ins_transaksi->waktu_kirim->format('d/m/Y H:i A');
 
 
 					    // notif android
@@ -524,6 +536,10 @@ class TransaksiController extends Controller
 
 		        	//loadJumNot
 		        	SendNotif::SendNotPesan('5',['jenisNotif' => '1']);
+		        	
+		        	// Kirim Notif Ke Web User
+        			SendNotif::SendNotPesan('1','',[$req['user_id']]);
+        			
 		        	if($req['metode_pembayaran'] == "2"){
 		        		SendNotif::SendNotPesan('5',['jenisNotif' => '4']);
 		        	}
@@ -607,12 +623,24 @@ class TransaksiController extends Controller
              $offset = ($page - 1) * $dataPerpage;
         	 
         	 $list_transaksi = Transaksi::where('user_id','=',$req['user_id'])
-        	 							  ->selectRaw("id,user_id,no_transaksi,banyak_item,total_bayar,metode_pembayaran,status,created_at,updated_at")
+        	 							  ->selectRaw("id,user_id,no_transaksi,banyak_item,total_bayar,metode_pembayaran,status,created_at,updated_at,detail_alamat")
         	 							//   ->where('status','!=','3')
         	 							//   ->where('waktu_kirim','>', Carbon::now()->format('Y-m-d H:i:s'))
         	  							  ->orderBy('transaksi.id','DESC')
 										  ->limit($dataPerpage)
 										  ->offset($offset)->get();
+
+			 $list_transaksi->map(function($list_transaksi){
+			 	$items = ItemTransaksi::join('item','item.id','=','item_transaksi.item_id')
+			 							->selectRaw("item.id,
+			 										 item.nama_item,
+			 										 item_transaksi.jumlah,
+			 										 item_transaksi.harga,
+			 										 item_transaksi.total,
+			 										 (Select gambar from gambar_item where item_id = item.id and utama = '1' ) as gambar_utama")
+			 							->where('transaksi_id',$list_transaksi->id)->get();
+			 	$list_transaksi['items'] = $items;
+			 });	
 
 	         $jumdat = Transaksi::where('user_id','=',$req['user_id'])
 	         					//  ->where('status','!=','3')
@@ -633,7 +661,7 @@ class TransaksiController extends Controller
 	         $kr = 200;
         }
         
-        return response()->json(['success' => $success,'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'msg' => $msg], $kr);
+        return response()->json(['success' => $success,'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'msg' => $msg, 'jumHal' => $jumHal], $kr);
     }
 
     public function ListPenggunaanSaldo(Request $request)
@@ -660,11 +688,23 @@ class TransaksiController extends Controller
 									->where('metode_pembayaran','1')
 									->orWhere('top_up','1')
              						->where('user_id',$req['user_id'])
-             						->selectRaw("id,user_id,no_transaksi,banyak_item,total_bayar,metode_pembayaran,status,created_at as waktu,top_up")
+             						->selectRaw("id,user_id,no_transaksi,banyak_item,total_bayar,metode_pembayaran,status,created_at as waktu,top_up,created_at")
          						    ->orderBy('transaksi.id','DESC')
 									->limit($dataPerpage)
 									->offset($offset)->get();
             
+             $transaksi->map(function($transaksi){
+			 	$items = ItemTransaksi::join('item','item.id','=','item_transaksi.item_id')
+			 							->selectRaw("item.id,
+			 										 item.nama_item,
+			 										 item_transaksi.jumlah,
+			 										 item_transaksi.harga,
+			 										 item_transaksi.total,
+			 										 (Select gambar from gambar_item where item_id = item.id and utama = '1' ) as gambar_utama")
+			 							->where('transaksi_id',$transaksi->id)->get();
+			 	$transaksi['items'] = $items;
+			 });
+
             $jumdat =  Transaksi::where('status','5')
 									 ->where('metode_pembayaran','1')
 									 ->orWhere('top_up','1')
@@ -673,7 +713,6 @@ class TransaksiController extends Controller
 
 	         // $HistoriTopup = HistoriTopup::where('user_id',$req['user_id'])->get();
 	         // return $HistoriTopup;
-
 	         $jumHal = ceil($jumdat / $dataPerpage);
 	         $pageSaatIni = (int) $page;
 	         $pageSelanjutnya = $page+1;
@@ -688,7 +727,7 @@ class TransaksiController extends Controller
 	         $kr = 200;
 
         }
-        return response()->json(['success' => $success,'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'msg' => $msg], $kr);
+        return response()->json(['success' => $success,'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'msg' => $msg, 'jumHal' => $jumHal ], $kr);
 
     }
 
@@ -705,33 +744,38 @@ class TransaksiController extends Controller
             $kr = 400;
         }else{
         	$transaksi = Transaksi::select("id",
-								        	"user_id",
-								        	"no_transaksi",
-								        	"banyak_item",
-								        	"total_transaksi",
-								        	"jarak_tempuh",
-								        	"total_biaya_pengiriman",
-								        	"total_bayar",
-								        	"alamat_lain",
-								        	"lat",
-								        	"long",
-								        	"detail_alamat",
-								        	"durasi_kirim",
-								        	"waktu_kirim",
-								        	"metode_pembayaran",
-								        	"status",
-								        	"created_at",
-								        	"updated_at")
+							        	  "user_id",
+							        	  "no_transaksi",
+							        	  "banyak_item",
+							        	  "total_transaksi",
+							        	  "jarak_tempuh",
+							        	  "total_biaya_pengiriman",
+							        	  "opsi_bt",
+							        	  "biaya_admin",
+							        	  "total_bayar",
+							        	  "alamat_lain",
+							        	  "lat",
+							        	  "long",
+							        	  "detail_alamat",
+							        	  "durasi_kirim",
+							        	  "waktu_kirim",
+							        	  "metode_pembayaran",
+							        	  "status",
+							        	  "created_at",
+							        	  "updated_at")
         							->where('id','=',$req['transaksi_id'])
         							->first();
+        	$selno_hp = User::where('id',$transaksi->user_id)->first();
+        	$transaksi['no_hp'] = $selno_hp->no_hp;
+        	$transaksi['nama'] = $selno_hp->name;
+
         	$selItem = ItemTransaksi::join('item','item.id','=','item_transaksi.item_id')
         							  ->where('item_transaksi.transaksi_id','=',$transaksi->id)
-        							  ->select('item_transaksi.*','item.nama_item')
+        							  ->selectRaw("item_transaksi.*,item.nama_item,
+        							  			  (Select gambar from gambar_item where item_id = item_transaksi.item_id and utama = '1' ) as gambar_utama ")
         							  ->get();
         	
         	$transaksi['item_transaksi'] = $selItem;
-        	
-
         	if($transaksi->metode_pembayaran != "3"){
         		
         		if( $transaksi->status >= '2' && $transaksi->status != '3' && $transaksi->status != '6' && $transaksi->status != '4'){
