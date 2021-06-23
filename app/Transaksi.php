@@ -33,11 +33,11 @@ class Transaksi extends Model
                  'jenis',
                  'jalur',
                  'kasir_id',
-                 'for_ps','waktu_kirim_tf','top_up'];
+                 'for_ps','waktu_kirim_tf','top_up','opsi_bt','biaya_admin'];
 
     protected $dates = ['waktu_kirim','tgl_bayar','waktu_kirim_tf'];
 
-  	protected $appends = array('ket_metodepembayaran','ket_status_transaksi');
+  	protected $appends = ['ket_metodepembayaran','ket_status_transaksi','ket_kode_status'];
 
     public function getKetMetodepembayaranAttribute()
     {
@@ -88,6 +88,43 @@ class Transaksi extends Model
            $ket = "Pengajuan Pembatalan";
          }else {
            $ket = "";
+         }
+      }
+
+      return $ket;
+    }
+
+    public function getKetKodeStatusAttribute()
+    {
+      $attr = $this->status;
+      $mp = $this->metode_pembayaran;
+      if($mp == "1" || $mp == "2"){
+         if($attr == "1"){
+           $ket = "#3728ff";
+         }else if($attr == "2"){
+           $ket = "#9a29ad";
+         }else if($attr == "5"){
+           $ket = "#64cd2a";
+         }else if($attr == "3"){
+           $ket = "#f83435";
+         }else if($attr == "6"){
+           $ket = "#ffed35";
+         }else if($attr == "4"){
+           $ket = "#f83435";
+         }else{
+           $ket = "#ff9500";
+         }
+      }else{
+         if($attr == "1"){
+           $ket = "#3728ff";
+         }else if($attr == "5"){
+           $ket = "#64cd2a";
+         }else if($attr == "3"){
+           $ket = "#f83435";
+         }else if($attr == "4"){
+           $ket = "#f83435";
+         }else {
+           $ket = "#ff9500";
          }
       }
 

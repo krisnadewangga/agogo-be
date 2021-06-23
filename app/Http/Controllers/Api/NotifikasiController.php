@@ -36,7 +36,10 @@ class NotifikasiController extends Controller
                                     $query->where('notifikasi.penerima_id',$id_user)
                                           ->orWhere('notifikasi.penerima_id','0')
                                           ->where('notifikasi.pengirim_id','!=',$id_user);
-                                })->orderBy('id','DESC')->limit($dataPerpage)->offset($offset)->get();
+                                })->orderBy('id','DESC')
+                                ->limit($dataPerpage)
+                                ->offset($offset)
+                                ->get();
 
 
             $jumdat = Notifikasi::where( function ($query) use ($id_user) {
@@ -59,7 +62,21 @@ class NotifikasiController extends Controller
             $kr = 200;
         }
 
-    	  return response()->json(['success' => $success, 'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'msg' => $msg], $kr);
+    	  return response()->json(['success' => $success, 'pageSaatIni' => $pageSaatIni, 'pageSelanjutnya' => $tampilPS, 'jumHal' => $jumHal, 'msg' => $msg], $kr);
+    }
+
+    public function JumNotif(Request $request)
+    {
+        $req = $request->all();
+        $id_user = $req['user_id'];
+
+        $jumNotBelumDibaca = Notifikasi::where([ 
+                                                 ['dibaca','=','0'],
+                                                 ['penerima_id','=', $id_user]
+                                               ])->count();
+
+        return response()->json(['success' => '1', 'jum_notif' => $jumNotBelumDibaca]);
+
     }
 
 
@@ -82,5 +99,32 @@ class NotifikasiController extends Controller
     	}
 
     	return response()->json(['success' => $success, 'msg' => $msg], $kr);
+    }
+
+    public function DetailNotifikasi(Request $request)
+    {
+        $req = $request->all();
+
+        $rules = ['id' => 'required'];
+        $messsages = ['id.required' => 'id Tidak Bisa Kosong' ];
+
+        $validator = Validator::make($req,$rules,$messsages);
+        if($validator->fails()){
+            $success = 0;
+            $msg = $validator->messages()->all();
+            $kr = 400;
+        }else{
+            $notif = Notifikasi::findOrFail($req['id']);
+            
+            if($notif->dibaca == "0"){
+                $notif->Update(['dibaca' => '1']);
+            }
+
+            $success = 1;
+            $msg = $notif;
+            $kr = 200;
+        }
+        return response()->json(['success' => $success, 'msg' => $msg], $kr);
+
     }
 }
