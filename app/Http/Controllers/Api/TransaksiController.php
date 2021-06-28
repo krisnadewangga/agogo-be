@@ -623,7 +623,7 @@ class TransaksiController extends Controller
              $offset = ($page - 1) * $dataPerpage;
         	 
         	 $list_transaksi = Transaksi::where('user_id','=',$req['user_id'])
-        	 							  ->selectRaw("id,user_id,no_transaksi,banyak_item,total_bayar,metode_pembayaran,status,created_at,updated_at,detail_alamat")
+        	 							  ->selectRaw("id,user_id,no_transaksi,banyak_item,total_bayar,metode_pembayaran,status,created_at,updated_at,detail_alamat,opsi_bt")
         	 							//   ->where('status','!=','3')
         	 							//   ->where('waktu_kirim','>', Carbon::now()->format('Y-m-d H:i:s'))
         	  							  ->orderBy('transaksi.id','DESC')
