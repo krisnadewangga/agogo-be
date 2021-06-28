@@ -267,7 +267,7 @@ class TransaksiController extends Controller
 
 						$kirim_notif = $waktu_skrang1->addMinutes(330)->format('Y-m-d H:i:s');
 						$req_transaksi['waktu_kirim_tf'] = $batas_bayar;
-						$req_transaksi['waktu_kirim'] = $req['waktu_kirim'];
+						$req_transaksi['waktu_kirim'] = $batas_bayar;
 
 						
 
