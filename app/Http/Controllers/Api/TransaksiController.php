@@ -273,7 +273,7 @@ class TransaksiController extends Controller
 
 						// return $req_transaksi;	
 						$req_transaksi['status'] = '6';
-
+						$req_transaksi['total_bayar'] = $req_transaksi['total_transaksi'] + $req_transaksi['total_biaya_pengiriman'];
 						
 						$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 						// $min_stock_item = $this->UpdateStock($itemTransaksi);
@@ -349,7 +349,7 @@ class TransaksiController extends Controller
 						
 					
 						$ff = $sendData->data;
-				    	$pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim_tf->format('d/m/Y H:i A');
+				    	$pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + $ins_transaksi->biaya_admin,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim_tf->format('d/m/Y H:i A');
 				    	$pesanAndro = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini <a href='".$ff->checkout_url."'>".$ff->checkout_url."</a> Batas Waktu Pembayaran".$ins_transaksi->waktu_kirim->format('d/m/Y H:i A');
 
 
