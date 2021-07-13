@@ -98,7 +98,8 @@ Route::post('/CheckApproval', 'Api\react\KasController@CheckApproval');
 Route::put('/updateKas/{id}', 'Api\react\KasController@updateKas');
 
 
-
+// tax
+Route::get('/cek_tax/{id}', 'Api\MasterController@cekTax');
 
 // react
 Route::get('categories', 'Api\react\ProductController@categories');

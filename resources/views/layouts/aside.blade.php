@@ -60,6 +60,7 @@
                <li id="sm_promo"><a href="{{ route('setup_promo.index') }}"><i class="fa fa-circle-o"></i> <span>SetUp Promo</span></a></li>
                <li id="sm_versi"><a href="{{ route('versi.index') }}"><i class="fa fa-circle-o"></i> <span>Update Versi</span></a></li>
                <li id="sm_st"><a href="{{ route('set_tanggal.index') }}"><i class="fa fa-circle-o"></i> <span>Set Tanggal Produksi</span></a></li>
+               <li id="sm_st"><a href="{{ route('tax_set') }}"><i class="fa fa-circle-o"></i> <span>Set Pajak</span></a></li>
                 
             </ul>
           </li>
@@ -133,7 +134,8 @@
               <li id="sm_kas"><a href="{{ route('lap_kas') }}"><i class="fa fa-circle-o"></i> <span>Kas</span></a></li>
               <li id="sm_opname"><a href="{{ route('opname') }}"><i class="fa fa-circle-o"></i> <span>Opname</span></a></li>
               <li id="sm_pergerakan_stock"><a href="{{ route('lap_pergerakan_stock') }}"><i class="fa fa-circle-o"></i> <span>Pergerakan Stock</span></a></li>
-              
+              <li id="sm_pendapatan_harian"><a href="{{ route('lap_tax_harian') }}"><i class="fa fa-circle-o"></i> <span>Total Tax Harian</span></a></li>
+
             </ul>
           </li>
 
