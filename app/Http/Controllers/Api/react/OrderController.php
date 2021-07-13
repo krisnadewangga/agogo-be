@@ -125,6 +125,7 @@ public function postOrder(Request $request)
                     'metode_pembayaran' => '3',
                     'tgl_bayar' => date("Y-m-d H:i:s"),
                     'waktu_kirim' => date("Y-m-d H:i:s"),
+                    'tax' => $req[0]['tax'],
                     'for_ps' => '0'
   ];
 

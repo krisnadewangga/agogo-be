@@ -30,6 +30,8 @@ class TransaksiController extends Controller
     {
     
     	$req = $request->all();
+
+
     	// return $req['metode_pembayaran'];
 
 		$rules = [  'user_id' => 'required',
@@ -177,6 +179,7 @@ class TransaksiController extends Controller
 												'alamat_lain',
 												'lat',
 												'long',
+												'tax',
 												'detail_alamat',
 												'metode_pembayaran',
 												'banyak_item',
@@ -273,7 +276,8 @@ class TransaksiController extends Controller
 
 						// return $req_transaksi;	
 						$req_transaksi['status'] = '6';
-						$req_transaksi['total_bayar'] = $req_transaksi['total_transaksi'] + $req_transaksi['total_biaya_pengiriman'];
+
+						$req_transaksi['total_bayar'] = $req_transaksi['total_transaksi'] + $req_transaksi['total_biaya_pengiriman']+ $req_transaksi['tax'];
 						
 						$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 						// $min_stock_item = $this->UpdateStock($itemTransaksi);
@@ -281,7 +285,7 @@ class TransaksiController extends Controller
 						$itemForEmail = "";
 						$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
 						$dataItemForEmail = $selitemForEmail->ItemTransaksi()->get();
-						$signature = tripay::Signature($ins_transaksi->no_transaksi,$ins_transaksi->total_transaksi + $ins_transaksi->total_biaya_pengiriman);
+						$signature = tripay::Signature($ins_transaksi->no_transaksi,$ins_transaksi->total_transaksi + $ins_transaksi->total_biaya_pengiriman + $ins_transaksi->tax);
 						$noItemForEmail = 1;
 					
 						$order = [];
@@ -316,12 +320,20 @@ class TransaksiController extends Controller
 						$ongkir = ['name' => 'Ongkir', 
 									'price' => $req['biaya_pengiriman'], 
 								   'quantity' => $req['jarak_tempuh'] ];
+
+						$tax_beban = ['name' => 'Tax 10', 
+								   'price' => $req['tax'] , 
+								  'quantity' => 1];		   
 						
 						array_push($arr_order, $ongkir);
+						array_push($arr_order, $tax_beban);
+						//dd($arr_order);
+								 // dd($req['total_transaksi'] + $req['total_biaya_pengiriman'] +  $req['tax']);
+						
 				
 						$data = ['method' => $req['method'] ,
 				                 'merchant_ref' => $ins_transaksi->no_transaksi,
-					             'amount'=> $req['total_transaksi'] + $req['total_biaya_pengiriman'],
+					             'amount'=> $req['total_transaksi'] + $req['total_biaya_pengiriman'] + $req['tax'] ,
 					             'customer_name' => $sel_user->name,
 					             'customer_email' => $sel_user->email,
 					             'customer_phone' => $sel_user->no_hp,
@@ -338,7 +350,7 @@ class TransaksiController extends Controller
 								->withData( $data )
 								->withHeader('Authorization: Bearer 4synTlbXG2qsABvPRz7aT16aeq88fP4fhJKz3a1D')
 								->asJson()
-								->post();
+								->post(); 
 							
 					     #mode development		
 				       	// $sendData = Curl::to('https://payment.tripay.co.id/api-sandbox/transaction/create')
@@ -349,6 +361,7 @@ class TransaksiController extends Controller
 						
 					
 						$ff = $sendData->data;
+					
 				    	$pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar + $ins_transaksi->biaya_admin,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini  \n".$ff->checkout_url."\n Batas Waktu Pembayaran ".$ins_transaksi->waktu_kirim_tf->format('d/m/Y H:i A');
 				    	$pesanAndro = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \nSegera Lakukan Pembayaran Dengan Mentransfer dengan total ".number_format($ins_transaksi->total_bayar,'0','','.')." Ke ".$ff->payment_name." : \nKode Pembayaran ".$ff->pay_code."  \nAtau Bisa melalui link ini <a href='".$ff->checkout_url."'>".$ff->checkout_url."</a> Batas Waktu Pembayaran".$ins_transaksi->waktu_kirim->format('d/m/Y H:i A');
 
@@ -761,6 +774,7 @@ class TransaksiController extends Controller
 							        	  "waktu_kirim",
 							        	  "metode_pembayaran",
 							        	  "status",
+										  "tax",
 							        	  "created_at",
 							        	  "updated_at")
         							->where('id','=',$req['transaksi_id'])
