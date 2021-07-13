@@ -170,6 +170,19 @@ class KasController extends Controller
         // ->where('hari_pelunasan','notsameday')
  		->where('transaksi.kasir_id',$id)
         ->sum('preorders.discount');
+
+
+          //tax
+          $sumTax = DB::table('transaksi')
+          ->where('transaksi.updated_at', '>', $waktu)
+          ->where('transaksi.status','5')
+          ->where('transaksi.kasir_id',$id)
+          ->sum('transaksi.tax');
+
+
+  
+
+
  
         $diskon =  $sumDiskonOrder;
         $totalKeseluruhan = ($totalOrders + $sumPreordersDP + $sumPreordersPelunasan) - $diskon;
@@ -180,6 +193,7 @@ class KasController extends Controller
             'total_dp_preorders' => (int)$sumPreordersDP,
             'total_pelunasan_preorders' => (int)$sumPreordersPelunasan,
             'diskon' => $diskon,
+            'tax' =>  (int)$sumTax,
             'saldo_awal' =>  $qr['saldo_awal'],
             'total_refund' => 0
         ), 200);
@@ -232,6 +246,8 @@ class KasController extends Controller
             $diskon = $request[0]['diskon'];
             $tgl_hitung = $request[0]['tgl_hitung'];
             $refund = $request[0]['refund'];
+            $tax = $request[0]['tax'];
+          
        
 
             // return $saldo_akhir;
@@ -243,6 +259,7 @@ class KasController extends Controller
                 'diskon' => $diskon,
                 'tgl_hitung' => $tgl_hitung,
                 'total_refund' => $refund,
+                'tax' => $tax,
                 'status' => '1'
                 ]
             );
