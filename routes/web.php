@@ -40,6 +40,8 @@ Route::resource('aproval','AprovalController');
 Route::resource('kategori','KategoriController');
 Route::resource('item','ItemController');
 Route::resource('/versi','VersiController');
+Route::get('/tax','VersiController@showPajak')->name('tax_set');
+Route::POST('/tax_update','VersiController@updatePajak')->name('tax_update');
 Route::resource('/set_tanggal','SetTanggalController');
 
 Route::POST('/store_gambarItem','ItemController@store_gambarItem')->name('store_gambarItem');
@@ -92,10 +94,16 @@ Route::post('/cari_laporan_penjualan_per_item','LaporanController@CariPenjualanP
 Route::get('/lap_pendapatan_harian','LaporanController@LaporanPendapatanHarian')->name('lap_pendapatan_harian');
 Route::post('/cari_pendapatan_harian','LaporanController@CariPendapatanHarian')->name('cari_pendapatan_harian');
 
+Route::get('/lap_tax_harian','LaporanController@LaporanTaxHarian')->name('lap_tax_harian');
+Route::post('/cari_tax_harian','LaporanController@CariTaxHarian')->name('cari_tax_harian');
+
 Route::get('/export_penjualan','LaporanController@ExportPenjualan')->name('export_penjualan'); 
 Route::get('/export_pendapatan','LaporanController@ExportPendapatan')->name('export_pendapatan');
 Route::get('/export_penjualan_per_item','LaporanController@ExportPenjualanPerItem')->name('export_penjualan_per_item');
 Route::get('/export_pendapatan_harian','LaporanController@ExportPendapatanHarian')->name('export_pendapatan_harian');
+
+Route::get('/export_tax_harian','LaporanController@ExportTaxHarian')->name('export_tax_harian');
+
 
 Route::get('/export_kas','LaporanController@ExportKas')->name('export_kas');
 Route::get('/export_pergerakan_stock','LaporanController@ExportProduksi')->name('export_pergerakan_stock');
