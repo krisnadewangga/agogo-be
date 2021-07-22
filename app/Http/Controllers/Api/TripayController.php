@@ -31,7 +31,7 @@ class TripayController extends Controller
 
     public function paymentChannel(Request $Request)
     {
-    	$response = Curl::to('https://payment.tripay.co.id/api/merchant/payment-channel')
+    	$response = Curl::to('https://tripay.co.id/api/merchant/payment-channel')
                         ->withHeader('Authorization: '.$this->api_key)
                         ->asJson()
 						->get();
@@ -42,7 +42,7 @@ class TripayController extends Controller
 	public function kalkulator(Request $Request)
     {
 		$req = $Request->all();
-    	$response = Curl::to('https://payment.tripay.co.id/api/merchant/fee-calculator')
+    	$response = Curl::to('https://tripay.co.id/api/merchant/fee-calculator')
 						->withHeader('Authorization: '.$this->api_key)
 						->withData( array( 'amount' => $req['amount'], 'code' => $req['code']) )
                         ->asJson()
