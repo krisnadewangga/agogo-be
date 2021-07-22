@@ -653,6 +653,17 @@
 			</div>
 		@endif
 
+		@if($transaksi->tax > 0)
+			<div class="row" style="margin-top: 10px;">
+				<div class="col-md-6 col-xs-6">
+					Tax -
+				</div>
+				<div class="col-md-6 text-right col-xs-6">
+					Rp {{number_format($transaksi->tax,'0','','.')}}
+				</div>
+			</div>
+		@endif
+
 		<div  style="margin-top: 10px; border:1px solid #CCC; border-left: none; border-right: none; border-bottom:none; padding:10px;" class="bg-primary">
 			<div class="row">
 				<div class="col-md-6 col-xs-6">
