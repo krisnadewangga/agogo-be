@@ -285,7 +285,13 @@ class TransaksiController extends Controller
 						$itemForEmail = "";
 						$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
 						$dataItemForEmail = $selitemForEmail->ItemTransaksi()->get();
-						$signature = tripay::Signature($ins_transaksi->no_transaksi,$ins_transaksi->total_transaksi + $ins_transaksi->total_biaya_pengiriman + $ins_transaksi->tax);
+						if((int)$req['tax'] > 0){
+							$signature = tripay::Signature($ins_transaksi->no_transaksi,$ins_transaksi->total_transaksi + $ins_transaksi->total_biaya_pengiriman + $ins_transaksi->tax);
+						}else{
+							$signature = tripay::Signature($ins_transaksi->no_transaksi,$ins_transaksi->total_transaksi + $ins_transaksi->total_biaya_pengiriman);
+
+						}
+					
 						$noItemForEmail = 1;
 					
 						$order = [];
@@ -321,19 +327,31 @@ class TransaksiController extends Controller
 									'price' => $req['biaya_pengiriman'], 
 								   'quantity' => $req['jarak_tempuh'] ];
 
+
+
 						$tax_beban = ['name' => 'Tax 10', 
 								   'price' => $req['tax'] , 
 								  'quantity' => 1];		   
 						
 						array_push($arr_order, $ongkir);
-						array_push($arr_order, $tax_beban);
+						
+
+					
+						if((int)$req['tax'] > 0){
+							array_push($arr_order, $tax_beban);
+							$totalB = $req['total_transaksi'] + $req['total_biaya_pengiriman'] + $req['tax'];
+						}else{
+							$totalB = $req['total_transaksi'] + $req['total_biaya_pengiriman'];
+
+						}
+					
 						//dd($arr_order);
 								 // dd($req['total_transaksi'] + $req['total_biaya_pengiriman'] +  $req['tax']);
 						
 				
 						$data = ['method' => $req['method'] ,
 				                 'merchant_ref' => $ins_transaksi->no_transaksi,
-					             'amount'=> $req['total_transaksi'] + $req['total_biaya_pengiriman'] + $req['tax'] ,
+					             'amount'=>  $totalB,
 					             'customer_name' => $sel_user->name,
 					             'customer_email' => $sel_user->email,
 					             'customer_phone' => $sel_user->no_hp,
@@ -346,7 +364,7 @@ class TransaksiController extends Controller
 						
 						
 								// real production
-								$sendData = Curl::to('https://payment.tripay.co.id/api/transaction/create')
+								$sendData = Curl::to('https://tripay.co.id/api/transaction/create')
 								->withData( $data )
 								->withHeader('Authorization: Bearer 4synTlbXG2qsABvPRz7aT16aeq88fP4fhJKz3a1D')
 								->asJson()
