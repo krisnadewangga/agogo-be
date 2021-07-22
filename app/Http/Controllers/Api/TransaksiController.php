@@ -206,11 +206,13 @@ class TransaksiController extends Controller
 										$req_transaksi['tgl_bayar'] = Carbon::now();
 										$req_transaksi['transaksi_member'] = '1';
 										// return $req_transaksi;
-										$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 										
+										$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
+										$req_transaksi['total_bayar'] = $req_transaksi['total_bayar'] +  $req_transaksi['tax'];
+						
 										// $min_stock_item = $this->UpdateStock($itemTransaksi);
 
-										$new_saldo = $saldo - $req['total_bayar'];
+										$new_saldo = $saldo - $req_transaksi['total_bayar'];
 										$this->UpdateSaldo($req['user_id'],$new_saldo);
 
 
@@ -421,6 +423,8 @@ class TransaksiController extends Controller
 
 						$req_transaksi['waktu_kirim'] = $batas_bayar;
 
+
+						$req_transaksi['total_bayar'] = $req_transaksi['total_bayar'] +  $req_transaksi['tax'];
 						$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 						$itemForEmail = "";
 						$selitemForEmail = Transaksi::findOrFail($ins_transaksi->id);
@@ -520,7 +524,7 @@ class TransaksiController extends Controller
 						$msg = "Berhasil Simpan Transaksi";
 						$data = "";
 					}else if($req['metode_pembayaran'] == "4"){
-						
+						$req_transaksi['total_bayar'] = $req_transaksi['total_bayar'] +  $req_transaksi['tax'];
 						$ins_transaksi = $this->SimpanTransaksi($req_transaksi,$itemTransaksi);
 						// $order = [];
 						
