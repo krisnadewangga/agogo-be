@@ -11,6 +11,7 @@ use App\Promo;
 use App\Pesan;
 use App\User;
 use App\Versi;
+use App\Tax;
 
 use Validator;
 
@@ -358,6 +359,22 @@ class MasterController extends Controller
 
   // cek kas
 
+
+  public function cekTax($id){
+    // id = 1 = kasir
+    // id = 2 = pesanan
+    // id = 3 = android
+    // id = 4 = web
+
+    $data = Tax::findOrfail($id);
+    if($data->status_aktif == 1){
+      $data['tax'] = 10;
+    }else{
+      $data['tax'] = 0;
+    }
+   
+    return response()->json(['success' => 1, 'msg' => $data], 200);
+  }
  
 
   
