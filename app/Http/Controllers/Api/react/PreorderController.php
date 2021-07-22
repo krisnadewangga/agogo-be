@@ -152,6 +152,7 @@ public function store(Request $request)
             // 'kasir_id' => $req[0]['user_id'],
             'catatan' => $request[0]['catatan'],
             'detail_alamat' => $request[0]['alamat'],
+            'tax' => $request[0]['tax'],
             'metode_pembayaran' => '3',
             'waktu_kirim' => date("Y-m-d H:i:s")
           ];
@@ -338,6 +339,7 @@ public function editPreorder(Request $request)
       $update = Transaksi::where('id',$req[0]['preorder_id'])->update(['total_transaksi' =>$req[0]['subtotal'],
         'total_bayar' => $req[0]['total'],
         'catatan' => $request[0]['catatan'],
+        'tax' => $request[0]['tax'],
         'detail_alamat' => $request[0]['alamat']]);
 
 
