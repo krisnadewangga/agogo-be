@@ -179,24 +179,21 @@ class SendNotif{
     public static function sendNotifWa($no_hp, $message)
     {
         // $waktu_skrang = Carbon::now();
-        // $response = Curl::to('http://103.27.207.4/mawar/api/sendOutbox')
-        //     ->withData(
-        //         array(
-        //             'from' => '-',
-        //             'to' => $no_hp,
-        //             'msg' =>  $message,
-        //             'send_at' => '2020-09-16 18:30:00',
-        //             'session' => 'w7eq36',
-        //             'apikey' => 'o76tq4gdc9m555o3u8u29ns0b1'
-        //         )
-        //     )
-        //     ->post();
+        $response = Curl::to('http://localhost/web_gw/api/post.php')
+            ->withData(
+                array(
+                    'Phone' => $no_hp,
+                    'Message' =>  $message,
+                    'Apikey' => '2585'
+                )
+            )
+            ->post();
 
-            $response = Curl::to('https://ampel.wablas.com/api/send-message')
-                        ->withData( array( 'phone' => $no_hp,'message' => $message) )
-                        ->withHeader('Authorization: c3JhyjSlbIknDJN1PTUx3KiQZxgbGaNOdtZEPYUyuBt43OQfJtfg2zOlSxZCeVRo')
-                        ->asJson( true )
-                        ->post();
+            // $response = Curl::to('https://ampel.wablas.com/api/send-message')
+            //             ->withData( array( 'phone' => $no_hp,'message' => $message) )
+            //             ->withHeader('Authorization: c3JhyjSlbIknDJN1PTUx3KiQZxgbGaNOdtZEPYUyuBt43OQfJtfg2zOlSxZCeVRo')
+            //             ->asJson( true )
+            //             ->post();
         return $response;
 
     }
