@@ -201,7 +201,9 @@ class TransaksiController extends Controller
 							if($saldo > $req['total_bayar'] ){
 
 								if(isset($req['otp'])){
-									$findOtp = Otp::where('user_id',$req['user_id'])->first();
+									$findOtp = Otp::where('user_id',$req['user_id'])
+									->where('created_at', '>' , Carbon::now()->format('Y-m-d H:i:s'))
+									->first();
 									if($findOtp->otp == $req['otp']){
 										$req_transaksi['tgl_bayar'] = Carbon::now();
 										$req_transaksi['transaksi_member'] = '1';
@@ -601,7 +603,11 @@ class TransaksiController extends Controller
     	$req = $request->all();
         $rules = ['user_id' => 'required'];
         $messsages = ['user_id.required' => 'user_id Tidak Bisa Kosong' ];
-       
+
+	
+		$waktu_skrang = Carbon::now();
+		$waktuEx = $waktu_skrang->addMinutes(3)->format('Y-m-d H:i:s');
+
         $validator = Validator::make($req, $rules,$messsages);
         if($validator->fails()){
             $success = 0;
@@ -609,25 +615,47 @@ class TransaksiController extends Controller
             $kr = 400;
         }else{
         	$cek = Otp::where('user_id', $req['user_id'])->first();
+
+			
 	        $angka =  date('s') . $req['user_id'];
 	        $otp =  Acak::otp($angka);
 	        if ($cek) {
-	            $angka =  date('s') . $req['user_id'];
-	            $otp =  Acak::otp($angka);
-	            $data['otp'] = $otp;
-	            $cek->update($data);
-	            $id = $cek->id;
-	            $no_hp = $cek->User->no_hp;
+
+				if($cek->created_at < Carbon::now()->format('Y-m-d H:i:s')){
+					$angka =  date('s') . $req['user_id'];
+					$otp =  Acak::otp($angka);
+					$data['otp'] = $otp;
+					$data['created_at'] = $waktuEx;
+					$cek->update($data);
+					$id = $cek->id;
+					$no_hp = $cek->User->no_hp;
+
+					$msg_wa = 'Agogo Bakery Kode OTP : ' . $otp . ' .Kode OTP Bersifat Rahasia dan Jangan Beritahu Siapapun !!';
+					$response = SendNotif::sendNotifWa($no_hp, $msg_wa);	
+				}else{
+
+					$otp = $cek->otp;
+					$id = $cek->id;
+					$no_hp = $cek->User->no_hp;
+					// $msg_wa = 'Agogo Bakery Kode OTP : ' . $cek->otp . ' .Kode OTP Bersifat Rahasia dan Jangan Beritahu Siapapun !!';
+					// $response = SendNotif::sendNotifWa($no_hp, $msg_wa);
+				}
+				
+	            
+
+
 	        } else {
 	            $data['otp'] = $otp;
 	            $data['user_id'] = $req['user_id'];
+				$data['created_at'] = $waktuEx;
 	            $i = Otp::create($data);
 	            $id = $i->id;
 	            $no_hp = $i->User->no_hp;
+				$msg_wa = 'Agogo Bakery Kode OTP : ' . $otp . ' .Kode OTP Bersifat Rahasia dan Jangan Beritahu Siapapun !!';
+				$response = SendNotif::sendNotifWa($no_hp, $msg_wa);
 	        }
 
-	        $msg_wa = 'Agogo Bakery Kode OTP : ' . $otp . ' .Kode OTP Bersifat Rahasia dan Jangan Beritahu Siapapun !!';
-	        $response = SendNotif::sendNotifWa($no_hp, $msg_wa);
+	      
 	        // $r = array(json_decode($response, true));
 	      	
         	$success = 1;
