@@ -463,7 +463,7 @@ class TransaksiController extends Controller
             $total_bayar = $find->total_bayar;
             $new_saldo = $saldo_saat_ini + $total_bayar;
             $update_saldo = $find->User->DetailKonsumen()->update(['saldo' => $new_saldo]);
-            $sambunganNotif = " ,Saldo Yang Dipakai, Telah Di Pulihkan Ke Akun Anda";
+            $sambunganNotif = "Dana Yang telah Dipakai di kembalikan Ke saldo Akun Anda";
         }else{
             $sambunganNotif = "";
         }
