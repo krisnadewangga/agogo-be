@@ -264,100 +264,112 @@ public function GetLastDate()
 
 public function postProduction(Request $request)
 {
-    $ubah_tanggal = null;
-    $ubah_tanggal = $request[0]['ubah_tanggal'];
 
-    if(!Auth::attempt(['name' => $request[0]['username_approval'], 'password' => $request[0]['pin_approval']]))
-        return response()->json([
-          'status' => 'failed',
-          'message' => 'Invalid Username / PIN'
-      ], 400);
-    $user = $request->user();
-    // $role = Role::where('user_id',$user->id)
-    //              ->whereIn('level_id',['1','2','7'])
-    //              ->count();
-    $role = Aproval::where('user_id',$user->id)->where('rule','3')->count();
+    if($request == null ){
 
-    if($role > 0){
-
-        DB::beginTransaction();
-        try {
-
-
-            $date_produksi = DB::table('produksi')
-            ->select('created_at')
-            ->orderBy('created_at', 'DESC')->first();
-            
-            $tgl_produksi = null;
-
-      
-
-            if (Carbon::parse($date_produksi->created_at)->format('Y-m-d') < Carbon::now()->format('Y-m-d') ){            
-                $tgl_produksi = Carbon::parse($date_produksi->created_at)->format('Y-m-d') . '23:59:59';    
-               
-            }            
-          
-            else {
-                $tgl_produksi = Carbon::now()->format('Y-m-d H:i:s');
-            
-            }
-
-            $cari = Produksi::where('item_id',$request[0]['product_id'])->orderBy('created_at','DESC')->first();
-
-            if(Carbon::parse($cari->created_at)->format('Y-m-d H:i:s') < Carbon::now()->format('Y-m-d H:i:s')){
-
-                if($request[0]['produksi1'] > 0 || $request[0]['ket_rusak'] > 0 || $request[0]['ket_lain'] > 0 ){           
-                    $production = Produksi::create([
-                        'item_id'               => $request[0]['product_id'] ,
-                        'produksi1'             => $request[0]['produksi1'],
-                        'produksi2'             => 0,
-                        'produksi3'             => 0,
-                        'total_produksi'        => $request[0]['total_produksi'],
-                        'penjualan_toko'        => $request[0]['penjualan_toko'],
-                        'penjualan_pemesanan'   => $request[0]['penjualan_pemesanan'],
-                        'total_penjualan'       => $request[0]['total_penjualan'],
-                        'ket_rusak'             => $request[0]['ket_rusak'],
-                        'ket_lain'              => $request[0]['ket_lain'],
-                        'total_lain'            => $request[0]['total_lain'],
-                        'catatan'               => $request[0]['catatan'],
-                        'stock_awal'            => $request[0]['stock_awal'],
-                        'sisa_stock'            => $request[0]['sisa_stock'],
-                        'created_at'            => $tgl_produksi
-    
-    
-                    ]); 
-                    $sisa_stock = $request[0]['sisa_stock'];
-                    $products = DB::table('item')->where('id', $request[0]['product_id'])->update(['stock' => $sisa_stock]);
-                } 
-            }
-
-
-
-
-            
-
-
-            
-
-            DB::commit();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Produksi Berhasil',
-            ]);
-        } catch (Exception $e) {
-            DB::rollback();
-            return response()->json([
-                'status' => 'failed',
-                'message' => $e->getMessage()
-            ], 400);
-        }
-    }else {
         return response()->json([
             'status' => 'failed',
             'message' => 'Anda Bukan Approval'
         ], 400);
+
+    }else{
+        $ubah_tanggal = null;
+        $ubah_tanggal = $request[0]['ubah_tanggal'];
+    
+        if(!Auth::attempt(['name' => $request[0]['username_approval'], 'password' => $request[0]['pin_approval']]))
+            return response()->json([
+              'status' => 'failed',
+              'message' => 'Invalid Username / PIN'
+          ], 400);
+        $user = $request->user();
+        // $role = Role::where('user_id',$user->id)
+        //              ->whereIn('level_id',['1','2','7'])
+        //              ->count();
+        $role = Aproval::where('user_id',$user->id)->where('rule','3')->count();
+    
+        if($role > 0){
+    
+            DB::beginTransaction();
+            try {
+    
+    
+                $date_produksi = DB::table('produksi')
+                ->select('created_at')
+                ->orderBy('created_at', 'DESC')->first();
+                
+                $tgl_produksi = null;
+    
+          
+    
+                if (Carbon::parse($date_produksi->created_at)->format('Y-m-d') < Carbon::now()->format('Y-m-d') ){            
+                    $tgl_produksi = Carbon::parse($date_produksi->created_at)->format('Y-m-d') . '23:59:59';    
+                   
+                }            
+              
+                else {
+                    $tgl_produksi = Carbon::now()->format('Y-m-d H:i:s');
+                
+                }
+    
+                $cari = Produksi::where('item_id',$request[0]['product_id'])->orderBy('created_at','DESC')->first();
+    
+                if(Carbon::parse($cari->created_at)->format('Y-m-d H:i:s') < Carbon::now()->format('Y-m-d H:i:s')){
+    
+                    if($request[0]['produksi1'] > 0 || $request[0]['ket_rusak'] > 0 || $request[0]['ket_lain'] > 0 ){           
+                        $production = Produksi::create([
+                            'item_id'               => $request[0]['product_id'] ,
+                            'produksi1'             => $request[0]['produksi1'],
+                            'produksi2'             => 0,
+                            'produksi3'             => 0,
+                            'total_produksi'        => $request[0]['total_produksi'],
+                            'penjualan_toko'        => $request[0]['penjualan_toko'],
+                            'penjualan_pemesanan'   => $request[0]['penjualan_pemesanan'],
+                            'total_penjualan'       => $request[0]['total_penjualan'],
+                            'ket_rusak'             => $request[0]['ket_rusak'],
+                            'ket_lain'              => $request[0]['ket_lain'],
+                            'total_lain'            => $request[0]['total_lain'],
+                            'catatan'               => $request[0]['catatan'],
+                            'stock_awal'            => $request[0]['stock_awal'],
+                            'sisa_stock'            => $request[0]['sisa_stock'],
+                            'created_at'            => $tgl_produksi
+        
+        
+                        ]); 
+                        $sisa_stock = $request[0]['sisa_stock'];
+                        $products = DB::table('item')->where('id', $request[0]['product_id'])->update(['stock' => $sisa_stock]);
+                    } 
+                }
+    
+    
+    
+    
+                
+    
+    
+                
+    
+                DB::commit();
+    
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Produksi Berhasil',
+                ]);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => $e->getMessage()
+                ], 400);
+            }
+        }else {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Anda Bukan Approval'
+            ], 400);
+        }
+
     }
+    
 }
 
 
