@@ -219,7 +219,7 @@ class TransaksiController extends Controller
 
 
 
-									     $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \n Dengan Metode Pembayaran melalui saldo anda sebesar ". $req['total_bayar']. "\n yang sebelumnya saldo anda ".$saldo.", sisah saldo anda sekarang ".$new_saldo;
+									     $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi " .$ins_transaksi->no_transaksi." \n Dengan Metode Pembayaran melalui saldo anda sebesar ". $req['total_bayar']. "\n yang sebelumnya saldo anda ".$saldo.", sisa saldo anda sekarang ".$new_saldo;
 
 										// notif android
 										$dnotif =[

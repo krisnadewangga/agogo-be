@@ -44,6 +44,9 @@ class SendNotif{
 	    $downstreamResponse = FCM::sendTo($token, $option, null, $data);
     }
 
+
+    
+
     public static function sendTopic($judul,$pesan)
     {
         $notificationBuilder = new PayloadNotificationBuilder($judul);
