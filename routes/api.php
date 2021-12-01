@@ -170,7 +170,7 @@ Route::get('/clear-cache', function() {
 
 
 Route::get('/kirimm',function(){
-    SendNotif::sendNotifWa('082343965747',"cantik");
+    SendNotif::sendNotifWa('+6282343965747',"cantik");
 
 
    
