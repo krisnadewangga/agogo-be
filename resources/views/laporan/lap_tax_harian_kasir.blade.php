@@ -1,13 +1,13 @@
 @extends('layouts.app1')
 
 @section('content')
-	@component('components.card', ['title' => 'Lap. Total Tax Harian', 
+	@component('components.card', ['title' => 'Lap. Total Tax Harian Kasir', 
 								   'breadcumbs' => array(
                                                           array('judul' => 'Lap. Tax','link' => '#')
                                                     	) 
                                   ])
         <div class="card">
-        	<form method="POST" action="{{ route('cari_tax_harian') }}">
+        	<form method="POST" action="{{ route('cari_tax_harian_kasir') }}">
 	        	@csrf
 	        	<div class="row">
 	        		<div class="col-md-3">
@@ -79,7 +79,7 @@
 	        	</div>
         		<div  style="margin-top: 5px;">
         			<button class="btn btn-primary">Cari</button>
-        			<a href="{{ route('lap_tax_harian') }}"><label class="btn btn-warning" >Reset</label></a>
+        			<a href="{{ route('lap_tax_harian_kasir') }}"><label class="btn btn-warning" >Reset</label></a>
         			<a href="javascript:export_pdf()"><label class="btn btn-success" >Export PDF</label></a>
         		</div>
         	</form>
@@ -148,7 +148,7 @@
         		var sort_by = $("#sort_by").val();
                 var opsi_sort = $("#opsi_sort").val();
 				
-				window.open('export_tax_harian?mt='+tanggal+'&st='+tanggal1+'&sort_by='+sort_by+'&opsi_sort='+opsi_sort, '_blank');
+				window.open('export_tax_harian_kasir?mt='+tanggal+'&st='+tanggal1+'&sort_by='+sort_by+'&opsi_sort='+opsi_sort, '_blank');
         	}
         </script>
     @endcomponent
