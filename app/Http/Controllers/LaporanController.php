@@ -1811,12 +1811,13 @@ class LaporanController extends Controller
               ];
       $opsi = ['1' => 'ASC','2' => 'DESC'];
 
-      $transaksi = Transaksi::selectRaw("date(updated_at) as tgl,sum(total_transaksi) as total_transaksi, sum(tax) as total_tax, 
+      $transaksi = Transaksi::selectRaw("date(tgl_bayar) as tgl,sum(total_transaksi) as total_transaksi, sum(tax) as total_tax, 
                                    (sum(total_transaksi) + sum(potongan)) as transaksi")
                                    ->where('jalur','1')
                                    ->where('jenis','1')
-                        ->whereBetween('updated_at',$data)          
-                        ->groupBy(DB::raw('date(updated_at)'))
+                                   ->where('for_ps','0')
+                        ->whereBetween('tgl_bayar',$data)          
+                        ->groupBy(DB::raw('date(tgl_bayar)'))
                         
                         ->orderBy($sort[$data[2]], $opsi[$data[3]])
                         ->get();
