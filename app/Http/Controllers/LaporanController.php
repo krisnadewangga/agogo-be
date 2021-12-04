@@ -1550,22 +1550,70 @@ class LaporanController extends Controller
       return view('laporan.lap_pendapatan_harian',compact('menu_active','input','data'));   
     }
 
-    public function LaporanTaxHarian()
+    public function LaporanTaxHarianKasir()
     {
    
       $dates = [Carbon::now()->startOfMonth()->format('Y-m-d'), 
                 Carbon::now()->endOfMonth()->format('Y-m-d'),
                 '1','1'];
 
-      $data = $this->SetDataTaxHarian($dates);
+      $data = $this->SetDataTaxHarianKasir($dates);
      
+
+            
+
+
+
       $input = ['mt' => Carbon::now()->startOfMonth()->format('d/m/Y') , 
                 'st' => Carbon::now()->endOfMonth()->format('d/m/Y'), 
                 'sort_by' => '1', 'opsi_sort' => '1'];
 
-      $menu_active = "laporan|tax_harian|0";
-      return view('laporan.lap_tax_harian',compact('menu_active','input','data'));   
+      $menu_active = "laporan_tax|tax_harian_kasir|0";
+      return view('laporan.lap_tax_harian_kasir',compact('menu_active','input','data'));   
     }
+
+    public function LaporanTaxHarianPesanan()
+    {
+   
+      $dates = [Carbon::now()->startOfMonth()->format('Y-m-d'), 
+                Carbon::now()->endOfMonth()->format('Y-m-d'),
+                '1','1'];
+
+      $data = $this->SetDataTaxHarianPesanan($dates);
+     
+
+            
+
+
+
+      $input = ['mt' => Carbon::now()->startOfMonth()->format('d/m/Y') , 
+                'st' => Carbon::now()->endOfMonth()->format('d/m/Y'), 
+                'sort_by' => '1', 'opsi_sort' => '1'];
+
+      $menu_active = "laporan_tax|tax_harian_pesanan|0";
+      return view('laporan.lap_tax_harian_pesanan',compact('menu_active','input','data'));   
+    }
+
+    public function LaporanTaxHarianWeb()
+    {
+   
+      $dates = [Carbon::now()->startOfMonth()->format('Y-m-d'), 
+                Carbon::now()->endOfMonth()->format('Y-m-d'),
+                '1','1'];
+
+      $data = $this->SetDataTaxHarianWeb($dates);
+     
+
+    
+
+      $input = ['mt' => Carbon::now()->startOfMonth()->format('d/m/Y') , 
+                'st' => Carbon::now()->endOfMonth()->format('d/m/Y'), 
+                'sort_by' => '1', 'opsi_sort' => '1'];
+
+      $menu_active = "laporan_tax|tax_harian_web|0";
+      return view('laporan.lap_tax_harian_web',compact('menu_active','input','data'));   
+    }
+
 
 
 
@@ -1600,7 +1648,7 @@ class LaporanController extends Controller
       return view('laporan.lap_pendapatan_harian',compact('menu_active','input','data'));  
     }
 
-    public function CariTaxHarian(Request $request)
+    public function CariTaxHarianKasir(Request $request)
     {
       $req = $request->all();
       if(empty($req['mt'])){
@@ -1618,7 +1666,7 @@ class LaporanController extends Controller
       }
 
       $dates = [$mt." 00:00:00", $st." 23:59:00", $req['sort_by'], $req['opsi_sort']];
-      $data = $this->SetDataTaxHarian($dates);
+      $data = $this->SetDataTaxHarianKasir($dates);
 
       $input = ['mt' => Carbon::parse($mt)->format('d/m/Y') , 
                 'st' => Carbon::parse($st)->format('d/m/Y'),
@@ -1626,9 +1674,71 @@ class LaporanController extends Controller
                 'opsi_sort' => $req['opsi_sort']
                ];
 
-      $menu_active = "laporan|tax_harian|0";
+      $menu_active = "laporan_tax|tax_harian_kasir|0";
 
-      return view('laporan.lap_tax_harian',compact('menu_active','input','data'));  
+      return view('laporan.lap_tax_harian_kasir',compact('menu_active','input','data'));  
+    }
+
+    public function CariTaxHarianPesanan(Request $request)
+    {
+      $req = $request->all();
+      if(empty($req['mt'])){
+        $mt = Carbon::now()->startOfMonth()->format('Y-m-d');
+      }else{
+        $explode = explode('/', $req['mt']);
+        $mt = $explode[2].'-'.$explode[1].'-'.$explode[0];
+      }
+
+      if(empty($req['st'])){
+        $st =  Carbon::now()->endOfMonth()->format('Y-m-d');
+      }else{
+        $explode1 = explode('/', $req['st']);
+        $st = $explode1[2].'-'.$explode1[1].'-'.$explode1[0];
+      }
+
+      $dates = [$mt." 00:00:00", $st." 23:59:00", $req['sort_by'], $req['opsi_sort']];
+      $data = $this->SetDataTaxHarianPesanan($dates);
+
+      $input = ['mt' => Carbon::parse($mt)->format('d/m/Y') , 
+                'st' => Carbon::parse($st)->format('d/m/Y'),
+                'sort_by' => $req['sort_by'],
+                'opsi_sort' => $req['opsi_sort']
+               ];
+
+      $menu_active = "laporan_tax|tax_harian_pesanan|0";
+
+      return view('laporan.lap_tax_harian_pesanan',compact('menu_active','input','data'));  
+    }
+
+    public function CariTaxHarianWeb(Request $request)
+    {
+      $req = $request->all();
+      if(empty($req['mt'])){
+        $mt = Carbon::now()->startOfMonth()->format('Y-m-d');
+      }else{
+        $explode = explode('/', $req['mt']);
+        $mt = $explode[2].'-'.$explode[1].'-'.$explode[0];
+      }
+
+      if(empty($req['st'])){
+        $st =  Carbon::now()->endOfMonth()->format('Y-m-d');
+      }else{
+        $explode1 = explode('/', $req['st']);
+        $st = $explode1[2].'-'.$explode1[1].'-'.$explode1[0];
+      }
+
+      $dates = [$mt." 00:00:00", $st." 23:59:00", $req['sort_by'], $req['opsi_sort']];
+      $data = $this->SetDataTaxHarianWeb($dates);
+
+      $input = ['mt' => Carbon::parse($mt)->format('d/m/Y') , 
+                'st' => Carbon::parse($st)->format('d/m/Y'),
+                'sort_by' => $req['sort_by'],
+                'opsi_sort' => $req['opsi_sort']
+               ];
+
+      $menu_active = "laporan_tax|tax_harian_web|0";
+
+      return view('laporan.lap_tax_harian_web',compact('menu_active','input','data'));  
     }
 
     public function SetDataPendapatanHarian($data)
@@ -1660,7 +1770,7 @@ class LaporanController extends Controller
     }
 
 
-    public function SetDataTaxHarian($data)
+    public function SetDataTaxHarianKasir($data)
     {
       $sort = ['1' => 'tgl',
                '2' => 'total_transaksi',
@@ -1669,12 +1779,16 @@ class LaporanController extends Controller
               ];
       $opsi = ['1' => 'ASC','2' => 'DESC'];
 
-      $transaksi = Kas::selectRaw("date(updated_at) as tgl, sum(transaksi) as total_transaksi, sum(tax) as total_tax, 
-                                   (sum(transaksi) + sum(diskon) ) as transaksi ")
+      $transaksi = Transaksi::selectRaw("date(updated_at) as tgl,sum(total_transaksi) as total_transaksi, sum(tax) as total_tax, 
+                                   (sum(total_transaksi) + sum(potongan)) as transaksi")
+                                   ->where('jalur','2')
+                                   ->where('jenis','1')
                         ->whereBetween('updated_at',$data)          
                         ->groupBy(DB::raw('date(updated_at)'))
                         ->orderBy($sort[$data[2]], $opsi[$data[3]])
                         ->get();
+
+ 
 
 
       $grandTotalTransaksi = $transaksi->sum('transaksi');
@@ -1687,6 +1801,73 @@ class LaporanController extends Controller
                'grandTotal' => number_format($grandTotal) ];
       return $data;
     }
+
+    public function SetDataTaxHarianWeb($data)
+    {
+      $sort = ['1' => 'tgl',
+               '2' => 'total_transaksi',
+               '3' => 'total_tax',
+               '4' => 'transaksi'
+              ];
+      $opsi = ['1' => 'ASC','2' => 'DESC'];
+
+      $transaksi = Transaksi::selectRaw("date(updated_at) as tgl,sum(total_transaksi) as total_transaksi, sum(tax) as total_tax, 
+                                   (sum(total_transaksi) + sum(potongan)) as transaksi")
+                                   ->where('jalur','1')
+                                   ->where('jenis','1')
+                        ->whereBetween('updated_at',$data)          
+                        ->groupBy(DB::raw('date(updated_at)'))
+                        
+                        ->orderBy($sort[$data[2]], $opsi[$data[3]])
+                        ->get();
+
+ 
+
+
+      $grandTotalTransaksi = $transaksi->sum('transaksi');
+      $grandTotalTax = $transaksi->sum('total_tax');
+      $grandTotal = $transaksi->sum('total_transaksi');
+
+      $data = ['data' => $transaksi, 
+               'grandTotalTransaksi' => number_format($grandTotalTransaksi),
+               'grandTotalTax' =>  number_format($grandTotalTax),
+               'grandTotal' => number_format($grandTotal) ];
+      return $data;
+    }
+
+    public function SetDataTaxHarianPesanan($data)
+    {
+      $sort = ['1' => 'tgl',
+               '2' => 'total_transaksi',
+               '3' => 'total_tax',
+               '4' => 'transaksi'
+              ];
+      $opsi = ['1' => 'ASC','2' => 'DESC'];
+
+      $transaksi = Transaksi::selectRaw("date(updated_at) as tgl,sum(total_transaksi) as total_transaksi, sum(tax) as total_tax, 
+                                   (sum(total_transaksi) + sum(potongan)) as transaksi")
+                                   ->where('jalur','2')
+                                   ->where('jenis','2')
+                                   ->where('for_ps','1')
+                        ->whereBetween('updated_at',$data)          
+                        ->groupBy(DB::raw('date(updated_at)'))
+                        ->orderBy($sort[$data[2]], $opsi[$data[3]])
+                        ->get();
+
+ 
+
+
+      $grandTotalTransaksi = $transaksi->sum('transaksi');
+      $grandTotalTax = $transaksi->sum('total_tax');
+      $grandTotal = $transaksi->sum('total_transaksi');
+
+      $data = ['data' => $transaksi, 
+               'grandTotalTransaksi' => number_format($grandTotalTransaksi),
+               'grandTotalTax' =>  number_format($grandTotalTax),
+               'grandTotal' => number_format($grandTotal) ];
+      return $data;
+    }
+
 
 
 
@@ -1717,7 +1898,7 @@ class LaporanController extends Controller
 
     }
 
-    public function ExportTaxHarian(Request $request)
+    public function ExportTaxHarianKasir(Request $request)
     {
       $req = $request->all();
       if(empty($req['mt'])){
@@ -1735,12 +1916,72 @@ class LaporanController extends Controller
       }
 
       $dates = [$mt." 00:00:00", $st." 23:59:00", $req['sort_by'], $req['opsi_sort']];
-      $data = $this->SetDataTaxHarian($dates);
+      $data = $this->SetDataTaxHarianKasir($dates);
 
       $start_tanggal = Carbon::parse($mt)->format('d/m/Y')." - ".Carbon::parse($st)->format('d/m/Y');
       
-      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.tax_harian', compact('data', 'start_tanggal'));
-      return $pdf->stream('laporan-tax-harian-'.$start_tanggal.'.pdf');
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.tax_harian_kasir', compact('data', 'start_tanggal'));
+      return $pdf->stream('laporan-tax-harian-kasir'.$start_tanggal.'.pdf');
+
+    }
+
+    
+  
+
+
+    
+    public function ExportTaxHarianPesanan(Request $request)
+    {
+      $req = $request->all();
+      if(empty($req['mt'])){
+        $mt = Carbon::now()->startOfMonth()->format('Y-m-d');
+      }else{
+        $explode = explode('/', $req['mt']);
+        $mt = $explode[2].'-'.$explode[1].'-'.$explode[0];
+      }
+
+      if(empty($req['st'])){
+        $st =  Carbon::now()->endOfMonth()->format('Y-m-d');
+      }else{
+        $explode1 = explode('/', $req['st']);
+        $st = $explode1[2].'-'.$explode1[1].'-'.$explode1[0];
+      }
+
+      $dates = [$mt." 00:00:00", $st." 23:59:00", $req['sort_by'], $req['opsi_sort']];
+      $data = $this->SetDataTaxHarianPesanan($dates);
+
+      $start_tanggal = Carbon::parse($mt)->format('d/m/Y')." - ".Carbon::parse($st)->format('d/m/Y');
+      
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.tax_harian_kasir', compact('data', 'start_tanggal'));
+      return $pdf->stream('laporan-tax-harian-pesanan'.$start_tanggal.'.pdf');
+
+    }
+
+    
+    public function ExportTaxHarianWeb(Request $request)
+    {
+      $req = $request->all();
+      if(empty($req['mt'])){
+        $mt = Carbon::now()->startOfMonth()->format('Y-m-d');
+      }else{
+        $explode = explode('/', $req['mt']);
+        $mt = $explode[2].'-'.$explode[1].'-'.$explode[0];
+      }
+
+      if(empty($req['st'])){
+        $st =  Carbon::now()->endOfMonth()->format('Y-m-d');
+      }else{
+        $explode1 = explode('/', $req['st']);
+        $st = $explode1[2].'-'.$explode1[1].'-'.$explode1[0];
+      }
+
+      $dates = [$mt." 00:00:00", $st." 23:59:00", $req['sort_by'], $req['opsi_sort']];
+      $data = $this->SetDataTaxHarianWeb($dates);
+
+      $start_tanggal = Carbon::parse($mt)->format('d/m/Y')." - ".Carbon::parse($st)->format('d/m/Y');
+      
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.tax_harian_kasir', compact('data', 'start_tanggal'));
+      return $pdf->stream('laporan-tax-harian-web'.$start_tanggal.'.pdf');
 
     }
 

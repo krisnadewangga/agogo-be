@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>LAPORAN TAX HARIAN</title>
+    <title>LAPORAN TAX HARIAN WEB & ANDROID</title>
     <style>
         body{
             padding: 0;
@@ -79,7 +79,7 @@
                  <img src="{{ asset('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>     
             </td>
             <td  style="width: 70%; text-align: right;">
-                <h4 style="">LAPORAN TOTAL TAX HARIAN</h4>
+                <h4 style="">LAPORAN TOTAL TAX HARIAN WEB DAN ANDROID</h4>
                 <p style="font-size: 20px">Tanggal Transaksi : {{ $start_tanggal }}</p>
             </td>
         </tr>
