@@ -94,15 +94,27 @@ Route::post('/cari_laporan_penjualan_per_item','LaporanController@CariPenjualanP
 Route::get('/lap_pendapatan_harian','LaporanController@LaporanPendapatanHarian')->name('lap_pendapatan_harian');
 Route::post('/cari_pendapatan_harian','LaporanController@CariPendapatanHarian')->name('cari_pendapatan_harian');
 
-Route::get('/lap_tax_harian','LaporanController@LaporanTaxHarian')->name('lap_tax_harian');
-Route::post('/cari_tax_harian','LaporanController@CariTaxHarian')->name('cari_tax_harian');
+Route::get('/lap_tax_harian_kasir','LaporanController@LaporanTaxHarianKasir')->name('lap_tax_harian_kasir');
+Route::post('/cari_tax_harian_kasir','LaporanController@CariTaxHarianKasir')->name('cari_tax_harian_kasir');
+
+Route::get('/lap_tax_harian_pesanan','LaporanController@LaporanTaxHarianPesanan')->name('lap_tax_harian_pesanan');
+Route::post('/cari_tax_harian_pesanan','LaporanController@CariTaxHarianPesanan')->name('cari_tax_harian_pesanan');
+
+Route::get('/lap_tax_harian_web','LaporanController@LaporanTaxHarianWeb')->name('lap_tax_harian_web');
+Route::post('/cari_tax_harian_web','LaporanController@CariTaxHarianWeb')->name('cari_tax_harian_web');
 
 Route::get('/export_penjualan','LaporanController@ExportPenjualan')->name('export_penjualan'); 
 Route::get('/export_pendapatan','LaporanController@ExportPendapatan')->name('export_pendapatan');
 Route::get('/export_penjualan_per_item','LaporanController@ExportPenjualanPerItem')->name('export_penjualan_per_item');
 Route::get('/export_pendapatan_harian','LaporanController@ExportPendapatanHarian')->name('export_pendapatan_harian');
 
-Route::get('/export_tax_harian','LaporanController@ExportTaxHarian')->name('export_tax_harian');
+Route::get('/export_tax_harian_kasir','LaporanController@ExportTaxHarianKasir')->name('export_tax_harian_kasir');
+
+Route::get('/export_tax_harian_pesanan','LaporanController@ExportTaxHarianPesanan')->name('export_tax_harian');
+
+
+Route::get('/export_tax_harian_web','LaporanController@ExportTaxHarianWeb')->name('export_tax_harian_web');
+
 
 
 Route::get('/export_kas','LaporanController@ExportKas')->name('export_kas');
