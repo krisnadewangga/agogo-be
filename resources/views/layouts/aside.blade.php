@@ -134,7 +134,25 @@
               <li id="sm_kas"><a href="{{ route('lap_kas') }}"><i class="fa fa-circle-o"></i> <span>Kas</span></a></li>
               <li id="sm_opname"><a href="{{ route('opname') }}"><i class="fa fa-circle-o"></i> <span>Opname</span></a></li>
               <li id="sm_pergerakan_stock"><a href="{{ route('lap_pergerakan_stock') }}"><i class="fa fa-circle-o"></i> <span>Pergerakan Stock</span></a></li>
-              <li id="sm_pendapatan_harian"><a href="{{ route('lap_tax_harian') }}"><i class="fa fa-circle-o"></i> <span>Total Tax Harian</span></a></li>
+             
+            </ul>
+          </li>
+
+
+          <li class="treeview" id="m_laporan_tax">
+            <a href="#">
+              <i class="fa fa-files-o"></i>
+              <span>Laporan Tax</span>
+              <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+            </a>
+            <ul class="treeview-menu">
+            
+            <li id="sm_tax_harian_kasir"><a href="{{ route('lap_tax_harian_kasir') }}"><i class="fa fa-circle-o"></i> <span>Tax Kasir</span></a></li>
+            <li id="sm_tax_harian_pesanan"><a href="{{ route('lap_tax_harian_pesanan') }}"><i class="fa fa-circle-o"></i> <span>Tax Pesanan</span></a></li>
+
+              <li id="sm_tax_harian_web"><a href="{{ route('lap_tax_harian_web') }}"><i class="fa fa-circle-o"></i> <span>Tax Web/Android</span></a></li>
 
             </ul>
           </li>
