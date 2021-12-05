@@ -1601,9 +1601,13 @@ class LaporanController extends Controller
                 Carbon::now()->endOfMonth()->format('Y-m-d'),
                 '1','1'];
 
+
+
+
       $data = $this->SetDataTaxHarianWeb($dates);
      
 
+     // return response()->json(['success' => 1, 'msg' => $data], 200);
     
 
       $input = ['mt' => Carbon::now()->startOfMonth()->format('d/m/Y') , 
@@ -1779,12 +1783,12 @@ class LaporanController extends Controller
               ];
       $opsi = ['1' => 'ASC','2' => 'DESC'];
 
-      $transaksi = Transaksi::selectRaw("date(updated_at) as tgl,sum(total_transaksi) as total_transaksi, sum(tax) as total_tax, 
+      $transaksi = Transaksi::selectRaw("date(tgl_bayar) as tgl,sum(total_transaksi) as total_transaksi, sum(tax) as total_tax, 
                                    (sum(total_transaksi) + sum(potongan)) as transaksi")
                                    ->where('jalur','2')
                                    ->where('jenis','1')
-                        ->whereBetween('updated_at',$data)          
-                        ->groupBy(DB::raw('date(updated_at)'))
+                        ->whereBetween('tgl_bayar',$data)          
+                        ->groupBy(DB::raw('date(tgl_bayar)'))
                         ->orderBy($sort[$data[2]], $opsi[$data[3]])
                         ->get();
 
@@ -1815,10 +1819,10 @@ class LaporanController extends Controller
                                    (sum(total_transaksi) + sum(potongan)) as transaksi")
                                    ->where('jalur','1')
                                    ->where('jenis','1')
-                                   ->where('for_ps','0')
+                                   ->where('status','5')
+
                         ->whereBetween('tgl_bayar',$data)          
                         ->groupBy(DB::raw('date(tgl_bayar)'))
-                        
                         ->orderBy($sort[$data[2]], $opsi[$data[3]])
                         ->get();
 
