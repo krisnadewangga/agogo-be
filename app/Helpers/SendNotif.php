@@ -182,6 +182,7 @@ class SendNotif{
     public static function sendNotifWa($no_hp, $message)
     {
         // $waktu_skrang = Carbon::now();
+        $response = "";
         $response = Curl::to('http://localhost/web_gw/api/post.php')
             ->withData(
                 array(
@@ -198,7 +199,6 @@ class SendNotif{
             //             ->asJson( true )
             //             ->post();
         return $response;
-
     }
 
 
