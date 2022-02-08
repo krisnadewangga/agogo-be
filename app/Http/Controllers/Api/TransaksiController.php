@@ -68,6 +68,9 @@ class TransaksiController extends Controller
 		
 		// if($sel_user->DetailKonsumen->kunci_transaksi == 0){
 
+
+			
+
 		if($transaksi_berlangsung < '3'){
 
 			$itemTransaksi = [];
@@ -977,6 +980,18 @@ class TransaksiController extends Controller
         	
         }
         return response()->json(['success' => $success, 'msg' => $msg],$kr);
+    }
+
+
+	public function getTransaksiUser($id)
+    {
+    	$find = Transaksi::where('user_id',$id)->count();
+    	if($find >= 3){
+    		$success = 1;
+    	}else{
+    		$success = 0;
+    	}
+    	return response()->json(['success' => $success], 200);
     }
     
 }
