@@ -169,7 +169,7 @@ Route::get('/clear-cache', function() {
 });
 
 // jumlah user transaksi
-Route::get('get_jumlah_trx/{id}','Api\TransaksiController@getTransaksiUser');
+Route::get('get_jumlah_trx','Api\TransaksiController@getTransaksiUser');
 
 Route::get('/kirimm',function(){
     SendNotif::sendNotifWa('+6282343965747',"cantik");
