@@ -168,6 +168,8 @@ Route::get('/clear-cache', function() {
     return "Cache is cleared";
 });
 
+// jumlah user transaksi
+Route::get('get_jumlah_trx/{id}','Api\TransaksiController@getTransaksiUser');
 
 Route::get('/kirimm',function(){
     SendNotif::sendNotifWa('082343965747',"cantik");
