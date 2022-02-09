@@ -983,9 +983,9 @@ class TransaksiController extends Controller
     }
 
 
-	public function getTransaksiUser($id)
+	public function getTransaksiUser(Request $request)
     {
-    	$find = Transaksi::where('user_id',$id)->count();
+    	$find = Transaksi::where('user_id',$request['id'])->count();
     	if($find >= 3){
     		$success = 1;
     	}else{
