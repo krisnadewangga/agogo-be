@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 Use App\Kas;
 use App\Role;
 use App\Aproval;
+use App\Level;
 use DB;
 use Illuminate\Support\Facades\Auth;
 use App\Transaksi;
@@ -56,6 +57,8 @@ class KasController extends Controller
 				'message' => 'Invalid Username / PIN'
 			], 400);
 		$user = $request->user();
+
+     
 		// $role = Role::where('user_id',$user->id)
   //                   ->whereIn('level_id',['1','2','7'])->count();
         $role = Aproval::where('user_id',$user->id)->where('rule','1')->count();
@@ -63,7 +66,12 @@ class KasController extends Controller
 
 		if($role > 0){
 
-			DB::beginTransaction();
+            $kasirr = Role::where('user_id',$request[0]['user_id'])->where('level_id','3')->count();
+
+
+            if($kasirr > 0){
+
+                DB::beginTransaction();
 			try {
 				$kas = Kas::create(array(
 					'diskon'		=> 0,
@@ -88,6 +96,16 @@ class KasController extends Controller
 					'message' => $e->getMessage()
 				], 400);
 			}
+
+            }else{
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Anda Bukan Level Kasir atau terjadi kesalahan Ulangi Aplikasi'
+                ], 400);
+
+            }
+
+			
 
 		}else {
 			return response()->json([
