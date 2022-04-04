@@ -58,22 +58,7 @@ class SetTanggalController extends Controller
 
         $item = Item::select('id','stock as sisa_stock')->where('status_aktif','1')->get();
         
-        $item->map(function($item){
-          $item['produksi1'] = 0;
-          $item['produksi2'] = 0;
-          $item['produksi3'] = 0;
-          $item['total_produksi'] = 0;
-          $item['penjualan_toko'] = 0;
-          $item['penjualan_pemesanan'] = 0;
-          $item['total_penjualan'] = 0;
-          $item['ket_rusak'] = 0;
-          $item['ket_lain'] = 0;
-          $item['total_lain'] = 0;
-          $item['catatan'] = 'tidak ada catatan';
-          $item['stock_awal'] = $item->sisa_stock;
-
-          return $item;
-        });
+     
           
 
         foreach ($item as $key ) {
@@ -100,7 +85,6 @@ class SetTanggalController extends Controller
                      'stock_awal' => $sisa_stock,
                      'sisa_stock' => $sisa_stock
                    ];
-
           Produksi::create($array);
         }
 
