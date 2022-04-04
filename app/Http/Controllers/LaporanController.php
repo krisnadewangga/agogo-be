@@ -2071,8 +2071,7 @@ class LaporanController extends Controller
 
       $item = Item::where('status_aktif','1')->select('id')->get();
       foreach ($item as $key) {
-        $select = Opname::whereDate('tanggal',$req['tanggal'])
-                       ->where('item_id',$key->id)->first();
+      $select = Opname::whereDate('tanggal',$req['tanggal'])->where('item_id',$key->id)->first();
 
         if($req['total_stock_toko_'.$key->id] !== NULL){
           if(isset($select->id)){
@@ -2094,6 +2093,8 @@ class LaporanController extends Controller
                                     ->whereDate('created_at',$req['tanggal'])
                                     ->orderBy('id','DESC')->first();
 
+                                
+
                                       try {
                                         $stokAwalProduksi = $findProduksi->stock_awal;
                                         $stokAkhirProduksi = $findProduksi->sisa_stock;
@@ -2110,8 +2111,12 @@ class LaporanController extends Controller
                                                                                                            'sisa_stock' => $fix_sisa_stok
                                                                                                           ]);
                                         $updateItemStock = Item::where('id',$key->id)->update(['stock' => $fix_sisa_stok ]);//code...
+                                      
+                                      
                                       } catch (\Throwable $th) {
                                         //throw $th;
+
+                                        Item::where('id',$key->id)->update(['stock' => $req['total_stock_toko_'.$key->id] ]);
                                       }                          
 
       
