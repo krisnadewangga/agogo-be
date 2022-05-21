@@ -43,8 +43,14 @@ class DemoCron extends Command
     public function handle()
     {
 
-        $select = NotifExpired::where('waktu_kirim', '<', Carbon::now()->format('Y-m-d H:i:s') )->where('status','=','0')->get();
+        // $select = NotifExpired::where('waktu_kirim', '<', Carbon::now()->format('Y-m-d H:i:s') )->where('status','=','0')->get();
         
+        
+	$select = NotifExpired::join('transaksi','notif_expired.transaksi_id','=','transaksi.id')
+	->whereNotIn('transaksi.status',['5','3'] )
+	->where('notif_expired.waktu_kirim', '<', Carbon::now()->format('Y-m-d H:i:s') )
+	->where('notif_expired.status','=','0')->get();
+
         $count = $select->count();
         //dd($count);
 
