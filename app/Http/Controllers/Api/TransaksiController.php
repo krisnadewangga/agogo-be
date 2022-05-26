@@ -373,7 +373,7 @@ class TransaksiController extends Controller
 								// real production
 								$sendData = Curl::to('https://tripay.co.id/api/transaction/create')
 								->withData( $data )
-								->withHeader('Authorization: Bearer 4synTlbXG2qsABvPRz7aT16aeq88fP4fhJKz3a1D')
+								->withHeader('Authorization: Bearer 5Ta6VblpbNbzLuFajpLx9J8U1gPOt79EReAW8PXe')
 								->asJson()
 								->post(); 
 							
