@@ -33,12 +33,19 @@ public function getNotAvailProduct()
 public function getTrxByProduct($id) {
 
 
-    $production = DB::table('produksi')
-    ->where('item_id', $id)
-    ->where('created_at', '>', Carbon::today())
-    ->orderBy('created_at','DESC')->first();
+    // $production = DB::table('produksi')
+    // ->where('item_id', $id)
+    // ->where('created_at', '>', Carbon::today())
+    // ->orderBy('created_at','DESC')->first();
 
    
+    $production = DB::table('produksi')
+    ->join('item','item.id', '=', 'produksi.item_id')
+    ->where('item.id', $id)
+    ->where('produksi.created_at', '>', Carbon::today())
+    ->select('produksi.id','produksi.item_id','produksi.produksi1','produksi.produksi2','produksi.produksi3','produksi.total_produksi','produksi.penjualan_toko','produksi.penjualan_pemesanan','produksi.total_penjualan','produksi.ket_rusak','produksi.ket_lain','produksi.total_lain','produksi.catatan','produksi.stock_awal','item.stock as sisa_stock','produksi.created_at','produksi.updated_at')
+    ->orderBy('produksi.created_at','DESC')->first();
+
 
     // if ($production == null ) {
 
