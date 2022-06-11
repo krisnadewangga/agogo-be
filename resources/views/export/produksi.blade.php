@@ -122,7 +122,7 @@
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->total_penjualan,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->ket_rusak,'0','','.') }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->ket_lain,'0','','.') }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->sisa_stock,'0','','.') }}</td>
+                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->stok,'0','','.') }}</td>
                         </tr>
                     @endforeach
                 </tbody>
