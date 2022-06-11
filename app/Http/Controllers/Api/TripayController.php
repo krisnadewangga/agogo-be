@@ -42,11 +42,10 @@ class TripayController extends Controller
     {
 		$req = $Request->all();
     	$response = Curl::to('http://agogobakery.com/api/kalkulator')
-
 						->withData( array( 'amount' => $req['amount'], 'code' => $req['code']) )
                         ->asJson()
 						->get();
-    	return response()->json(["fee" => $response->data[0]->total_fee->customer]);
+    	return response()->json($response);
     }
 
 
