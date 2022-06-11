@@ -167,17 +167,10 @@ public function postOrder(Request $request)
         // $find->ItemTransaksi()->createMany($insItem);
         //$insert = ItemTransaksi::insert($insItem);
 
-        DB::table('item')->where('id', $key['product_id'])
-            ->decrement('stock', $key['qty']);  
-      
-       
+        DB::table('item')->where('id', $key['product_id'])->decrement('stock', $key['qty']);   
         DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('penjualan_toko', $key['qty']);
-        
         DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['qty']);
-        
-        DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['qty']);
-
-
+       // DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['qty']);
 
     // }else {
     //     throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');
@@ -259,7 +252,7 @@ public function bayarTransaksiM(Request $request)
             
             DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->increment('total_penjualan', $key['qty']);
             
-            DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['qty']);
+           // DB::table('produksi')->where('item_id', $key['product_id'])->orderBy('id','DESC')->take(1)->decrement('sisa_stock', $key['qty']);
 
         }else {
             throw new \Exception('Stock ' . $getCount[0]['nama_item'] . ' Tidak Mencukupi');

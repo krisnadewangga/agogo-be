@@ -85,7 +85,7 @@ class SetTanggalController extends Controller
                      'stock_awal' => $sisa_stock,
                      'sisa_stock' => $sisa_stock
                    ];
-          Produksi::create($array);
+            Produksi::create($array);
         }
 
         return redirect()->back()->with('success','Berhasil Set Tanggal Produksi '.Carbon::now()->format('d/m/Y'));
