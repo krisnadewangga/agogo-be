@@ -115,28 +115,28 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $tahun = Transaksi::selectRaw("MIN(YEAR(tgl_bayar)) as min_tahun,
-                                            MAX(YEAR(tgl_bayar)) as max_tahun ")->first();
+    //     $tahun = Transaksi::selectRaw("MIN(YEAR(tgl_bayar)) as min_tahun,
+    //                                         MAX(YEAR(tgl_bayar)) as max_tahun ")->first();
         
 
-        $tahunNow = date('Y');
-        $tahun['max_tahun'] = $tahunNow;
-        $cek = $tahun->count();
-        if($cek == 0){
+    //     $tahunNow = date('Y');
+    //     $tahun['max_tahun'] = $tahunNow;
+    //     $cek = $tahun->count();
+    //     if($cek == 0){
 
-            $tahun = (object) ['min_tahun' => $tahunNow, 'max_tahun' => $tahunNow];
-        }
+    //         $tahun = (object) ['min_tahun' => $tahunNow, 'max_tahun' => $tahunNow];
+    //     }
 
-        $top_ten = Item::selectRaw("item.*,
-                                   (select sum(a.jumlah) from item_transaksi as a,transaksi as b
-                                    where  a.transaksi_id=b.id and a.item_id=item.id and YEAR(b.tgl_bayar) = $tahunNow and MONTH(b.tgl_bayar) = ".date('m')." and b.status != '3' ) as total_belanja
-                           ")
-                        // ->where([
-                        //           ['item.status_aktif','=','1']
-                        //         ])
-                        ->orderBy('total_belanja','DESC')
-                        ->limit('10')
-                        ->get();
+    //     $top_ten = Item::selectRaw("item.*,
+    //                                (select sum(a.jumlah) from item_transaksi as a,transaksi as b
+    //                                 where  a.transaksi_id=b.id and a.item_id=item.id and YEAR(b.tgl_bayar) = $tahunNow and MONTH(b.tgl_bayar) = ".date('m')." and b.status != '3' ) as total_belanja
+    //                        ")
+    //                     // ->where([
+    //                     //           ['item.status_aktif','=','1']
+    //                     //         ])
+    //                     ->orderBy('total_belanja','DESC')
+    //                     ->limit('10')
+    //                     ->get();
 
         $pesanan = Transaksi::where(function($q){
                                 $q->where('status','1');
@@ -154,7 +154,8 @@ class HomeController extends Controller
 
         $menu_active = "dashboard||0";
         
-        return view('home',compact('menu_active', 'top_ten','tahun','tahunNow','dashboard_k'));
+       // return view('home',compact('menu_active', 'top_ten','tahun','tahunNow','dashboard_k'));
+        return view('home',compact('menu_active','dashboard_k'));
     }
 
 }
