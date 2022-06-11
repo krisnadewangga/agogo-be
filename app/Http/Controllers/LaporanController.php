@@ -1309,6 +1309,7 @@ class LaporanController extends Controller
        $opsi_sort = ['1' => 'ASC', '2' => 'DESC'];
        $item = Produksi::selectRaw('produksi.*,
                                    (select code from item where id = produksi.item_id) as code,
+                                   (select stock from item where id = produksi.item_id) as stok,
                                    (select nama_item from item where id = produksi.item_id) as nama_item
                                   ')
                         ->whereIn('id',function($q) use ($data){
@@ -1334,7 +1335,7 @@ class LaporanController extends Controller
        if(isset($opname->id)){
           $item['stock_awal'] = $opname->stock_toko;
        }else{
-          $item['stock_awal'] = $stock_akhir->sisa_stock;
+          $item['stock_awal'] = $stock_akhir->stock_awal;
        }
 
       });
@@ -2153,6 +2154,8 @@ class LaporanController extends Controller
                           ->orderBy('id','DESC')
                           ->first();
 
+                 
+
         if(isset($query->id)){
            $item['stock_masuk'] = $query->produksi1;
         }else{
@@ -2171,7 +2174,7 @@ class LaporanController extends Controller
         }else{
           $item['stock_toko'] = '';
           if(isset($stock_akhir->id)){
-            $item['stock_akhir'] = $stock_akhir->sisa_stock;
+            $item['stock_akhir'] =  $item->stock;
           }else{
             $item['stock_akhir'] = $item->stock;
           }
@@ -2179,6 +2182,8 @@ class LaporanController extends Controller
         }
 
       });
+
+      
 
       if($data[2] == '1'){
          return $item->sortBy($sort_by[$data[1]])->values()->all();
