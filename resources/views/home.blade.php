@@ -9,7 +9,7 @@
         <!-- /.row -->
      
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
           <div class="row">
             <div class="col-lg-4 col-xs-4">
                 <!-- small box -->
@@ -58,102 +58,15 @@
          
           </div>
 
-          <div class="row">
-              <div class="col-md-12">
-                   <div class="card table-responsive" >
-                        <div class="row" >
-                            <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label >Tahun</label>
-                                    <select class="form-control" id="tahun_grafik" onchange="setGrafik(2)">
-                                       @for($a=$tahun->min_tahun; $a<=$tahun->max_tahun; $a++)
-                                          <option value="{{ $a }}"  @if($a == $tahunNow) selected @endif >{{ $a }}</option>
-                                        @endfor
-                                    </select>
-                                  </div>
-                            </div>
-                            <div class="col-md-6">
-                                
-                                   <div class="form-group">
-                                      <label>Bulan</label>  <span id="loading_bulan_grafik"></span>
-                                      <select class="form-control" id="bulan_grafik" onchange="setGrafik()">
-                                              <option value="">All Bulan</option>
-                                      </select>
-                                     
-                                  </div>
-                                 
-                            </div>
-                        </div>
-                    
-                        
-                        <div id="chartid"  style="min-width: 310px; height: auto; margin: 0;"></div>
-                   </div>
-              </div>
-          </div>
+  
          
         </div>
 
-        <div class="col-md-4">
-          <div class="card">
-            <h4 style="margin:0">10 Item Terlaris</h4>
-
-            
-            <div class="row" style="margin-top: 10px;">
-              <div class="col-md-6">
-                <div class="form-group">
-                    <select class="form-control" id="top_ten_tahun" onchange="getTopTen(2)">
-                        @for($i=$tahun->min_tahun; $i<=$tahun->max_tahun; $i++)
-                          <option value="{{ $i }}"  @if($i == $tahunNow) selected @endif >{{ $i }}</option>
-                        @endfor
-                    </select>
-                  </div>
-              </div>
-              <div class="col-md-6">
-                  <div class="pull-left" style="margin-top: -20px;" id="loading_bulan_topten" hidden>
-                    <label class='label label-warning'><i class='fa fa-spinner fa-pulse fa-fw' ></i> Loading...</label>
-                  </div>
-                  <div class="form-group">
-                    <select class="form-control" id="top_ten_bulan" onchange="getTopTen()">
-                      <option value="">All Bulan</option>
-                    </select>
-                  </div>
-              </div>
-            </div>
-           
-            
-            <div class="table-responsive" style="margin-top: 0px;">
-              <table class="table table-bordered">
-                <thead>
-                   <th style="width: 10px;">No</th>
-                   <th>Item</th>
-                   <th style="width: 20px;">Terjual</th>
-                </thead>
-                <tbody id="tbl_top_ten">
-                  @php $no=1 @endphp
-                  @foreach($top_ten as $key)
-                    <tr>
-                      <td align="center">{{ $no++ }}</td>
-                      <td>{{ $key->nama_item }}</td>
-                      <td>
-                         @if(!empty($key->total_belanja) )
-                            {{ $key->total_belanja }} PCS
-                         @else
-                            0 PCS
-                         @endif
-                      </td>
-                    </tr>
-                  @endforeach
-
-                </tbody>
-              </table>
-            </div>
-            
-          </div>
         </div>
         
       </div>
     @endcomponent
-    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <!-- <script src="https://code.highcharts.com/stock/highstock.js"></script>
     <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
     <script type="text/javascript">
       var bulan_sekarang = parseInt("<?= date('m') ?>");
@@ -429,5 +342,5 @@
           }
         });
       }
-    </script>
+    </script> -->
 @endsection

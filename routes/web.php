@@ -15,6 +15,7 @@
 use App\Events\PusherEvent;
 use App\Helpers\SendNotif;
 use App\Transaksi;
+use App\NotifExpired;
 use Carbon\Carbon;
 Auth::routes();
 
@@ -149,8 +150,55 @@ Route::post('/get_pesanan','TransaksiController@filterTransaksi')->name('get_pes
 Route::get('/maps','TransaksiController@Maps')->name('maps');
 
 Route::get('/tes_event',function(){
-	$message = ['user_id' => 21, 'name' => 'Fajrin Ismail', 'waktu' => '2020-01-01', 'jumPesan' => 0];
-	SendNotif::SendNotPesan('2',$message);
+
+
+	  
+        
+	$select = NotifExpired::join('transaksi','notif_expired.transaksi_id','=','transaksi.id')
+	->whereNotIn('transaksi.status',['5','3'] )
+	->where('notif_expired.waktu_kirim', '<', Carbon::now()->format('Y-m-d H:i:s') )
+	->where('notif_expired.status','=','0')->get();
+
+        $count = $select->count();
+        //dd($count);
+
+        if($count > 0){
+            foreach($select as $key){
+                if($key->Transaksi->metode_pembayaran == '2'){
+                   
+                    $pesanWa = "Anda Belum Melakukan Pembayaran Untuk Pesanan Nomor Transaksi ".$key->Transaksi->no_transaksi." Segera Lakukan Pembayaran. Batas Waktu Pembayaran ".$key->Transaksi->waktu_kirim->format('d/m/Y H:i A')." Pesanan Akan Dibatalkan Apabila Sampai Dengan Batas Waktu Yang Telah Ditentukan Anda Belum Melakukan Transfer Pembayaran";
+                    $dnotif = ['pengirim_id' => '1',
+                                'penerima_id' => $key->Transaksi->user_id,
+                                'judul_id' => $key->transaksi_id,
+                                'judul' => 'Pembayaran Pesanan '.$key->Transaksi->no_transaksi,
+                                'isi' => $pesanWa,
+                                'jenis_notif' => 9,
+                                'dibaca' => '0'
+                               ];
+                               \Log::info("status awal");
+                }else{
+                               
+                    $pesanWa = "Anda Telah Melakukan Pesanan Dengan Nomor Transaksi ".$key->Transaksi->no_transaksi." Dengan Metode Pembayaran Bayar Di Toko . Batas Waktu Pengambilan Pesanan ".$key->Transaksi->waktu_kirim->format('d/m/Y H:i A')." Pesanan Akan Dibatalkan Apabila Sampai Dengan Batas Waktu Yang Telah Ditentukan Anda Belum Mengambil Pesanan";
+                    $dnotif =[
+                                'pengirim_id' => '1',
+                                'penerima_id' => $key->Transaksi->user_id,
+                                'judul_id' => $key->transaksi_id,
+                                'judul' => 'Pesanan No '.$key->Transaksi->no_transaksi,
+                                'isi' => $pesanWa,
+                                'jenis_notif' => 1,
+                                'dibaca' => '0'
+                                ];
+                                \Log::info("status awal");
+                }
+                
+                $noHp = $key->email;
+                
+  
+                $update = NotifExpired::where('transaksi_id', $key->id)->update(['status' => '1']);
+            
+            }
+        }
+
 });
 
 
