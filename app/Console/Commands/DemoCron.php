@@ -88,7 +88,7 @@ class DemoCron extends Command
                 $notif = Notifikasi::create($dnotif);
                 $sendNotAndroid = SendNotif::sendTopicWithUserId($notif->pengirim_id, $notif->judul, substr($notif->isi, 30), 0, $notif->penerima_id, 'Pembayaran Pesanan', $notif->judul_id);
                 $a = SendNotif::sendNotifWa($noHp,$pesanWa);   
-                $update = NotifExpired::where('id', $key->id)->update(['status' => '1']);
+                $update = NotifExpired::where('transaksi_id', $key->id)->update(['status' => '1']);
             
 
                 \Log::info("Successfully Send Email No Transaksi ".$key->Transaksi->no_transaksi);
