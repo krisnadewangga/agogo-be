@@ -31,8 +31,7 @@ class TripayController extends Controller
 
     public function paymentChannel(Request $Request)
     {
-    	$response = Curl::to('https://tripay.co.id/api/merchant/payment-channel')
-                        ->withHeader('Authorization: '.$this->api_key)
+    	$response = Curl::to('http://agogobakery.com/api/payment_channel')
                         ->asJson()
 						->get();
     	return response()->json($response);
@@ -42,13 +41,14 @@ class TripayController extends Controller
 	public function kalkulator(Request $Request)
     {
 		$req = $Request->all();
-    	$response = Curl::to('https://tripay.co.id/api/merchant/fee-calculator')
-						->withHeader('Authorization: '.$this->api_key)
+    	$response = Curl::to('http://agogobakery.com/api/kalkulator')
+
 						->withData( array( 'amount' => $req['amount'], 'code' => $req['code']) )
                         ->asJson()
 						->get();
     	return response()->json(["fee" => $response->data[0]->total_fee->customer]);
     }
+
 
     public function Callback(Request $Request)
     {

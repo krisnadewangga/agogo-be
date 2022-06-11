@@ -371,12 +371,10 @@ class TransaksiController extends Controller
 						
 						
 								// real production
-								$sendData = Curl::to('https://tripay.co.id/api/transaction/create')
+								$sendData = Curl::to('http://agogobakery.com/api/kirim_data')
 								->withData( $data )
-								->withHeader('Authorization: Bearer 5Ta6VblpbNbzLuFajpLx9J8U1gPOt79EReAW8PXe')
 								->asJson()
 								->post(); 
-							
 					     #mode development		
 				       	// $sendData = Curl::to('https://payment.tripay.co.id/api-sandbox/transaction/create')
 				        //                 ->withData( $data )
