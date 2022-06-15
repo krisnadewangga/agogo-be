@@ -296,32 +296,19 @@ public function postProduction(Request $request)
     
         if($role > 0){
     
-            DB::beginTransaction();
-            try {
+        
     
     
-                $date_produksi = DB::table('produksi')
-                ->select('created_at')
-                ->orderBy('created_at', 'DESC')->first();
-                
+                $date_produksi = DB::table('produksi')->select('created_at')->orderBy('created_at', 'DESC')->first();
                 $tgl_produksi = null;
-    
-          
-    
                 if (Carbon::parse($date_produksi->created_at)->format('Y-m-d') < Carbon::now()->format('Y-m-d') ){            
-                    $tgl_produksi = Carbon::parse($date_produksi->created_at)->format('Y-m-d') . '23:59:59';    
-                   
+                    $tgl_produksi = Carbon::parse($date_produksi->created_at)->format('Y-m-d') . '23:59:59';      
                 }            
-              
                 else {
                     $tgl_produksi = Carbon::now()->format('Y-m-d H:i:s');
-                
                 }
-    
                 $cari = Produksi::where('item_id',$request[0]['product_id'])->orderBy('created_at','DESC')->first();
-    
                 if(Carbon::parse($cari->created_at)->format('Y-m-d H:i:s') < Carbon::now()->format('Y-m-d H:i:s')){
-    
                     if($request[0]['produksi1'] > 0 || $request[0]['ket_rusak'] > 0 || $request[0]['ket_lain'] > 0 ){           
                         $production = Produksi::create([
                             'item_id'               => $request[0]['product_id'] ,
@@ -339,35 +326,17 @@ public function postProduction(Request $request)
                             'stock_awal'            => $request[0]['stock_awal'],
                             'sisa_stock'            => $request[0]['sisa_stock'],
                             'created_at'            => $tgl_produksi
-        
-        
                         ]); 
-                        $sisa_stock = $request[0]['sisa_stock'];
-                        $products = DB::table('item')->where('id', $request[0]['product_id'])->update(['stock' => $sisa_stock]);
+                        $sisa_stock = $request[0]['total_produksi'];
+                        $dataNow  = DB::table('item')->where('id', $request[0]['product_id'])->select('stock')->first();
+                        $products = DB::table('item')->where('id', $request[0]['product_id'])->update(['stock' => $sisa_stock + $dataNow->stock]);
                     } 
                 }
-    
-    
-    
-    
-                
-    
-    
-                
-    
-                DB::commit();
-    
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Produksi Berhasil',
                 ]);
-            } catch (Exception $e) {
-                DB::rollback();
-                return response()->json([
-                    'status' => 'failed',
-                    'message' => $e->getMessage()
-                ], 400);
-            }
+            
         }else {
             return response()->json([
                 'status' => 'failed',
