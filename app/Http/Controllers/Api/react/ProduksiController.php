@@ -309,28 +309,80 @@ public function postProduction(Request $request)
                 }
                 $cari = Produksi::where('item_id',$request[0]['product_id'])->orderBy('created_at','DESC')->first();
                 if(Carbon::parse($cari->created_at)->format('Y-m-d H:i:s') < Carbon::now()->format('Y-m-d H:i:s')){
-                    if($request[0]['produksi1'] > 0 || $request[0]['ket_rusak'] > 0 || $request[0]['ket_lain'] > 0 ){           
+                    if($request[0]['produksi1'] > 0){  
+                        
+                        
                         $production = Produksi::create([
                             'item_id'               => $request[0]['product_id'] ,
-                            'produksi1'             => $request[0]['produksi1'],
+                            'produksi1'             => $cari->produksi1 + $request[0]['produksi1'],
                             'produksi2'             => 0,
                             'produksi3'             => 0,
                             'total_produksi'        => $request[0]['total_produksi'],
-                            'penjualan_toko'        => $request[0]['penjualan_toko'],
-                            'penjualan_pemesanan'   => $request[0]['penjualan_pemesanan'],
-                            'total_penjualan'       => $request[0]['total_penjualan'],
-                            'ket_rusak'             => $request[0]['ket_rusak'],
-                            'ket_lain'              => $request[0]['ket_lain'],
-                            'total_lain'            => $request[0]['total_lain'],
+                            'penjualan_toko'        => $cari->penjualan_toko,
+                            'penjualan_pemesanan'   => $cari->penjualan_pemesanan,
+                            'total_penjualan'       => $cari->total_penjualan,
+                            'ket_rusak'             => $cari->ket_rusak,
+                            'ket_lain'              => $cari->ket_lain,
+                            'total_lain'            => $cari->total_lain,
                             'catatan'               => $request[0]['catatan'],
-                            'stock_awal'            => $request[0]['stock_awal'],
-                            'sisa_stock'            => $request[0]['sisa_stock'],
+                            'stock_awal'            => $cari->stock_awal,
+                            'sisa_stock'            => $cari->sisa_stock,
                             'created_at'            => $tgl_produksi
                         ]); 
-                        $sisa_stock = $request[0]['total_produksi'];
-                        $dataNow  = DB::table('item')->where('id', $request[0]['product_id'])->select('stock')->first();
-                        $products = DB::table('item')->where('id', $request[0]['product_id'])->update(['stock' => $sisa_stock + $dataNow->stock]);
-                    } 
+
+                        DB::table('item')->where('id',$request[0]['product_id'])->increment('stock', $request[0]['produksi1']);  
+                        
+                        
+                    } elseif ($request[0]['rusak'] > 0 ){
+
+                             
+                        $production = Produksi::create([
+                            'item_id'               => $request[0]['product_id'] ,
+                            'produksi1'             => $cari->produksi1,
+                            'produksi2'             => 0,
+                            'produksi3'             => 0,
+                            'total_produksi'        => $cari->total_produksi,
+                            'penjualan_toko'        => $cari->penjualan_toko,
+                            'penjualan_pemesanan'   => $cari->penjualan_pemesanan,
+                            'total_penjualan'       => $cari->total_penjualan,
+                            'ket_rusak'             => $cari->ket_rusak +  $request[0]['rusak'],
+                            'ket_lain'              => $cari->ket_lain,
+                            'total_lain'            => $cari->total_lain,
+                            'catatan'               => $request[0]['catatan'],
+                            'stock_awal'            => $cari->stock_awal,
+                            'sisa_stock'            => $cari->sisa_stock,
+                            'created_at'            => $tgl_produksi
+                        ]); 
+
+                        DB::table('item')->where('id',$request[0]['product_id'])->decrement('stock', $request[0]['rusak']);  
+                        
+
+
+                    }elseif($request[0]['lain'] > 0 ) {
+
+                        $production = Produksi::create([
+                            'item_id'               => $request[0]['product_id'] ,
+                            'produksi1'             => $cari->produksi1,
+                            'produksi2'             => 0,
+                            'produksi3'             => 0,
+                            'total_produksi'        => $cari->total_produksi,
+                            'penjualan_toko'        => $cari->penjualan_toko,
+                            'penjualan_pemesanan'   => $cari->penjualan_pemesanan,
+                            'total_penjualan'       => $cari->total_penjualan,
+                            'ket_rusak'             => $cari->ket_rusak ,
+                            'ket_lain'              => $cari->ket_lain +  $request[0]['lain'],
+                            'total_lain'            => $cari->total_lain,
+                            'catatan'               => $request[0]['catatan'],
+                            'stock_awal'            => $cari->stock_awal,
+                            'sisa_stock'            => $cari->sisa_stock,
+                            'created_at'            => $tgl_produksi
+                        ]); 
+
+                        DB::table('item')->where('id',$request[0]['product_id'])->decrement('stock', $request[0]['lain']);  
+                        
+
+                    }
+
                 }
                 return response()->json([
                     'status' => 'success',
