@@ -73,7 +73,7 @@ class UserController extends Controller
 
             $hp = $register->no_hp;
 
-            $pesan ="Selamat " .$register->name. " pendaftaran anda hanya tinggal aktivasi akun melalui WA ini. \n Mohon daftarkan lebih dahulu nomor kontak kami ini ke dalam daftar kontak HP anda sebelum anda dapat klik link aktivasi akun anda dibawah ini : \n http://".$_SERVER['HTTP_HOST']."/agogo/aktifasi/".$no_aktifasi;
+            $pesan ="Selamat " .$register->name. " pendaftaran anda hanya tinggal aktivasi akun melalui WA ini. \n Mohon Replay pesan ini mengetikan YES";
 
               
             
