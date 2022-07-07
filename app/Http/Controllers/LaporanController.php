@@ -2058,6 +2058,9 @@ class LaporanController extends Controller
 
     public function PostOpname(Request $request)
     {
+
+
+
       $req = $request->all();
       
       if(!Auth::attempt(['name' => $req['username'], 'password' => $req['password'] ]))
@@ -2093,12 +2096,12 @@ class LaporanController extends Controller
           $findProduksi = Produksi::where('item_id',$key->id)
                                     ->whereDate('created_at',$req['tanggal'])
                                     ->orderBy('id','DESC')->first();
-
+          $a = Item::where('id',$key->id)->first();
                                 
 
                                       try {
                                         $stokAwalProduksi = $findProduksi->stock_awal;
-                                        $stokAkhirProduksi = $findProduksi->sisa_stock;
+                                        $stokAkhirProduksi = $a->stock;
                               
                                         if($req['total_stock_toko_'.$key->id] > $stokAwalProduksi){
                                           $selisih = $req['total_stock_toko_'.$key->id] - $stokAwalProduksi;
@@ -2107,25 +2110,18 @@ class LaporanController extends Controller
                                           $selisih = $stokAwalProduksi - $req['total_stock_toko_'.$key->id];
                                           $fix_sisa_stok =  $stokAkhirProduksi - $selisih;
                                         }
-                              
+                                        
                                         $updateProduksi = Produksi::where('id',$findProduksi->id)->update(['stock_awal' => $req['total_stock_toko_'.$key->id],
                                                                                                            'sisa_stock' => $fix_sisa_stok
                                                                                                           ]);
-                                        $updateItemStock = Item::where('id',$key->id)->update(['stock' => $fix_sisa_stok ]);//code...
-                                      
+                                        $updateItemStock = Item::where('id',$key->id)->update(['stock' => $fix_sisa_stok ]);//code...                                
                                       
                                       } catch (\Throwable $th) {
                                         //throw $th;
-
                                         Item::where('id',$key->id)->update(['stock' => $req['total_stock_toko_'.$key->id] ]);
                                       }                          
-
-      
-        }
-        
+        } 
       }
-      
-      
       return redirect()->route('opname',['tanggal' => Carbon::parse($req['tanggal'])->format('d/m/Y'), 'sort_by' => '1', 'opsi_sort' => '1' ])->with('success','Berhasil Set Opname ')->withInput();
     }
 
