@@ -73,7 +73,7 @@ class UserController extends Controller
 
             $hp = $register->no_hp;
 
-            $pesan ="Selamat " .$register->name. " pendaftaran anda hanya tinggal aktivasi akun melalui WA ini. \n Mohon Replay pesan ini mengetikan YES";
+            $pesan ="Selamat " .$register->name. " pendaftaran anda hanya tinggal aktivasi akun melalui WA ini. \n Segera balas pesan ini dengan mengetik YES";
 
               
             
