@@ -161,7 +161,7 @@ class UserController extends Controller
                 
             }else{
                 $success = 0;
-                $msg = "Gagal Login, Periksan Kembali No Hp Dan Password Anda";
+                $msg = "Gagal Login, Periksa Kembali No Hp Dan Password Anda";
             } 
         }
         return response()->json(['success' => $success, 'msg' => $msg],200);
