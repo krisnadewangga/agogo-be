@@ -83,7 +83,7 @@ class UserController extends Controller
 	        
 	          $success = 1;
 	          // $token = JWTAuth::fromUser($register);
-	          $msg = "Silahkan Aktifasi Akun Anda , Kami Telah Mengirimkan Link Aktifasi Ke WA Anda";
+	          $msg = "Silahkan Aktifasi akun anda, kami telah mengirim pesan di nomor WA yg sudah didaftarkan";
 	          // $response = [
 	          //     "success" => $success,
 	          //     "user_id" => $register['id'],
