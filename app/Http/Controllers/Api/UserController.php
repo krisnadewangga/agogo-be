@@ -316,9 +316,9 @@ class UserController extends Controller
   public function resetPassword(Request $request)
   {
     $req = $request->all();
-    $rules = [ 'email' => 'required|exists:users,email' ];
-    $messsages = ['email.required' => 'email Masukan Email Anda',
-                 'email.exists' => 'email Tidak Ditemukan'
+    $rules = [ 'no_hp' => 'required|exists:users,no_hp' ];
+    $messsages = ['no_hp.required' => 'Masukan No hp Anda',
+                 'no_hp.exists' => 'No hp Tidak Ditemukan'
                 ];
     $validator = Validator::make($request->all(), $rules,$messsages);
     if($validator->fails()){
@@ -326,7 +326,7 @@ class UserController extends Controller
         $msg = $validator->messages()->all();
 
     }else{
-        $find = User::where([ ['email','=',$req['email'] ], 
+        $find = User::where([ ['no_hp','=',$req['no_hp'] ], 
                               ['level_id', '=' ,'6'] 
                            ])->first();
         if(isset($find->id) ){
@@ -347,8 +347,8 @@ class UserController extends Controller
           //$subject = "Reset Password Akun AgogoBakery.com";
          // SendNotif::kirimEmail($find->email,$data,$subject);
           $data = "Selamat !! anda Berhasil melakukan reset password, Silahkan Login dengan password baru ini ".$passwordNew;
-          SendNotif::sendNotifWa($find->hp,$data);
-
+          SendNotif::sendNotifWa($find->no_hp,$data);
+    
           $success = 1;
           $msg = "Berhasil Reset Password";
 
