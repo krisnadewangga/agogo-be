@@ -24,7 +24,7 @@ class TripayController extends Controller
 	public function __construct()
 	{
 		$this->api_key = 'Bearer 5Ta6VblpbNbzLuFajpLx9J8U1gPOt79EReAW8PXe';
-		$this->private_key = 'HNrwk-XkBqq-cT3Ra-ozRI0-f0J0G';
+		$this->private_key = 'nPVBJ-Jf2CT-sXDFb-b9sjv-Zrvtn';
 		$this->merchant_code ='T1977';
 		$this->merchant_ref = '';
 	}
