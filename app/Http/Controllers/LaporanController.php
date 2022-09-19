@@ -10,6 +10,7 @@ use App\Item;
 use App\ItemTransaksi;
 use App\Preorders;
 use App\Kas;
+use App\Helpers\SendNotif;
 use App\Produksi;
 use App\Opname;
 use Carbon\Carbon;
@@ -427,11 +428,16 @@ class LaporanController extends Controller
 
     public function AktifasiManual($id)
     {
-      $user = User::where('id',$id)
-                  ->update(['status_aktif' => '1','email_verified_at' => date('Y-m-d H:i:s')]);
 
+
+      $user = User::where('id',$id);
+      $userBaru = $user->first();
+     SendNotif::sendNotifWa($userBaru->no_hp,"Hey ".$userBaru->name." Account anda telah aktif, silahkan login ");
+
+      $user->update(['status_aktif' => '1','email_verified_at' => date('Y-m-d H:i:s')]);
       return redirect()->back()->with("success","Berhasil Mengaktifkan User");
     }
+
 
     public function HapusUser($id,$stat = '1')
     {
