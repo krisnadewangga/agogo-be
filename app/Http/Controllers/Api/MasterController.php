@@ -12,7 +12,7 @@ use App\Pesan;
 use App\User;
 use App\Versi;
 use App\Tax;
-
+use Carbon\Carbon;
 use Validator;
 
 class MasterController extends Controller
@@ -244,13 +244,14 @@ class MasterController extends Controller
 	
   public function topTen(Request $request)
   {
+    $tgl = Carbon::now()->subDays(1)->format('Y-m-d');
     $item = Item::selectRaw("item.*,
-                             (select sum(jumlah) from item_transaksi where item_id=item.id ) as total_belanja
+                             (select sum(jumlah) from item_transaksi where item_id=item.id and created_at > $tgl and created_at < $tgl) as jumlah
                            ")
                 ->where([
                           ['item.status_aktif','=','1']
                         ])
-                ->orderBy('total_belanja','DESC')
+                ->orderBy('jumlah','DESC')
                 ->limit('10')
                 ->get();
     return response()->json(['success' => 1,'msg' => $item], 200);
