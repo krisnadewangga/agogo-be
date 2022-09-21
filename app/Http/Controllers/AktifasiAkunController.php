@@ -10,6 +10,7 @@ class AktifasiAkunController extends Controller
 {
    public function Aktifasi($id)
    {
+	
    	 $find = User::join('detail_konsumen','users.id','=','detail_konsumen.user_id')
    	 			   ->where(['no_aktifasi' => $id ])
    	 			   ->select('users.*','detail_konsumen.no_aktifasi')
