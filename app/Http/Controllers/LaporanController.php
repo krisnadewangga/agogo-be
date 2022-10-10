@@ -432,7 +432,7 @@ class LaporanController extends Controller
 
       $user = User::where('id',$id);
       $userBaru = $user->first();
-     SendNotif::sendNotifWa($userBaru->no_hp,"Hey ".$userBaru->name." Account anda telah aktif, silahkan login ");
+     SendNotif::sendNotifWa($userBaru->no_hp,"Selamat ".$userBaru->name." user anda telah aktif. Silahkan login Kembali");
 
       $user->update(['status_aktif' => '1','email_verified_at' => date('Y-m-d H:i:s')]);
       return redirect()->back()->with("success","Berhasil Mengaktifkan User");
