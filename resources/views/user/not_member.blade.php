@@ -46,6 +46,7 @@
 							<th style="width: 5px;">No</th>
 							<th style="width:130px;" class="nowrap"> Waktu Regis</th>
 							<th class="nowrap">Nama Member</th>
+							<th class="nowrap">No Hp</th>
 							<th style="width:90px;" class="nowrap"><center>Saldo</center></th>
 							<th style="width:80px;" class="nowrap"><center>Total Belanja</center></th>
 							<th style="width:80px;" class="nowrap"><center>Batal Belanja</center></th>
@@ -59,6 +60,7 @@
 								<td align="center"></td>
 								<td class="nowrap">{{ $key->created_at->format('d M Y H:i A') }}</td>
 								<td class="nowrap">{{$key->name}}</td>
+								<td class="nowrap">{{$key->no_hp}}</td>
 								<td align="right" class="nowrap">Rp {{ number_format($key->DetailKonsumen->saldo,'0','','.') }}</td>
 								<td align="center" class="nowrap">{{ $key->total_belanja }}</td>
 								<td align="center" class="nowrap">{{ $key->batal_belanja }}</td>
