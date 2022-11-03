@@ -36,7 +36,7 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define('manage-kurirs',function($user){
             $roles = $user->Roles->pluck('level_id')->toArray();
-            if( (in_array('1', $roles) || in_array('2', $roles)  ) && $user->status_aktif == "1"){
+            if( (in_array('1', $roles) || in_array('2', $roles) || in_array('7', $roles)  ) && $user->status_aktif == "1"){
                 return true;
             }
             return false;
@@ -52,7 +52,7 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define('manage-konsu',function($user){
             $roles = $user->Roles->pluck('level_id')->toArray();
-            if( (in_array('1', $roles) || in_array('2', $roles)  ) && $user->status_aktif == "1"){
+            if( (in_array('1', $roles) || in_array('2', $roles) || in_array('7', $roles)   ) && $user->status_aktif == "1"){
                 return true;
             }
             return false;
@@ -60,7 +60,7 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define('manage-versi',function($user){
             $roles = $user->Roles->pluck('level_id')->toArray();
-            if( (in_array('1', $roles) || in_array('2', $roles)  ) && $user->status_aktif == "1"){
+            if( (in_array('1', $roles)|| in_array('2', $roles) || in_array('7', $roles)  ) && $user->status_aktif == "1"){
                 return true;
             }
             return false;
