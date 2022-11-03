@@ -32,11 +32,7 @@
                 @endif
                 <li id="sm_admin"><a href="{{ route('administrator.index') }}"><i class="fa fa-circle-o"></i>User</a></li>
                 <li id="sm_aproval"><a href="{{ route('aproval.index') }}"><i class="fa fa-circle-o"></i>Aproval</a></li>
-                  
-                 <li id="sm_kurir"><a href="{{ route('kurir.index') }}"><i class="fa fa-circle-o"></i>Kurir</a></li>
-                
-                 <li id="sm_member" ><a href="{{ route('member') }}"><i class="fa fa-circle-o"></i><span>Member</span></a></li>
-                 <li id="sm_not_member" ><a href="{{ route('not_member') }}"><i class="fa fa-circle-o"></i><span>Not Member</span></a></li>
+
                 
               </ul>
             </li>
@@ -53,9 +49,28 @@
             </a>
             <ul class="treeview-menu">
                @if( in_array('1', $roles) || in_array('2', $roles) ) 
+               
                 <li id="sm_kategori"><a href="{{ route('kategori.index') }}"><i class="fa fa-circle-o"></i>Kategori</a></li>
                 <li id="sm_item"><a href="{{ route('item.index') }}"><i class="fa fa-circle-o"></i>Item</a></li>
-               @endif
+                <li id="sm_kurir"><a href="{{ route('kurir.index') }}"><i class="fa fa-circle-o"></i>Kurir</a></li>
+                
+                <li id="sm_member" ><a href="{{ route('member') }}"><i class="fa fa-circle-o"></i><span>Member</span></a></li>
+                <li id="sm_not_member" ><a href="{{ route('not_member') }}"><i class="fa fa-circle-o"></i><span>Not Member</span></a></li>
+      
+            
+               @elseif(in_array('7',$roles) )
+
+                                  
+               <li id="sm_kurir"><a href="{{ route('kurir.index') }}"><i class="fa fa-circle-o"></i>Kurir</a></li>
+                
+                <li id="sm_member" ><a href="{{ route('member') }}"><i class="fa fa-circle-o"></i><span>Member</span></a></li>
+                <li id="sm_not_member" ><a href="{{ route('not_member') }}"><i class="fa fa-circle-o"></i><span>Not Member</span></a></li>
+      
+                @endif
+
+            
+                                 
+
                <li id="sm_topup"><a href="{{ route('topup_saldo.index') }}"><i class="fa fa-circle-o"></i> <span>TopUp Saldo</span></a></li>
                <li id="sm_promo"><a href="{{ route('setup_promo.index') }}"><i class="fa fa-circle-o"></i> <span>SetUp Promo</span></a></li>
                <li id="sm_versi"><a href="{{ route('versi.index') }}"><i class="fa fa-circle-o"></i> <span>Update Versi</span></a></li>
