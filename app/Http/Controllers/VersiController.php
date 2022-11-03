@@ -12,7 +12,7 @@ class VersiController extends Controller
   
     public function __construct()
     {
-        $this->middleware('auth');
+      
         $this->middleware(function($request,$next){
             if(Gate::allows('manage-versi')) return $next($request);
             abort(404,'Halaman Tidak Ditemukan');

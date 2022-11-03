@@ -99,7 +99,8 @@ public function index()
   'preorders.sisa_harus_bayar',
   'preorders.uang_dibayar',
   'preorders.uang_kembali'
-)->get();
+)->orderBy('preorders.tgl_selesai', 'asc')
+->get();
 
   return response()->json($preorders, 200);
 }
