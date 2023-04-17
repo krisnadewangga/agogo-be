@@ -245,13 +245,11 @@ class MasterController extends Controller
   public function topTen(Request $request)
   {
     $tgl = Carbon::now()->subDays(1)->format('Y-m-d');
-    $item = Item::selectRaw("item.*,
-                             (select sum(jumlah) from item_transaksi where item_id=item.id and created_at > $tgl and created_at < $tgl) as jumlah
-                           ")
-                ->where([
-                          ['item.status_aktif','=','1']
+    $item = Item::
+                where([
+                          ['status_aktif','=','1']
                         ])
-                ->orderBy('jumlah','DESC')
+                ->orderBy('id','DESC')
                 ->limit('10')
                 ->get();
     return response()->json(['success' => 1,'msg' => $item], 200);

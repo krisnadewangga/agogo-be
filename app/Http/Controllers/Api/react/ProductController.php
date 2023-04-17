@@ -28,6 +28,8 @@ class ProductController extends Controller
 
     public function products()
     {
+		
+		
     	$item = Item::selectRaw("item.id,
     							 item.code,
     							 item.nama_item as name,
@@ -55,6 +57,8 @@ class ProductController extends Controller
     }
 
     public function show($id){
+		
+	
     	$item = Item::where('id',$id)->select('id',
                                              'code',
                                              'nama_item as name',

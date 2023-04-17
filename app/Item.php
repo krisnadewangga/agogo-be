@@ -16,7 +16,12 @@ class Item extends Model
   public function getGambarUtamaAttribute()
   {
      $gambarItem = GambarItem::where([ ['utama','=','1'],['item_id','=',$this->id] ])->select('gambar')->first();
-     return $gambarItem->gambar;
+	 if($gambarItem){
+		  return $gambarItem->gambar;
+	}else{
+		 return "";
+	}
+    
   }
 
    public function Kategori()
