@@ -34,7 +34,8 @@ class UserController extends Controller
         }else{
 
             //$user['photo'] = "http://agogobakery.com/atur/".$user['photo'];
-            $user['photo'] = "http://192.168.1.30/agogo/upload/".$user['photo'];
+            // $user['photo'] = "http://127.0.0.1/agogo/upload/".$user['photo'];
+            $user['photo'] = "https://pos.agogo-bakery.com/upload/".$user['photo'];
 
        
 

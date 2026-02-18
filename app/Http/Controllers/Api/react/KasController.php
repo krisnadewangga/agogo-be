@@ -198,7 +198,26 @@ class KasController extends Controller
           ->sum('transaksi.tax');
 
 
-  
+          //cash
+          $sumCash = DB::table('transaksi')
+          ->where('transaksi.updated_at', '>', $waktu)
+          ->where('transaksi.status','5')
+          ->where('transaksi.kasir_id',$id)
+          ->sum('transaksi.cash');
+
+          //transfer
+          $sumTransfer = DB::table('transaksi')
+          ->where('transaksi.updated_at', '>', $waktu)
+          ->where('transaksi.status','5')
+          ->where('transaksi.kasir_id',$id)
+          ->sum('transaksi.transfer');
+
+          //qris
+          $sumQris = DB::table('transaksi')
+          ->where('transaksi.updated_at', '>', $waktu)
+          ->where('transaksi.status','5')
+          ->where('transaksi.kasir_id',$id)
+          ->sum('transaksi.qris');
 
 
  
@@ -212,6 +231,9 @@ class KasController extends Controller
             'total_pelunasan_preorders' => (int)$sumPreordersPelunasan,
             'diskon' => $diskon,
             'tax' =>  (int)$sumTax,
+            'cash' =>  (int)$sumCash,
+            'transfer' =>  (int)$sumTransfer,
+            'qris' =>  (int)$sumQris,
             'saldo_awal' =>  $qr['saldo_awal'],
             'total_refund' => 0
         ), 200);

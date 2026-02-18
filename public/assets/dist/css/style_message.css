@@ -1,0 +1,185 @@
+
+.control-sidebar-bg, .control-sidebar {
+    top: 0;
+    right: -350px;
+    width: 350px;
+    -webkit-transition: right .3s ease-in-out;
+    -o-transition: right .3s ease-in-out;
+    transition: right .3s ease-in-out;
+}
+
+
+.header-user-panel{
+	background: #ededed;
+
+}
+
+.tombol_hapus{
+    margin-top:5px;   
+
+}
+
+.waktu_chat{
+    font-size:11px;
+}
+
+.header-user-panel p {
+	color: #a0a0a0;
+	font-size: 12pt;
+}
+.header-user-panel hr{
+	margin:0;
+	border-color: #CCC;
+}
+.search-user{
+	padding:10px 10px 1px 10px;
+
+	background: #f8f8f8; 
+}
+
+.search-user input{
+	border-radius: 20px;
+}
+
+.box-footer{
+	background: white;
+	border:0px;
+}
+
+.box-footer:hover{
+	background: #ededed;
+	cursor: pointer;
+}
+
+.list-kontak hr{
+	margin:0 auto;
+}
+
+.img-sm, .box-comments .box-comment img, .user-block.user-block-sm img {
+  width: 40px !important;
+  height: 40px !important;
+  
+}
+
+.box-comments .comment-text {
+  margin-left: 50px;
+  color: #555;
+}
+
+.input-pesan{
+	padding:10px 10px 1px 10px;
+
+	background: #ededed;
+}
+
+.input-pesan input{
+	border-radius: 20px;
+}
+
+.direct-chat-messages {
+    -webkit-transform: translate(0, 0);
+    -ms-transform: translate(0, 0);
+    -o-transform: translate(0, 0);
+    transform: translate(0, 0);
+    padding: 10px;
+    height: 450px;
+    
+    overflow: auto;
+}
+
+.direct-chat-text {
+    border-radius: 5px;
+    position: relative;
+    padding: 5px 10px;
+    background: #d2d6de;
+    border: 1px solid #d2d6de;
+    margin: 5px 0 0 0px;
+    color: #444;
+    width: 50%;
+}
+
+.right .direct-chat-text {
+    margin-right: 5px;
+    margin-left: 48%;
+}
+
+
+/* 
+  ##Device = Desktops
+  ##Screen = 1281px to higher resolution desktops
+*/
+
+@media (min-width: 1281px) {
+  
+  .direct-chat-messages {
+    height: 450px;
+  }
+  
+}
+
+/* 
+  ##Device = Laptops, Desktops
+  ##Screen = B/w 1025px to 1280px
+*/
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+  
+  .direct-chat-messages {
+    height: 600px;
+  }
+  
+}
+
+/* 
+  ##Device = Tablets, Ipads (portrait)
+  ##Screen = B/w 768px to 1024px
+*/
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  
+  .direct-chat-messages {
+    height: 830px;
+  }
+  
+  
+}
+
+/* 
+  ##Device = Tablets, Ipads (landscape)
+  ##Screen = B/w 768px to 1024px
+*/
+
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  
+  
+  
+}
+
+/* 
+  ##Device = Low Resolution Tablets, Mobiles (Landscape)
+  ##Screen = B/w 481px to 767px
+*/
+
+@media (min-width: 481px) and (max-width: 767px) {
+  
+  
+  
+}
+
+/* 
+  ##Device = Most of the Smartphones Mobiles (Portrait)
+  ##Screen = B/w 320px to 479px
+*/
+
+@media (min-width: 320px) and (max-width: 480px) {
+  
+  .direct-chat-messages {
+    height: 320px;
+  }
+  .control-sidebar-bg, .control-sidebar {
+    
+    right: -320px;
+    width: 320px;
+    
+}
+}

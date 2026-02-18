@@ -100,8 +100,11 @@ public function postOrder(Request $request)
 
   $req = $request->all();
 
-  if(!empty($request[0]['invoice']) ){            
-    $no_transaksi = $request[0]['invoice'] ;
+  // if(!empty($request[0]['invoice']) ){ r_code           
+  //   $no_transaksi = $request[0]['invoice'] ;
+  // }
+  if(!empty($request[0]['r_code']) ){           
+    $no_transaksi = $request[0]['r_code'] ;
   }
   else {
     $no_transaksi = $this->generateInvoice('1');
@@ -126,6 +129,9 @@ public function postOrder(Request $request)
                     'tgl_bayar' => date("Y-m-d H:i:s"),
                     'waktu_kirim' => date("Y-m-d H:i:s"),
                     'tax' => $req[0]['tax'],
+                    'cash' => $req[0]['cash'],
+                    'transfer' => $req[0]['transfer'],
+                    'qris' => $req[0]['qris'],
                     'for_ps' => '0'
   ];
 
@@ -182,6 +188,9 @@ public function postOrder(Request $request)
   $find = Transaksi::findOrFail($insertTransaksi->id);
   $find->ItemTransaksi()->createMany($insItem);
   $find->R_Order()->create(['transaksi_id' => $insertTransaksi->id, 
+   'cash' => $req[0]['cash'],
+   'transfer' => $req[0]['transfer'],
+   'qris' => $req[0]['qris'],
    'uang_dibayar' => $req[0]['dibayar'],
    'uang_kembali' => $req[0]['kembali'],
    'status' => $req[0]['status'] ]);
@@ -392,7 +401,8 @@ public function keepOrder(Request $request)
   }else{
                 $no_transaksi = $this->generateInvoice('1'); // invoice nomor
                 $req_transaksi = ['user_id' => $req[0]['user_id'],
-                'no_transaksi' => $no_transaksi,
+                // 'no_transaksi' => $no_transaksi,$req[0]['invoice']
+                'no_transaksi' => $req[0]['invoice'],
                 'total_transaksi' => $req[0]['subtotal'],
                 'total_bayar' => $req[0]['total'],
                 'status' => '7',
@@ -452,7 +462,10 @@ public function keepOrder(Request $request)
 
         public function getPaidOrders()
         {
-          $orders = Transaksi::where(['status' => '5','jenis'=>'1'])->get();
+          $orders = Transaksi::where('status', '5')
+            ->where('jenis', '1')
+            ->whereDate('created_at', Carbon::today())
+            ->get();
           return response()->json($orders, 200);
         }
 
