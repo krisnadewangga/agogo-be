@@ -11,7 +11,7 @@
         <div style="margin-top: 10px;">
             <!-- <h3 style="margin-top: 0px;" class="fg-black"><u><b>LOGIN</b></u></h3> -->
             <center><img src="{{ asset('assets/dist/img/fixLogo.png') }}" height="70px"></center>
-            <p class="login-box-msg" style="margin-top: 10px;">Silahkan Masukan Email Dan Password Anda</p>
+            <p class="login-box-msg" style="margin-top: 10px;">Silahkan Masukan Email dan Password Anda</p>
         </div>
         <div style="margin-top: 0px; margin-bottom: 10px;">
           <form method="POST" action="{{ route('login') }}">
