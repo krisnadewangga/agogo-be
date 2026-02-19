@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/agogobak/pos.new-agogo-bakery.com
+    - /bin/cp -a * $DEPLOYPATH
