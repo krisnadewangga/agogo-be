@@ -33,6 +33,9 @@ class Transaksi extends Model
                  'jenis',
                  'jalur',
                  'kasir_id',
+                 'cash',
+                 'transfer',
+                 'qris',
                  'for_ps','waktu_kirim_tf','top_up','opsi_bt','biaya_admin','tax'];
 
     protected $dates = ['waktu_kirim','tgl_bayar','waktu_kirim_tf'];
