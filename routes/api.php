@@ -121,6 +121,7 @@ Route::post('/refunds', 'Api\react\OrderController@postRefunds');
 
 //paid
 Route::get('/PaidOrders', 'Api\react\OrderController@getPaidOrders');
+Route::get('/PaidOrdersItem/{id}', 'Api\react\OrderController@getTransaksiItem');
 Route::get('/paid_preorders', 'Api\react\PreorderController@paid_preorder');
 
 

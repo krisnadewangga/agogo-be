@@ -462,11 +462,32 @@ public function keepOrder(Request $request)
 
         public function getPaidOrders()
         {
-          $orders = Transaksi::where('status', '5')
-            ->where('jenis', '1')
-            ->whereDate('created_at', Carbon::today())
+          $orders = Transaksi::join('users as u', 'transaksi.kasir_id', '=', 'u.id')
+            ->select('transaksi.*', 'u.name as kasir_name')
+            ->where('transaksi.status', '5')
+            ->where('transaksi.jenis', '1')
+            ->whereDate('transaksi.created_at', Carbon::today())
             ->get();
           return response()->json($orders, 200);
+        }
+        
+        public function getTransaksiItem($transaksi_id)
+        {
+          $items = ItemTransaksi::join('item as a', 'a.id', '=', 'item_transaksi.item_id')
+            ->select(
+              'item_transaksi.id',
+              'item_transaksi.transaksi_id',
+              'item_transaksi.item_id as product_id',
+              'a.nama_item as product_name',
+              'item_transaksi.jumlah as qty',
+              'item_transaksi.harga as price',
+              'item_transaksi.total'
+            )
+            ->where('item_transaksi.transaksi_id', $transaksi_id)
+            ->where('item_transaksi.status', '1')
+            ->get();
+
+          return response()->json($items, 200);
         }
 
 
