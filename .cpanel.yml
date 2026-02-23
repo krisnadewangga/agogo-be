@@ -2,6 +2,6 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/agogobak/pos.new-agogo-bakery.com
-    - /bin/cp -R app * $DEPLOYPATH
-    - /bin/cp -R resources * $DEPLOYPATH
-    - /bin/cp -R routes * $DEPLOYPATH
+    - /bin/cp -R app $DEPLOYPATH
+    - /bin/cp -R resources $DEPLOYPATH
+    - /bin/cp -R routes $DEPLOYPATH
