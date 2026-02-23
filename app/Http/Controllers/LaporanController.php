@@ -1260,7 +1260,7 @@ class LaporanController extends Controller
       $data = $this->SetDataReprintStruk($dates);
 
       $input = ['tanggal' => Carbon::now()->format('d/m/Y'), 'sort_by' => '1', 'opsi_sort' => '1'];
-      $menu_active = "laporan|lap_reprint_struk|0";
+      $menu_active = "laporan|struk|0";
       
       return view('laporan.lap_reprint_struk', compact('menu_active', 'input', 'data'));
     }
@@ -1279,7 +1279,7 @@ class LaporanController extends Controller
       $data = $this->SetDataReprintStruk($dates);
 
       $input = ['tanggal' => $req['tanggal'], 'sort_by' => $req['sort_by'] ?? '1', 'opsi_sort' => $req['opsi_sort'] ?? '1'];
-      $menu_active = "laporan|lap_reprint_struk|0";
+      $menu_active = "laporan|struk|0";
       
       return view('laporan.lap_reprint_struk', compact('menu_active', 'input', 'data'));
     }
@@ -1362,7 +1362,7 @@ class LaporanController extends Controller
 
       // dd($transaksi); 
       
-      $menu_active = "laporan|detail_reprint_struk|1";
+      $menu_active = "laporan|struk|1";
       return view('laporan.detail_reprint_struk', compact('menu_active', 'transaksi'));
     }
     // END LAP REPRINT STRUK
