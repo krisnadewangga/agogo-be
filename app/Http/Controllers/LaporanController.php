@@ -1208,6 +1208,8 @@ class LaporanController extends Controller
 
       $input = ['tanggal' => $req['tanggal'], 'sort_by' => $req['sort_by'],'opsi_sort' => $req['opsi_sort']];
       $menu_active = "laporan|kas|0";
+
+      // dd($data);
       return view('laporan.lap_kas',compact('menu_active','input','data'));
     }
 
@@ -1220,6 +1222,7 @@ class LaporanController extends Controller
       $data->map(function($data){
         $data['total_pendapatan'] = $data->transaksi - $data->total_refund;
         $data['kas_tersedia'] = $data->saldo_awal +  $data->transaksi - $data->total_refund;
+        
       });
 
     
@@ -1244,11 +1247,14 @@ class LaporanController extends Controller
       $opsi_sort = ['1' => 'ASC','2' => 'DESC'];
 
       $kas = Kas::selectRaw('kas.*,
-                             (select name from users where id = kas.user_id) as nama_kasir
-                            ')
-                 ->whereDate('created_at',$data[0])
-                 ->orderBy($sort_by[$data[1]], $opsi_sort[$data[2]])
-                 ->get();
+                 (select name from users where id = kas.user_id) as nama_kasir,
+                 (select sum(cash) from transaksi where kasir_id = kas.user_id and date(tgl_bayar) = date(kas.created_at)) as total_cash,
+                 (select sum(transfer) from transaksi where kasir_id = kas.user_id and date(tgl_bayar) = date(kas.created_at)) as total_transfer,
+                 (select sum(qris) from transaksi where kasir_id = kas.user_id and date(tgl_bayar) = date(kas.created_at)) as total_qris
+                ')
+             ->whereDate('created_at',$data[0])
+             ->orderBy($sort_by[$data[1]], $opsi_sort[$data[2]])
+             ->get();
       return $kas ; 
     }
     //END LAP KAS
