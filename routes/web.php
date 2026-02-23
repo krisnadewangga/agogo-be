@@ -87,6 +87,9 @@ Route::get("/lap_pemesanan",'LaporanController@LapPemesanan')->name('lap_pemesan
 Route::post('/filter_laporan_pemesanan','LaporanController@FilterLaporanPemesanan')->name('filter_laporan_pemesanan');
 Route::get('/lap_kas','LaporanController@LapKas')->name('lap_kas');
 Route::post('/cari_laporan_kas','LaporanController@CariLaporanKas')->name('cari_laporan_kas');
+Route::get('/lap_reprint_struk','LaporanController@LapReprintStruk')->name('lap_reprint_struk');
+Route::post('/cari_laporan_reprint_struk','LaporanController@CariReprintStruk')->name('cari_laporan_reprint_struk');
+Route::get('/reprint_struk/{id}','LaporanController@ReprintStruk')->name('reprint_struk');
 Route::get('/lap_pergerakan_stock','LaporanController@LapPergerakanStock')->name('lap_pergerakan_stock');
 Route::post('/cari_laporan_pergerakan_stock','LaporanController@CariPergerakanStock')->name('cari_laporan_pergerakan_stock');
 

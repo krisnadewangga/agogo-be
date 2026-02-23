@@ -1253,6 +1253,120 @@ class LaporanController extends Controller
     }
     //END LAP KAS
 
+    // START LAP REPRINT STRUK
+    public function LapReprintStruk()
+    {
+      $dates = [Carbon::now()->format('Y-m-d'), '1', '1'];
+      $data = $this->SetDataReprintStruk($dates);
+
+      $input = ['tanggal' => Carbon::now()->format('d/m/Y'), 'sort_by' => '1', 'opsi_sort' => '1'];
+      $menu_active = "laporan|lap_reprint_struk|0";
+      
+      return view('laporan.lap_reprint_struk', compact('menu_active', 'input', 'data'));
+    }
+
+    public function CariReprintStruk(Request $request)
+    {
+      $req = $request->all();
+      $validator = \Validator::make($req, ['tanggal' => 'required|date_format:d/m/Y']);
+      
+      if ($validator->fails()) {
+        return redirect()->back()->withErrors($validator)->with('gagal', 'simpan')->withInput();
+      }
+
+      $explode = explode('/', $req['tanggal']);
+      $dates = [$explode[2] . "-" . $explode[1] . "-" . $explode[0], $req['sort_by'] ?? '1', $req['opsi_sort'] ?? '1'];
+      $data = $this->SetDataReprintStruk($dates);
+
+      $input = ['tanggal' => $req['tanggal'], 'sort_by' => $req['sort_by'] ?? '1', 'opsi_sort' => $req['opsi_sort'] ?? '1'];
+      $menu_active = "laporan|lap_reprint_struk|0";
+      
+      return view('laporan.lap_reprint_struk', compact('menu_active', 'input', 'data'));
+    }
+
+    public function SetDataReprintStruk($data)
+    {
+      $sort_by = ['1' => 'no_transaksi',
+            '2' => 'nama',
+            '3' => 'tgl_bayar',
+            '4' => 'total_bayar',
+            '5' => 'metode_pembayaran',
+            '6' => 'nama_kasir'
+             ];
+      
+      $opsi_sort = ['1' => 'ASC', '2' => 'DESC'];
+
+      $transaksi = Transaksi::selectRaw("transaksi.*,
+                        (SELECT name FROM users WHERE id = transaksi.kasir_id) as nama_kasir")
+                  ->whereDate('tgl_bayar', $data[0])
+                  ->where('status', '!=', '3')
+                  ->orderBy($sort_by[$data[1]], $opsi_sort[$data[2]])
+                  ->get();
+
+      $transaksi->map(function($transaksi) {
+        $transaksi['nama'] = $transaksi->User->name;
+        $transaksi['tgl_bayar_format'] = $transaksi->tgl_bayar->format('d/m/Y H:i');
+        $transaksi['total_bayar_format'] = number_format($transaksi->total_bayar, '0', '', '.');
+        
+        if ($transaksi->metode_pembayaran == '1') {
+          $transaksi['metode_pembayaran_text'] = 'Top Up';
+        } elseif ($transaksi->metode_pembayaran == '2') {
+          $transaksi['metode_pembayaran_text'] = 'Bank Transfer';
+        } elseif ($transaksi->metode_pembayaran == '3') {
+          $transaksi['metode_pembayaran_text'] = 'Bayar Ditoko';
+        } elseif ($transaksi->metode_pembayaran == '4') {
+          $transaksi['metode_pembayaran_text'] = 'COD';
+        }
+      });
+
+      return $transaksi;
+    }
+
+    public function ReprintStruk($id)
+    {
+      $transaksi = Transaksi::findOrFail($id);
+      $transaksi->ItemTransaksi;
+      
+      $kasir = User::findOrFail($transaksi->kasir_id);
+
+      $items = ItemTransaksi::join('item as a', 'a.id', '=', 'item_transaksi.item_id')
+            ->select(
+              'item_transaksi.id',
+              'item_transaksi.transaksi_id',
+              'item_transaksi.item_id as product_id',
+              'a.nama_item as product_name',
+              'item_transaksi.jumlah as qty',
+              'item_transaksi.harga as price',
+              'item_transaksi.total'
+            )
+            ->where('item_transaksi.transaksi_id', $id)
+            ->where('item_transaksi.status', '1')
+            ->get();
+      
+      $transaksi['nama_kasir'] = $kasir->name;
+      $transaksi['items'] = $items;
+      $transaksi['tgl_bayar_format'] = $transaksi->tgl_bayar->format('d/m/Y H:i');
+      $total_uang_bayar = $transaksi->cash + $transaksi->transfer + $transaksi->qris;
+      $transaksi['total_uang_bayar'] = number_format($total_uang_bayar, 0, '', '.');
+      $transaksi['uang_kembali'] = number_format($total_uang_bayar - $transaksi->total_bayar, 0, '', '.');
+      
+      if ($transaksi->metode_pembayaran == '1') {
+        $transaksi['metode_pembayaran_text'] = 'Top Up';
+      } elseif ($transaksi->metode_pembayaran == '2') {
+        $transaksi['metode_pembayaran_text'] = 'Bank Transfer';
+      } elseif ($transaksi->metode_pembayaran == '3') {
+        $transaksi['metode_pembayaran_text'] = 'Bayar Ditoko';
+      } elseif ($transaksi->metode_pembayaran == '4') {
+        $transaksi['metode_pembayaran_text'] = 'COD';
+      }
+
+      // dd($transaksi); 
+      
+      $menu_active = "laporan|detail_reprint_struk|1";
+      return view('laporan.detail_reprint_struk', compact('menu_active', 'transaksi'));
+    }
+    // END LAP REPRINT STRUK
+
     //LAP PERGERAKAN STOCK
 
     public function LapPergerakanStock()
