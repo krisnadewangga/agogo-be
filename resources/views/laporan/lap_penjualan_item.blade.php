@@ -46,7 +46,7 @@
 			                <!-- /.input group -->
 	              		</div>
 	        		</div>
-	        		<div class="col-md-3">
+	        		<div class="col-md-2">
 	        			<div class="form-group">
 	        				<label>Sort By</label>
 		        			<select name="sort_by" class="form-control" id="sort_by">
@@ -74,7 +74,7 @@
 		        			</select>
 	        			</div>
 	        		</div>
-	        		<div class="col-md-3">
+	        		<div class="col-md-2">
 	        			 <label>Opsi Sort</label>
 	        			 <select name="opsi_sort" class="form-control" id="opsi_sort">
 	        			 	@if($input['opsi_sort'] == '1')
@@ -86,6 +86,16 @@
 	        			 	@endif
 	        			 </select>
 	        		</div>
+					<div class="col-md-2">
+						<label for="opsi_kasir">Opsi Per Kasir</label>
+						<select name="opsi_kasir" class="form-control" id="opsi_kasir">
+							@foreach($data['opsi_kasir'] as $id => $name)
+								<option value="{{ $id }}" {{ (old('selected_kasir') ?? ($data['selected_kasir'] ?? '')) == $id ? 'selected' : '' }}>
+									{{ $name }}
+								</option>
+							@endforeach
+						</select>
+					</div>
 	        	</div>
 	        	<div class="row">
 	        		
@@ -138,6 +148,10 @@
         </div>
 
         <script type="text/javascript">
+			// document.getElementById('opsi_kasir').addEventListener('change', function() {
+			// 	// Jika select berada dalam form, submit formnya
+			// 	this.form.submit();
+			// });
         	$(function(){
         		 $('.datepicker').datepicker({
 		           format: 'dd/mm/yyyy',
@@ -170,6 +184,7 @@
         		var tanggal1 = $("#st").val();
         		var sort_by = $("#sort_by").val();
         		var opsi_sort = $("#opsi_sort").val();
+        		var opsi_kasir = $("#opsi_kasir").val();
 
         		if(tanggal != "" || tanggal1 != ""){
         			var pisah = tanggal.split('/');
@@ -178,7 +193,7 @@
 	        		var mt = pisah[2]+"-"+pisah[1]+"-"+pisah[0];
 	        		var st = pisah1[2]+"-"+pisah1[1]+"-"+pisah1[0];
 	        		// document.location.href('export_kas');
-	        		window.open('export_penjualan_per_item?tanggal='+mt+'&sampai_tanggal='+st+'&sort_by='+sort_by+'&opsi_sort='+opsi_sort, '_blank');
+	        		window.open('export_penjualan_per_item?tanggal='+mt+'&sampai_tanggal='+st+'&sort_by='+sort_by+'&opsi_sort='+opsi_sort+'&opsi_kasir='+opsi_kasir, '_blank');
         		}else{
         			alert("Maaf! Pastikan Mulai Tanggal & Sampat Tanggal Tidak Kosong");
         		}

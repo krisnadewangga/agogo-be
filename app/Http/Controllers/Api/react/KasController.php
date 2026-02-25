@@ -287,6 +287,7 @@ class KasController extends Controller
             $tgl_hitung = $request[0]['tgl_hitung'];
             $refund = $request[0]['refund'];
             $tax = $request[0]['tax'];
+            $uang_fisik_diterima = $request[0]['uang_fisik_diterima'];
           
        
 
@@ -300,6 +301,7 @@ class KasController extends Controller
                 'tgl_hitung' => $tgl_hitung,
                 'total_refund' => $refund,
                 'tax' => $tax,
+                'uang_fisik_diterima' => $uang_fisik_diterima,
                 'status' => '1'
                 ]
             );

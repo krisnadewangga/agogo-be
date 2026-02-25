@@ -1540,19 +1540,19 @@ class LaporanController extends Controller
     } 
 
     //penjualan per item
-    public function LaporanPenjualanPerItem()
+    public function LaporanPenjualanPerItem(Request $request)
     {
       $dates = [Carbon::now()->format('Y-m-d'),
                 Carbon::now()->format('Y-m-d'),
-                '1','1'
+                '1','1','1',
                ];
       $data = $this->SetDataPenjualanPerItem($dates);
-    
 
       $input = ['tanggal' => Carbon::now()->format('d/m/Y'), 
                 'sampai_tanggal' =>  Carbon::now()->format('d/m/Y'),
                 'sort_by' => '1',
-                'opsi_sort' => '1'
+                'opsi_sort' => '1',
+                'opsi_kasir' => '1',
                ];
       $menu_active = "laporan|penjualan_item|0";
 
@@ -1576,14 +1576,17 @@ class LaporanController extends Controller
       $mt = $explode[2]."-".$explode[1]."-".$explode[0];
       $st = $explode1[2]."-".$explode1[1]."-".$explode1[0];
        
-      $dates = [$mt, $st, $req['sort_by'], $req['opsi_sort']];
+      // dd($req);
+      $dates = [$mt, $st, $req['sort_by'], $req['opsi_sort'], $req['opsi_kasir']];
 
       $data = $this->SetDataPenjualanPerItem($dates);
      
       $input = ['tanggal' => $req['mulai_tanggal'], 
                 'sampai_tanggal' => $req['sampai_tanggal'],
                 'sort_by' => $req['sort_by'],
-                'opsi_sort' => $req['opsi_sort'] ];
+                'opsi_sort' => $req['opsi_sort'],
+                'opsi_kasir' => $req['opsi_kasir']
+                ];
 
       $menu_active = "laporan|penjualan_item|0";
       return view('laporan.lap_penjualan_item',compact('menu_active','input','data')); 
@@ -1597,7 +1600,19 @@ class LaporanController extends Controller
                '4' => 'total'
               ];
       $opsi = ['1' => 'ASC','2' => 'DESC'];
+      //admin dan kasir
+      $target_levels = [1, 2, 3]; 
 
+      $kasir_db = User::whereIn('level_id', $target_levels)
+                      ->orderBy('name', 'asc')
+                      ->pluck('name', 'id')
+                      ->toArray();
+
+      $opsi_kasir = [1 => 'Penjualan Total'] + $kasir_db;
+      
+      // dump($nama_kasir);
+      // xxxxxxxxxxxxx
+      
       if($data[0] == $data[1]){
         $transaksi = ItemTransaksi::selectRaw("item_transaksi.item_id,
                                                 (SELECT nama_item FROM item where id = item_transaksi.item_id ) as nama_item,
@@ -1608,6 +1623,9 @@ class LaporanController extends Controller
                                         return $q->from('transaksi')
                                                   ->select('id')
                                                   ->where('status','5')
+                                                  ->when($data[4] != 1, function ($q) use ($data) {
+                                                      return $q->where('kasir_id', $data[4]);
+                                                  })
                                                   ->whereDate('updated_at',$data[0]);
                                       })->groupBy('item_transaksi.item_id')
                                       ->orderBy($sort[$data[2]], $opsi[$data[3]])
@@ -1622,6 +1640,9 @@ class LaporanController extends Controller
                                         return $q->from('transaksi')
                                                   ->select('id')
                                                   ->where('status','5')
+                                                  ->when($data[4] != 1, function ($q) use ($data) {
+                                                      return $q->where('kasir_id', $data[4]);
+                                                  })
                                                   ->where('updated_at','>=', $data[0]." 00:00:00")
                                                   ->where('updated_at','<=', $data[1]." 23:59:59");
                                       })->groupBy('item_transaksi.item_id')
@@ -1629,6 +1650,8 @@ class LaporanController extends Controller
                                       ->get();
        
       }
+      // dump($data);
+
 
       $transaksi->map(function($transaksi){
         $transaksi['tampil_total'] = number_format($transaksi->total,'0','','.');
@@ -1636,7 +1659,7 @@ class LaporanController extends Controller
       
       $grandTotal = number_format($transaksi->sum('total'),'0','','.');
 
-      $array = ['data' => $transaksi, 'grandTotal' => $grandTotal];
+      $array = ['data' => $transaksi, 'grandTotal' => $grandTotal, 'opsi_kasir' => $opsi_kasir, 'selected_kasir' => $data[4]];
       return $array;
 
       // return $data;
@@ -1700,17 +1723,24 @@ class LaporanController extends Controller
     {
       $req = $request->all();
 
-      $dates = [$req['tanggal'], $req['sampai_tanggal'], $req['sort_by'], $req['opsi_sort'] ];
+      $dates = [$req['tanggal'], $req['sampai_tanggal'], $req['sort_by'], $req['opsi_sort'], $req['opsi_kasir'] ];
       $data = $this->SetDataPenjualanPerItem($dates);
       
+      if ($data['selected_kasir'] == 1) {
+        $nama_kasir = "Penjualan Total";
+      } else {
+        $nama_kasir = User::find($data['selected_kasir'])->name;
+      }
 
       $explode = explode('-',$req['tanggal']);
       $explode1 = explode('-',$req['sampai_tanggal']);
 
       $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
       $end_tanggal = $explode1[2]."/".$explode1[1]."/".$explode1[0];
+      // $selectedKasir = $req['opsi_kasir'];
 
-      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.penjualan_per_item', compact('data', 'start_tanggal','end_tanggal'));
+
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.penjualan_per_item', compact('data', 'start_tanggal','end_tanggal', 'nama_kasir'));
          return $pdf->stream('laporan-pemesanan-'.$start_tanggal.'-'.$end_tanggal.'.pdf');
 
       // $dates = [$req['tanggal']];

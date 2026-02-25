@@ -115,6 +115,7 @@
 						<th class="nowrap">Total Transaksi</th>
 						<th class="nowrap">Total Refund</th>
 						<th class="nowrap">Saldo Akhir</th>
+						<th class="nowrap">Cash Fisik</th>
 						
 						</tr>
 					</thead>
@@ -131,6 +132,7 @@
 								<td  class="nowrap">Rp. {{ number_format($key->transaksi,'0','','.') }}</td>
 								<td  class="nowrap">Rp. {{ number_format($key->total_refund,'0','','.') }}</td>
 								<td  class="nowrap">Rp. {{ number_format($key->saldo_akhir,'0','','.') }}</td>
+								<td  class="nowrap">Rp. {{ number_format($key->uang_fisik_diterima,'0','','.') }}</td>
 							</tr>
 						@endforeach
 					</tbody>
