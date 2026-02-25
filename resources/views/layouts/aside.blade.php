@@ -150,6 +150,7 @@
               <li id="sm_pemesanan"><a href="{{ route('lap_pemesanan') }}"><i class="fa fa-circle-o"></i> <span>Pemesanan</span></a></li>
               <li id="sm_kas"><a href="{{ route('lap_kas') }}"><i class="fa fa-circle-o"></i> <span>Kas</span></a></li>
               <li id="sm_struk"><a href="{{ route('lap_reprint_struk') }}"><i class="fa fa-circle-o"></i> <span>Laporan Nota Struk</span></a></li>
+              <li id="sm_produksi"><a href="{{ route('lap_produksi') }}"><i class="fa fa-circle-o"></i> <span>Laporan Produksi</span></a></li>
              
               <li id="sm_pergerakan_stock"><a href="{{ route('lap_pergerakan_stock') }}"><i class="fa fa-circle-o"></i> <span>Pergerakan Stock</span></a></li>
              

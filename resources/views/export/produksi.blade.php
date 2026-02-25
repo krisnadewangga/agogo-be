@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>LAPORAN PERGERAKAN STOCK PRODUKSI</title>
+    <title>LAPORAN PRODUKSI</title>
     <style>
        body{
             padding: 0;
@@ -78,7 +78,7 @@
         <div class="header">
                 <img src="{{ asset('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>        
                 <div style="float:right;margin-top:-30px">
-                    <h3>LAPORAN STOCK PRODUKSI</h3>
+                    <h3>LAPORAN PRODUKSI</h3>
                     <p style="margin-left:120px">Tanggal Produksi : {{$start_tanggal}}</p>
                 </div>            
                 <br>
@@ -95,14 +95,8 @@
                         <th >No.</th>
                         <th >Kode Menu</th>
                         <th >Nama Menu</th>
-                        <th >Stock Awal</th>
                         <th >Produksi</th>
-                        <th >Toko</th>
-                        <th >Pemesanan</th>
-                        <th >Total Penjualan</th>
-                        <th >Rusak</th>
-                        <th >Lain - lain</th>
-                        <th >Sisa Stock</th>
+                        <th >Catatan</th>
                     </tr>
                     
                   
@@ -114,15 +108,8 @@
                             <td align="center" style="text-align:center;border-bottom:0px">{{ $no++ }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ $key->Item->code }}</td>
                             <td style="text-align:center;border-bottom:0px">{{ $key->Item->nama_item }}</td>
-                
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->stock_awal,'0','','.') }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->produksi1,'0','','.') }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->penjualan_toko,'0','','.') }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->penjualan_pemesanan,'0','','.') }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->total_penjualan,'0','','.') }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->ket_rusak,'0','','.') }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->ket_lain,'0','','.') }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->stok,'0','','.') }}</td>
+                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->total_produksi,'0','','.') }}</td>
+                            <td style="text-align:center;border-bottom:0px">{{ $key->catatan }}</td>
                         </tr>
                     @endforeach
                 </tbody>

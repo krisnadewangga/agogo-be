@@ -1373,6 +1373,70 @@ class LaporanController extends Controller
     }
     // END LAP REPRINT STRUK
 
+    // LAP PRODUKSI
+    
+    public function LapProduksi(Request $request)
+    {
+      $dates = [Carbon::now()->format('Y-m-d'),'1','1'];
+      $data = $this->SetDataProduksi($dates);
+
+      $input = ['tanggal' => Carbon::now()->format('d/m/Y'), 'sort_by' => '1', 'opsi_sort' => '1'];
+      $menu_active = "laporan|produksi|0";
+      
+      return view('laporan.lap_produksi', compact('menu_active', 'input', 'data'));
+    }
+
+     public function CariLaporanProduksi(Request $request)
+    {
+      $req = $request->all();
+      $validator = \Validator::make($req,['tanggal' => 'required|date_format:d/m/Y']);
+      if($validator->fails()){
+       return redirect()->back()->withErrors($validator)->with('gagal','simpan')->withInput();
+      }
+
+      $explode = explode('/',$req['tanggal']);
+      $dates = [$explode[2]."-".$explode[1]."-".$explode[0], $req['sort_by'], $req['opsi_sort'] ];
+      $data = $this->SetDataProduksi($dates);
+
+      $input = ['tanggal' => $req['tanggal'], 'sort_by' => $req['sort_by'], 'opsi_sort' => $req['opsi_sort'] ];
+      $menu_active = "laporan|produksi|0";
+      return view('laporan.lap_produksi',compact('menu_active','input','data'));
+    }
+
+    public function SetDataProduksi($data)
+    {
+      $sort_by = ['1' => 'code',
+                  '2' => 'nama_item',
+                  '3' => 'total_produksi',
+                  '4' => 'catatan',
+                ];
+
+      $opsi_sort = ['1' => 'ASC', '2' => 'DESC'];
+
+      $item = Produksi::selectRaw('produksi.*,
+        (select code from item where id = produksi.item_id) as code,
+        (select stock from item where id = produksi.item_id) as stok,
+        (select nama_item from item where id = produksi.item_id) as nama_item
+      ')
+      ->whereIn('id',function($q) use ($data){
+          $q->from('produksi')
+          ->selectRaw('max(produksi.id)')
+          ->whereDate('produksi.created_at',$data[0])
+          ->groupBy('produksi.item_id');
+          return $q;
+      })->get();
+
+      if($data[2] == '1'){
+         return $item->sortBy($sort_by[$data[1]])->values()->all();
+      }elseif($data[2] == '2'){
+         return $item->sortByDesc($sort_by[$data[1]])->values()->all();
+      }
+
+    }
+
+
+    // END LAP PRODUKSI
+
     //LAP PERGERAKAN STOCK
 
     public function LapPergerakanStock()
@@ -1407,13 +1471,13 @@ class LaporanController extends Controller
     {
       $req = $request->all();
       $dates = [$req['tanggal'], $req['sort_by'], $req['opsi_sort'] ];
-      $data = $this->SetDataPergerakanStock($dates);
+      $data = $this->SetDataProduksi($dates);
 
       $explode = explode("-", $request->tanggal);
       $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
 
       $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.produksi', compact('data', 'start_tanggal'));
-      return $pdf->stream('laporan-pergerakan-stock-'.$start_tanggal.'.pdf');
+      return $pdf->stream('laporan-produksi-'.$start_tanggal.'.pdf');
       // return View('export.produksi', compact('data', 'start_tanggal'));
 
     } 
