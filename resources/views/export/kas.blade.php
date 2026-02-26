@@ -90,6 +90,9 @@
                             <th style="text-align:right;border-bottom:0px">Total Transaksi</th>
                             <th style="text-align:right;border-bottom:0px">Total Refund</th>                            
                             <th style="text-align:right;border-bottom:0px">Total Pedapatan</th>
+                            <th style="text-align:right;border-bottom:0px">Cash</th>
+                            <th style="text-align:right;border-bottom:0px">Transfer</th>
+                            <th style="text-align:right;border-bottom:0px">Qris</th>
                             <th style="text-align:right;border-bottom:0px">Cash Fisik</th>
                             <th style="text-align:right;border-bottom:0px">Kas Tersedia</th>
                         </tr>
@@ -105,6 +108,9 @@
                             <td style="text-align:right;border-bottom:0px">{{ number_format($key->transaksi,'0','','.') }}</td>
                             <td style="text-align:right;border-bottom:0px">{{ number_format($key->total_refund,'0','','.') }}</td>
                             <td style="text-align:right;border-bottom:0px">{{ number_format($key->total_pendapatan,'0','','.') }}</td>
+                            <td style="text-align:right;border-bottom:0px">{{ number_format($key->total_cash,'0','','.') }}</td>
+                            <td style="text-align:right;border-bottom:0px">{{ number_format($key->total_transfer,'0','','.') }}</td>
+                            <td style="text-align:right;border-bottom:0px">{{ number_format($key->total_qris,'0','','.') }}</td>
                             <td style="text-align:right;border-bottom:0px">{{ number_format($key->uang_fisik_diterima,'0','','.') }}</td>
                             <td style="text-align:right;border-bottom:0px">{{ number_format($key->kas_tersedia,'0','','.') }}</td>
                         </tr>

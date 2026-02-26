@@ -3,7 +3,7 @@
 @section('content')
 	@component('components.card', ['title' => 'Lap. Opname', 
 								   'breadcumbs' => array(
-                                                          array('judul' => 'Lap. Penjualan Per Item','link' => '#')
+                                                          array('judul' => 'Lap. Opname','link' => '#')
                                                     	) 
                                   ])
         

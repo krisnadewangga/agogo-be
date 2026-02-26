@@ -109,13 +109,13 @@
 						<th>Kasir</th>
 						<th>Waktu</th>
 						<th class="nowrap">Saldo Awal</th>
+						<th class="nowrap">Total Transaksi</th>
+						<th class="nowrap">Total Refund</th>
 						<th class="nowrap">Cash</th>
 						<th class="nowrap">Transfer</th>
 						<th class="nowrap">Qris</th>
-						<th class="nowrap">Total Transaksi</th>
-						<th class="nowrap">Total Refund</th>
-						<th class="nowrap">Saldo Akhir</th>
 						<th class="nowrap">Cash Fisik</th>
+						<th class="nowrap">Saldo Akhir</th>
 						
 						</tr>
 					</thead>
@@ -126,13 +126,13 @@
 								<td  class="nowrap">{{ $key->User->name }}</td>
 								<td  class="nowrap">{{ $key->created_at->format('d/m/Y H:i:s') }}</td>
 								<td  class="nowrap">Rp. {{ number_format($key->saldo_awal,'0','','.') }}</td>
+								<td  class="nowrap">Rp. {{ number_format($key->transaksi,'0','','.') }}</td>
+								<td  class="nowrap">Rp. {{ number_format($key->total_refund,'0','','.') }}</td>
 								<td  class="nowrap">Rp. {{ number_format($key->total_cash,'0','','.') }}</td>
 								<td  class="nowrap">Rp. {{ number_format($key->total_transfer,'0','','.') }}</td>
 								<td  class="nowrap">Rp. {{ number_format($key->total_qris,'0','','.') }}</td>
-								<td  class="nowrap">Rp. {{ number_format($key->transaksi,'0','','.') }}</td>
-								<td  class="nowrap">Rp. {{ number_format($key->total_refund,'0','','.') }}</td>
-								<td  class="nowrap">Rp. {{ number_format($key->saldo_akhir,'0','','.') }}</td>
 								<td  class="nowrap">Rp. {{ number_format($key->uang_fisik_diterima,'0','','.') }}</td>
+								<td  class="nowrap">Rp. {{ number_format($key->saldo_akhir,'0','','.') }}</td>
 							</tr>
 						@endforeach
 					</tbody>

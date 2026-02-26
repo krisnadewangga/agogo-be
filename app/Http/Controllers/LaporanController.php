@@ -1415,16 +1415,22 @@ class LaporanController extends Controller
 
       $item = Produksi::selectRaw('produksi.*,
         (select code from item where id = produksi.item_id) as code,
-        (select stock from item where id = produksi.item_id) as stok,
         (select nama_item from item where id = produksi.item_id) as nama_item
       ')
       ->whereIn('id',function($q) use ($data){
           $q->from('produksi')
           ->selectRaw('max(produksi.id)')
           ->whereDate('produksi.created_at',$data[0])
-          ->groupBy('produksi.item_id');
+          ->groupBy('produksi.item_id')
+          ->where(function($query) {
+          $query->where('produksi.produksi1', '>', 0)
+            ->orWhere('produksi.produksi2', '>', 0)
+            ->orWhere('produksi.produksi3', '>', 0);
+          });
           return $q;
       })->get();
+
+      // dump($item[0]);
 
       if($data[2] == '1'){
          return $item->sortBy($sort_by[$data[1]])->values()->all();
@@ -1433,7 +1439,6 @@ class LaporanController extends Controller
       }
 
     }
-
 
     // END LAP PRODUKSI
 
@@ -2238,7 +2243,7 @@ class LaporanController extends Controller
       }
 
       $input = ['tanggal' => $tanggal ,'sort_by' => $sort_by, 'opsi_sort' => $opsi_sort];
-      $menu_active = "laporan|opname|0";
+      $menu_active = "transaksi|opname|0";
 
       $explode = explode('/',$tanggal);
       $dates = [$explode[2]."-".$explode[1]."-".$explode[0],$sort_by,$opsi_sort];

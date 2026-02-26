@@ -108,7 +108,7 @@
                             <td align="center" style="text-align:center;border-bottom:0px">{{ $no++ }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ $key->Item->code }}</td>
                             <td style="text-align:center;border-bottom:0px">{{ $key->Item->nama_item }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->total_produksi,'0','','.') }}</td>
+                            <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->produksi1 + $key->produksi2 + $key->produksi3,'0','','.') }}</td>
                             <td style="text-align:center;border-bottom:0px">{{ $key->catatan }}</td>
                         </tr>
                     @endforeach
