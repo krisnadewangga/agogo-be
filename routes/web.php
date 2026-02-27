@@ -92,6 +92,9 @@ Route::post('/cari_laporan_reprint_struk','LaporanController@CariReprintStruk')-
 Route::get('/reprint_struk/{id}','LaporanController@ReprintStruk')->name('reprint_struk');
 Route::get("/lap_produksi",'LaporanController@LapProduksi')->name('lap_produksi');
 Route::post('/cari_laporan_produksi','LaporanController@CariLaporanProduksi')->name('cari_laporan_produksi');
+Route::get("/lap_target_produksi",'LaporanController@LapTargetProduksi')->name('lap_target_produksi');
+Route::post('/cari_target_produksi','LaporanController@CariLaporanTargetProduksi')->name('cari_target_produksi');
+Route::post('/post_target_produksi','LaporanController@PostTargetProduksi')->name('post_target_produksi');
 
 Route::get('/lap_pergerakan_stock','LaporanController@LapPergerakanStock')->name('lap_pergerakan_stock');
 Route::post('/cari_laporan_pergerakan_stock','LaporanController@CariPergerakanStock')->name('cari_laporan_pergerakan_stock');
@@ -128,6 +131,7 @@ Route::get('/export_kas','LaporanController@ExportKas')->name('export_kas');
 Route::get('/export_pergerakan_stock','LaporanController@ExportProduksi')->name('export_pergerakan_stock');
 Route::get('/export_pemesanan','LaporanController@ExportPemesanan')->name('export_pemesanan');
 Route::get('/export_produksi','LaporanController@ExportProduksi')->name('export_produksi');
+Route::get('/export_target_produksi','LaporanController@ExportTargetProduksi')->name('export_target_produksi');
 
 Route::get('/penjualan','LaporanController@ShowPenjualan')->name('penjualan');
 Route::get('/set_grafik_penjualan','LaporanController@setGrafikPenjualan')->name('set_grafik_penjualan');

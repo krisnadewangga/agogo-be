@@ -125,8 +125,6 @@
                   </span>
                 </a>
                </li>
-
-               <li id="sm_opname"><a href="{{ route('opname') }}"><i class="fa fa-circle-o"></i> <span>Opname</span></a></li>
             </ul>
           </li>
 
@@ -144,16 +142,14 @@
               <!-- <li id="sm_pendapatan"><a href="{{ route('lap_pendapatan') }}"><i class="fa fa-circle-o"></i> <span>Pendapatan</span></a></li> -->
 
               <li id="sm_penjualan_item"><a href="{{ route('lap_penjualan_per_item') }}"><i class="fa fa-circle-o"></i> <span>Total Penjualan Per Item</span></a></li>
-
               <li id="sm_pendapatan_harian"><a href="{{ route('lap_pendapatan_harian') }}"><i class="fa fa-circle-o"></i> <span>Total Pendapatan Harian</span></a></li>
-
               <li id="sm_pemesanan"><a href="{{ route('lap_pemesanan') }}"><i class="fa fa-circle-o"></i> <span>Pemesanan</span></a></li>
               <li id="sm_kas"><a href="{{ route('lap_kas') }}"><i class="fa fa-circle-o"></i> <span>Kas</span></a></li>
               <li id="sm_struk"><a href="{{ route('lap_reprint_struk') }}"><i class="fa fa-circle-o"></i> <span>Laporan Nota Struk</span></a></li>
               <li id="sm_produksi"><a href="{{ route('lap_produksi') }}"><i class="fa fa-circle-o"></i> <span>Laporan Produksi</span></a></li>
-             
+              <li id="sm_target_produksi"><a href="{{ route('lap_target_produksi') }}"><i class="fa fa-circle-o"></i> <span>Laporan Realisasi Produksi</span></a></li>
               <li id="sm_pergerakan_stock"><a href="{{ route('lap_pergerakan_stock') }}"><i class="fa fa-circle-o"></i> <span>Pergerakan Stock</span></a></li>
-             
+              <li id="sm_opname"><a href="{{ route('opname') }}"><i class="fa fa-circle-o"></i> <span>Opname</span></a></li>
             </ul>
           </li>
 

@@ -12,6 +12,7 @@ use App\Preorders;
 use App\Kas;
 use App\Helpers\SendNotif;
 use App\Produksi;
+use App\TargetProduksi;
 use App\Opname;
 use Carbon\Carbon;
 use App\Kategori;
@@ -962,8 +963,8 @@ class LaporanController extends Controller
 
        $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.pemesanan', compact('data', 'start_tanggal','end_tanggal'));
          return $pdf->stream('laporan-pemesanan-'.$start_tanggal.'-'.$end_tanggal.'.pdf');
-       
-       // return View('export.pemesanan', compact('data', 'start_tanggal','end_tanggal'));
+
+      // return View('export.pemesanan', compact('data', 'start_tanggal','end_tanggal'));
      
     }
 
@@ -1372,6 +1373,149 @@ class LaporanController extends Controller
       return view('laporan.detail_reprint_struk', compact('menu_active', 'transaksi'));
     }
     // END LAP REPRINT STRUK
+
+    // START LAP TARGET PRODUKSI
+    public function LapTargetProduksi(Request $request)
+    {
+      $req = $request->all();
+      $dates = [Carbon::now()->format('Y-m-d'),'1','1'];
+      $data = $this->SetDataTargetProduksi($dates);
+
+      if(isset($req['tanggal'])){
+        $tanggal = $req['tanggal'];
+      }else{
+        $tanggal = Carbon::now()->format('d/m/Y');
+      }
+
+      $input = ['tanggal' => $tanggal, 'sort_by' => '1', 'opsi_sort' => '1'];
+      $menu_active = "laporan|target_produksi|0";
+
+      $pisah_tanggal = explode('/', $tanggal);
+      $tanggal_form = $pisah_tanggal[2]."-".$pisah_tanggal[1]."-".$pisah_tanggal[0];
+
+      // $items = Item::where('status_aktif', '1')
+      //       ->orderBy('nama_item', 'ASC')
+      //       ->get();
+
+      return view('laporan.lap_target_produksi', compact('menu_active', 'input', 'data', 'tanggal_form'));
+    }
+
+    public function CariLaporanTargetProduksi(Request $request)
+    {
+      $req = $request->all();
+      $validator = \Validator::make($req,['tanggal' => 'required|date_format:d/m/Y']);
+      if($validator->fails()){
+        return redirect()->back()->withErrors($validator)->with('gagal','simpan')->withInput();
+      }
+
+      $explode = explode('/',$req['tanggal']);
+      $dates = [$explode[2]."-".$explode[1]."-".$explode[0], $req['sort_by'], $req['opsi_sort'] ];
+      $data = $this->SetDataTargetProduksi($dates);
+
+      $items = Item::where('status_aktif', '1')
+            ->orderBy('nama_item', 'ASC')
+            ->get();
+
+      $tanggal_form = $explode[2]."-".$explode[1]."-".$explode[0];
+
+      $input = ['tanggal' => $req['tanggal'], 'sort_by' => $req['sort_by'], 'opsi_sort' => $req['opsi_sort'] ];
+      $menu_active = "laporan|target_produksi|0";
+      return view('laporan.lap_target_produksi',compact('menu_active','input','data','items','tanggal_form'));
+    }
+
+    public function SetDataTargetProduksi($data)
+    {
+      $sort_by = ['1' => 'code',
+                  '2' => 'nama_item',
+                  '3' => 'target_produksi',
+                  '4' => 'realisasi_produksi',
+                 ];
+
+      $item = Item::where('status_aktif','1')->get();
+      $item->map(function($item) use ($data) {
+        $produksi = Produksi::where('item_id', $item->id)
+          ->whereDate('created_at', $data[0])
+          ->orderBy('id', 'DESC')
+          ->first();
+
+        $item['realisasi_produksi'] = $produksi ? (int) $produksi->produksi1 : 0;
+      });
+      $item->map(function($item) use ($data){
+
+      $target = TargetProduksi::where('item_id',$item->id)
+                      ->whereDate('target_date',$data[0])
+                      ->first();
+                 
+      if(isset($target->id)){
+        $item['target_produksi'] = $target->target_produksi;
+      }else{
+        $item['target_produksi'] = "";
+      }
+
+      });
+
+      // dd($item->where('target_produksi', '>', 0)->first());
+      
+      if($data[2] == '1'){
+         return $item->sortBy($sort_by[$data[1]])->values()->all();
+      }elseif($data[2] == '2'){
+         return $item->sortByDesc($sort_by[$data[1]])->values()->all();
+      }
+    }
+
+    public function PostTargetProduksi(Request $request)
+    {
+      $req = $request->all();
+      
+      if(!Auth::attempt(['name' => $req['username'], 'password' => $req['password'] ]))
+      return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username Atau Password Salah')->withInput();        
+
+      $user = $request->user();
+      // $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
+      $role = Aproval::where('user_id',$user->id)->where('rule','4')->count();
+   
+      if($role == 0)
+      return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','User Tidak Punya Akses')->withInput();        
+
+      $tanggalToday = Carbon::now()->format('Y-m-d H:i:s');
+      $tanggalTarget = $req['tanggal'];
+      
+      $item = Item::where('status_aktif','1')->select('id')->get();
+      foreach ($item as $key) {
+        $targetValue = $req['target_produksi_'.$key->id] ?? 0;
+        
+        if(!empty($targetValue)) {
+          $select = TargetProduksi::whereDate('target_date',$tanggalTarget)->where('item_id',$key->id)->first();
+
+          if(isset($select->id)){
+            $select->update(['target_produksi' => $targetValue]);
+          }else{
+            $entri = TargetProduksi::create(['item_id'=>$key->id,
+                                      'target_produksi' => $targetValue,
+                                      'target_date' => $tanggalTarget,
+                                      'created_at' => $tanggalToday
+                                    ]);
+          }
+        }
+      }
+
+      return redirect()->route('lap_target_produksi',['tanggal' => Carbon::parse($req['tanggal'])->format('d/m/Y'), 'sort_by' => '1', 'opsi_sort' => '1' ])->with('success','Berhasil Set Target Produksi ')->withInput();
+    }
+
+    public function ExportTargetProduksi(Request $request)
+    {
+      $req = $request->all();
+      $dates = [$req['tanggal'], $req['sort_by'], $req['opsi_sort']];
+      $data = $this->SetDataTargetProduksi($dates);
+
+      $explode = explode("-", $request->tanggal);
+      $start_tanggal = $explode[2]."/".$explode[1]."/".$explode[0];
+
+      $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isRemoteEnabled' => true])->loadView('export.target_produksi', compact('data', 'start_tanggal'));
+      return $pdf->stream('laporan-target-produksi-'.$start_tanggal.'.pdf');
+      // return View('export.produksi', compact('data', 'start_tanggal'));
+    } 
+    // END LAP TARGET PRODUKSI
 
     // LAP PRODUKSI
     
@@ -2243,7 +2387,7 @@ class LaporanController extends Controller
       }
 
       $input = ['tanggal' => $tanggal ,'sort_by' => $sort_by, 'opsi_sort' => $opsi_sort];
-      $menu_active = "transaksi|opname|0";
+      $menu_active = "laporan|opname|0";
 
       $explode = explode('/',$tanggal);
       $dates = [$explode[2]."-".$explode[1]."-".$explode[0],$sort_by,$opsi_sort];
@@ -2283,9 +2427,6 @@ class LaporanController extends Controller
 
     public function PostOpname(Request $request)
     {
-
-
-
       $req = $request->all();
       
       if(!Auth::attempt(['name' => $req['username'], 'password' => $req['password'] ]))
@@ -2382,12 +2523,6 @@ class LaporanController extends Controller
         }else{
            $item['stock_masuk'] = 0;
         }
-       
-        // if(isset($stock_akhir->id)){
-        //   $item['stock_akhir'] = $stock_akhir->sisa_stock;
-        // }else{
-        //   $item['stock_akhir'] = 0;
-        // }
         
         if(isset($opname->id)){
           $item['stock_toko'] = $opname->stock_toko;
@@ -2413,6 +2548,5 @@ class LaporanController extends Controller
       }
 
     } 
-
     
 }

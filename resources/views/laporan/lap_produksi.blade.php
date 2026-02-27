@@ -71,7 +71,7 @@
 	        	</div>
 	        	<div style="margin-top: 5px;">
 	        		<button class="btn btn-primary">Cari</button>
-	        		<a href="{{ route('lap_pergerakan_stock') }}"><label class="btn btn-warning" >Reset</label></a>
+	        		<a href="{{ route('lap_produksi') }}"><label class="btn btn-warning" >Reset</label></a>
 	        		<a href="javascript:export_pdf()"><label class="btn btn-success" >Export PDF</label></a>
 	        	</div>
         	</form>

@@ -1,15 +1,15 @@
 @extends('layouts.app1')
 
 @section('content')
-	@component('components.card', ['title' => 'Lap. Opname', 
+	@component('components.card', ['title' => 'Lap. Target Realisasi dan Produksi', 
 								   'breadcumbs' => array(
-                                                          array('judul' => 'Lap. Opname','link' => '#')
+                                                          array('judul' => 'Lap. Target Realisasi dan Produksi','link' => '#')
                                                     	) 
                                   ])
         
 		
         <div class="card">
-        	<form method="POST" action="{{ route('cari_opname') }}">
+        	<form method="POST" action="{{ route('cari_target_produksi') }}">
 	        	@csrf
 	        	<div class="row">
 	        		<div class="col-md-4">
@@ -37,33 +37,23 @@
                                 @if($input['sort_by'] == '1')
                                     <option value="1" selected>Kode Barang</option>
                                     <option value="2">Nama Menu</option>
-                                    <option value="3">Stok Masuk</option>
-                                    <option value="4">Stok Akhir</option>
-                                    <option value="5">Stok Toko</option>
+                                    <option value="3">Target Produksi</option>
+                                    <option value="4">Realisasi Produksi</option>
                                 @elseif($input['sort_by'] == '2')
                                     <option value="1" >Kode Barang</option>
                                     <option value="2" selected>Nama Menu</option>
-                                    <option value="3">Stok Masuk</option>
-                                    <option value="4">Stok Akhir</option>
-                                    <option value="5">Stok Toko</option>
+                                    <option value="3">Target Produksi</option>
+                                    <option value="4">Realisasi Produksi</option>
                                 @elseif($input['sort_by'] == '3')
                                     <option value="1" >Kode Barang</option>
                                     <option value="2">Nama Menu</option>
-                                    <option value="3" selected>Stok Masuk</option>
-                                    <option value="4">Stok Akhir</option>
-                                    <option value="5">Stok Toko</option>
+                                    <option value="3" selected>Target Produksi</option>
+                                    <option value="4">Realisasi Produksi</option>
                                 @elseif($input['sort_by'] == '4')
                                     <option value="1" >Kode Barang</option>
                                     <option value="2">Nama Menu</option>
-                                    <option value="3">Stok Masuk</option>
-                                    <option value="4" selected>Stok Akhir</option>
-                                    <option value="5">Stok Toko</option>
-                                @elseif($input['sort_by'] == '5')
-                                    <option value="1" >Kode Barang</option>
-                                    <option value="2">Nama Menu</option>
-                                    <option value="3">Stok Masuk</option>
-                                    <option value="4">Stok Akhir</option>
-                                    <option value="5" selected>Stok Toko</option>
+                                    <option value="3">Target Produksi</option>
+                                    <option value="4" selected>Realisasi Produksi</option>
                                 @endif
                             </select>
                         </div>
@@ -103,7 +93,7 @@
 					{{ session('error') }}
 				@endcomponent
 			@endif
-			<form method="POST" action="{{ route('post_opname') }}" >
+			<form method="POST" action="{{ route('post_target_produksi') }}" >
 				@csrf
 				<input type="text" name="tanggal" value="{{ $tanggal_form }}" hidden>
 	        	<div class="table-responsive" style="margin-top: 10px;">
@@ -113,62 +103,21 @@
 								<th style="width: 5px;">No</th>
 								<th>Kode Barang</th>
 								<th>Nama Menu</th>
-
-								<th ><center>Stok Akhir Komputer</center></th>
-								<th ><center>Stok Akhir Fisik Malam</center></th>
-								<th ><center>Stok Awal Komputer</center></th>
-								<th ><center>Stok Awal Fisik Pagi</center></th>
-								
-								<th ><center>Stok Masuk</center></th>
-								<th ><center>Stok Akhir</center></th>
-								<th ><center>Stok Update</center></th>
-								<th ><center>Stok Toko</center></th>
+								<th>Target Produksi</th>
+								<th>Realisasi Produksi</th>
 							</tr>
 						</thead>
 						<tbody style=" font-size:14px;">
 							@php $no=1; @endphp
-							@foreach($item as $key)
+							@foreach($data as $key)
 								<tr>
 									<td class="nowrap" align="center">{{ $no++ }}</td>
 									<td class="nowrap">{{ $key->code }}</td>
 									<td class="nowrap">{{ $key->nama_item }}</td>
-
 									<td class="nowrap" align="center">
-										{{ $key->stock_akhir_komputer ?? '0' }}
-										<input type="hidden" name="total_stock_akhir_komputer_{{$key->id}}" value="{{ $key->stock_akhir_komputer }}" >
+										<input type="numeric" autocomplete="off" name="target_produksi_{{$key->id}}" class="form-control" value="{{ old('target_produksi_'.$key->id, $key->target_produksi) }}" style="width: 80px;">
 									</td>
-									<td class="nowrap" align="center">	
-										<input type="numeric" autocomplete="off" name="stock_akhir_fisik_malam_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('stock_akhir_fisik_malam_'.$key->id) }} @else {{$key->stock_akhir_fisik_malam}} @endif" style="width: 80px;">	
-									</td>
-									<td class="nowrap" align="center">
-										{{ $key->stock_awal_komputer ?? '0' }}
-										<input type="hidden" name="total_stock_awal_komputer_{{$key->id}}" value="{{ $key->stock_awal_komputer }}" >
-									</td>
-									<td class="nowrap" align="center">	
-										<input type="numeric" autocomplete="off" name="stock_awal_fisik_pagi_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('stock_awal_fisik_pagi_'.$key->id) }} @else {{$key->stock_awal_fisik_pagi}} @endif" style="width: 80px;">	
-									</td>
-
-									<td class="nowrap" align="center">
-										{{ $key->stock_masuk }}
-										<input type="hidden" name="total_stock_masuk_{{$key->id}}" value="{{ $key->stock_masuk }}" >
-									</td>
-									<td class="nowrap" align="center">
-										{{ $key->stock_akhir }}
-										<input type="hidden" name="total_stock_akhir_{{$key->id}}" value="{{ $key->stock_akhir }}" >
-									</td>
-									<td class="nowrap" align="center">
-										@if($key->stock_toko === '')
-											-
-										@else
-											{{ $key->stock_toko }}
-										@endif
-									</td>
-									<td class="nowrap" align="center">	
-										
-										<input type="numeric" autocomplete="off" name="total_stock_toko_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('total_stock_toko_'.$key->id) }} @else {{$key->stock_toko}} @endif" style="width: 80px;">
-										
-									</td>
-									
+									<td class="nowrap">{{ $key->realisasi_produksi == 0 ? "Tidak ada Produksi" : $key->realisasi_produksi }}</td>
 								</tr>
 							@endforeach
 						</tbody>
@@ -229,7 +178,7 @@
                 var opsi_sort = $("#opsi_sort").val();
 
         		// document.location.href('export_kas');
-        		window.open('export_opname?tanggal='+kt+'&sort_by='+sort_by+'&opsi_sort='+opsi_sort, '_blank');
+        		window.open('export_target_produksi?tanggal='+kt+'&sort_by='+sort_by+'&opsi_sort='+opsi_sort, '_blank');
         	}
 
         	function aproval()
