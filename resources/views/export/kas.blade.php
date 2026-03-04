@@ -86,15 +86,14 @@
                         <tr>
                             <th>No.</th>
                             <th>Kasir</th>  
-                            <th style="text-align:right;border-bottom:0px">Saldo Awal</th>
                             <th style="text-align:right;border-bottom:0px">Total Transaksi</th>
                             <th style="text-align:right;border-bottom:0px">Total Refund</th>                            
-                            <th style="text-align:right;border-bottom:0px">Total Pedapatan</th>
-                            <th style="text-align:right;border-bottom:0px">Cash</th>
                             <th style="text-align:right;border-bottom:0px">Transfer</th>
                             <th style="text-align:right;border-bottom:0px">Qris</th>
+                            <th style="text-align:right;border-bottom:0px">Saldo Awal</th>
                             <th style="text-align:right;border-bottom:0px">Cash Fisik</th>
-                            <th style="text-align:right;border-bottom:0px">Kas Tersedia</th>
+                            <th style="text-align:right;border-bottom:0px">Cash</th>
+                            <th style="text-align:right;border-bottom:0px">Total Saldo Akhir</th>
                         </tr>
                     </thead>
                 	<tbody>
@@ -104,14 +103,13 @@
                         <tr>
                             <td align="center" >{{ $no++ }}</td>
                             <td >{{ $key->User->name  }}</td>
-                            <td style="text-align:right;border-bottom:0px">{{ number_format($key->saldo_awal,'0','','.') }}</td>
                             <td style="text-align:right;border-bottom:0px">{{ number_format($key->transaksi,'0','','.') }}</td>
                             <td style="text-align:right;border-bottom:0px">{{ number_format($key->total_refund,'0','','.') }}</td>
-                            <td style="text-align:right;border-bottom:0px">{{ number_format($key->total_pendapatan,'0','','.') }}</td>
-                            <td style="text-align:right;border-bottom:0px">{{ number_format($key->total_cash,'0','','.') }}</td>
                             <td style="text-align:right;border-bottom:0px">{{ number_format($key->total_transfer,'0','','.') }}</td>
                             <td style="text-align:right;border-bottom:0px">{{ number_format($key->total_qris,'0','','.') }}</td>
+                            <td style="text-align:right;border-bottom:0px">{{ number_format($key->saldo_awal,'0','','.') }}</td>
                             <td style="text-align:right;border-bottom:0px">{{ number_format($key->uang_fisik_diterima,'0','','.') }}</td>
+                            <td style="text-align:right;border-bottom:0px">{{ number_format($key->total_cash,'0','','.') }}</td>
                             <td style="text-align:right;border-bottom:0px">{{ number_format($key->kas_tersedia,'0','','.') }}</td>
                         </tr>
                         @empty
@@ -122,70 +120,6 @@
                 	</tbody>
                     
             </table>  
-
-              <table class="display responsive-table" style="width: 40%; float: left; margin-left:20px; margin-top:-2px;border-spacing=0;">
-                <thead>
-                    <tr>
-                        <th style="border-top: 0px solid;">Penerimaan Uang</th>
-                        <th style="text-align: Center; border-left: 2px solid ;border-top: 0px solid;">Jumlah</th>
-                        
-                    </tr>
-                </thead>
-                <tbody>
-                   
-                    <tr>
-                        <td>100.000</td>      
-                        <td style="text-align: right; border-left: 2px solid ;"></td>                                                                                        
-                    </tr>
-                    <tr>
-                        <td>50.000</td>      
-                        <td style="text-align: right;border-left: 2px solid ;"></td>                                                                                                                                                                                                                                                                                                                                                                                                                                     
-                    </tr>
-                    <tr>
-                        <td>20.000</td>      
-                        <td style="text-align: right;border-left: 2px solid ;"></td>                                                                                            
-                    </tr>
-                    <tr>
-                        <td>10.000</td>      
-                        <td style="text-align: right;border-left: 2px solid ;"></td>                                                                                            
-                    </tr>
-                    <tr>
-                        <td>5000</td>      
-                        <td style="text-align: right;border-left: 2px solid ;"></td>                                                                                            
-                    </tr>
-                    <tr>
-                        <td>2000</td>      
-                        <td style="text-align: right;border-left: 2px solid ;"></td>                                                                                            
-                    </tr>
-                    <tr>
-                        <td>1000</td>      
-                        <td style="text-align: right;border-left: 2px solid ;"></td>                                                                                            
-                    </tr>
-                    <tr>
-                        <td>500</td>      
-                        <td style="text-align: right;border-left: 2px solid ;"></td>                                                                                            
-                    </tr>
-                    <tr>
-                        <td>200</td>      
-                        <td style="text-align: right;border-left: 2px solid ;"></td>                                                                                            
-                    </tr>
-                    <tr>
-                        <td>100</td>      
-                        <td style="text-align: right;border-left: 2px solid ;"></td>                                                                                            
-                    </tr>
-                    <tr>
-                        <td>10</td>      
-                        <td style="text-align: right;border-left: 2px solid ;"></td>                                                                                            
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th>Total Kas Selisih </th>      
-                        <th style="text-align: right;border-left: 2px solid ;"></th>                                                                                                                                                                                                                                                                                                                                             
-                    </tr>
-                    
-                </tfoot>
-            </table>
             <div>
                 <h4 style="margin-top: 60%;float:right;margin-right:25%">Keterangan</h4>
                 <h4 style="margin-top: 40%;float:right;margin-right:-7%">KASIR</h4>

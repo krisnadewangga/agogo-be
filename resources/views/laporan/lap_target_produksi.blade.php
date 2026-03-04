@@ -12,7 +12,7 @@
         	<form method="POST" action="{{ route('cari_target_produksi') }}">
 	        	@csrf
 	        	<div class="row">
-	        		<div class="col-md-4">
+	        		<div class="col-md-3">
 	        			<div class="form-group  @error('tanggal') has-error @enderror">
 			                <label>Pilih Tanggal</label>
 			                  @error('tanggal')
@@ -30,7 +30,7 @@
 			                <!-- /.input group -->
 	              		</div>
 	        		</div>
-	        		<div class="col-md-4">
+	        		<div class="col-md-3">
                         <div class="form-group">
                             <label>Sort By</label>
                             <select name="sort_by" class="form-control" id="sort_by">
@@ -58,7 +58,20 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-4">
+					<div class="col-md-3">
+						<div class="form-group">
+							<label>Filter Kategori</label>
+							<select name="kategori" class="form-control" id="kategori">
+								<option value="">Semua Kategori</option>
+								@foreach($kategoris as $kategori)
+									<option value="{{ $kategori->id }}" @if($input['kategori'] == $kategori->id) selected @endif>
+										{{ $kategori->kategori }}
+									</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+                    <div class="col-md-3">
                          <label>Opsi Sort</label>
                          <select name="opsi_sort" class="form-control" id="opsi_sort">
                             @if($input['opsi_sort'] == '1')
