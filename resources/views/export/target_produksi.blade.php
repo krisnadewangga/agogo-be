@@ -100,6 +100,7 @@
             <tbody>
                @php $no=1;@endphp
                @forelse($data as $key)
+                    @if($key->target_produksi != '' || $key->realisasi_produksi != 0)
                     <tr>
                         <td align="center" style="text-align:center;">{{ $no++ }}</td>
                         <td style="text-align:center;">{{ $key['code'] }}</td>
@@ -109,6 +110,7 @@
                             {{$key->realisasi_produksi == 0 ? 'Belum ada produksi' : $key->realisasi_produksi}}
                         </td>
                     </tr>
+                    @endif
                @empty
                 <tr>
                     <td class="text-center" colspan="5">Tidak ada data target produksi hari ini</td>
