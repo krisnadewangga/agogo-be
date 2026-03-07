@@ -2440,68 +2440,46 @@ class LaporanController extends Controller
     public function PostOpname(Request $request)
     {
       $req = $request->all();
-      
-      if(!Auth::attempt(['name' => $req['username'], 'password' => $req['password'] ]))
-      return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username Atau Password Salah')->withInput();        
+
+      if(!Auth::attempt(['name' => $req['username'], 'password' => $req['password']]))
+        return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username Atau Password Salah')->withInput();
 
       $user = $request->user();
-      // $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
-      $role = Aproval::where('user_id',$user->id)->where('rule','4')->count();
-     
+      $role = Aproval::where('user_id',$user->id)->where('rule','3')->count();
+
       if($role == 0)
-      return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','User Tidak Punya Akses')->withInput();        
+        return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','User Tidak Punya Akses')->withInput();
 
+      $tanggal = $req['tanggal'];
       $item = Item::where('status_aktif','1')->select('id')->get();
+
       foreach ($item as $key) {
-        $select = Opname::whereDate('tanggal',$req['tanggal'])->where('item_id',$key->id)->first();
+        $stock_fisik_pagi = $req['stock_fisik_pagi_'.$key->id] ?? 0;
+        $stock_fisik_malam = $req['stock_fisik_malam_'.$key->id] ?? 0;
+        $stock_toko = $req['stock_toko_'.$key->id] ?? 0;
 
-        if($req['stock_toko_'.$key->id] !== NULL){
-          $opnameData = [
-            'stock_masuk' => $req['produksi_'.$key->id] ?? 0,
-            'stock_akhir' => $req['stock_akhir_'.$key->id] ?? 0,
-            'stock_toko' => $req['stock_toko_'.$key->id],
-            'stock_fisik_pagi' => $req['stock_fisik_pagi_'.$key->id] ?? 0,
-            'stock_fisik_malam' => $req['stock_fisik_malam_'.$key->id] ?? 0
-          ];
+        if(!empty($stock_fisik_pagi) || !empty($stock_fisik_malam) || !empty($stock_toko)) {
+          $opname = Opname::where('item_id',$key->id)->whereDate('tanggal',$tanggal)->first();
 
-          if(isset($select->id)){
-            $select->update($opnameData);
+          if(isset($opname->id)){
+            $opname->update([
+              'stock_fisik_pagi' => $stock_fisik_pagi,
+              'stock_fisik_malam' => $stock_fisik_malam,
+              'stock_toko' => $stock_toko
+            ]);
           }else{
-            $opnameData['item_id'] = $key->id;
-            $opnameData['tanggal'] = $req['tanggal'];
-            $entri = Opname::create($opnameData);
-          }
-
-          $findProduksi = Produksi::where('item_id',$key->id)
-                      ->whereDate('created_at',$req['tanggal'])
-                      ->orderBy('id','DESC')->first();
-          $a = Item::where('id',$key->id)->first();
-
-          if($findProduksi && $a){
-            try {
-              $stokAwalProduksi = $findProduksi->stock_awal;
-              $stokAkhirProduksi = $a->stock;
-          
-              if($req['stock_toko_'.$key->id] > $stokAwalProduksi){
-                $selisih = $req['stock_toko_'.$key->id] - $stokAwalProduksi;
-                $fix_sisa_stok = $stokAkhirProduksi + $selisih;
-              }else{
-                $selisih = $stokAwalProduksi - $req['stock_toko_'.$key->id];
-                $fix_sisa_stok =  $stokAkhirProduksi - $selisih;
-              }
-              
-              $updateProduksi = Produksi::where('id',$findProduksi->id)->update(['stock_awal' => $req['stock_toko_'.$key->id],
-                                                             'sisa_stock' => $fix_sisa_stok
-                                                            ]);
-              $updateItemStock = Item::where('id',$key->id)->update(['stock' => $fix_sisa_stok ]);
-              
-            } catch (\Throwable $th) {
-              Item::where('id',$key->id)->update(['stock' => $req['stock_toko_'.$key->id] ]);
-            }
+            Opname::create([
+              'item_id' => $key->id,
+              'tanggal' => $tanggal,
+              'stock_fisik_pagi' => $stock_fisik_pagi,
+              'stock_fisik_malam' => $stock_fisik_malam,
+              'stock_toko' => $stock_toko
+            ]);
           }
         }
       }
-      return redirect()->route('opname',['tanggal' => Carbon::parse($req['tanggal'])->format('d/m/Y'), 'sort_by' => '1', 'opsi_sort' => '1' ])->with('success','Berhasil Set Opname ')->withInput();
+
+      return redirect()->route('opname',['tanggal' => Carbon::parse($tanggal)->format('d/m/Y')])->with('success','Berhasil Simpan Data Opname');
     }
 
     public function SetDataOpname($data)
@@ -2530,7 +2508,7 @@ class LaporanController extends Controller
            $item['stock_masuk'] = $query->produksi1;
            $item['stock_awal'] = $query->stock_awal;
            $item['produksi'] = $query->produksi1;
-           $item['selisih_pagi'] = $query->stock_awal - ($opname->stock_fisik_pagi ?? 0);
+           $item['selisih_pagi'] = $query->stock_awal - (isset($opname->stock_fisik_pagi) ? $opname->stock_fisik_pagi : 0);
            $item['terjual'] = $query->total_penjualan;
         }else{
            $item['stock_masuk'] = 0;
@@ -2543,21 +2521,21 @@ class LaporanController extends Controller
         
         if(isset($opname->id)){
           $item['stock_toko'] = $opname->stock_toko;
-          $item['stock_akhir'] = $opname->stock_akhir;
-          $item['selisih_malam'] = $opname->stock_akhir - ($opname->stock_fisik_malam ?? 0);
-          $item['stock_fisik_pagi'] = $opname->stock_fisik_pagi ?? "";
-          $item['stock_fisik_malam'] = $opname->stock_fisik_malam ?? "";
+          $item['stock_akhir'] = $query->sisa_stock;
+          $item['selisih_malam'] = $query->sisa_stock - (isset($opname->stock_fisik_malam) ? $opname->stock_fisik_malam : 0);
+          $item['stock_fisik_pagi'] = isset($opname->stock_fisik_pagi) ? $opname->stock_fisik_pagi : "";
+          $item['stock_fisik_malam'] = isset($opname->stock_fisik_malam) ? $opname->stock_fisik_malam : "";
         }else{
           $item['stock_toko'] = '';
           if(isset($query->id)){
-            $item['stock_akhir'] =  $item->stock;
-            $item['stock_fisik_pagi'] = $opname->stock_fisik_pagi ?? "";
-            $item['stock_fisik_malam'] = $opname->stock_fisik_malam ?? "";
+            $item['stock_akhir'] =  $query->sisa_stock;
+            $item['stock_fisik_pagi'] = isset($opname->stock_fisik_pagi) ? $opname->stock_fisik_pagi : "";
+            $item['stock_fisik_malam'] = isset($opname->stock_fisik_malam) ? $opname->stock_fisik_malam : "";
 
           }else{
-            $item['stock_akhir'] = $item->stock;
-            $item['stock_fisik_pagi'] = $opname->stock_fisik_pagi ?? "";
-            $item['stock_fisik_malam'] = $opname->stock_fisik_malam ?? "";
+            $item['stock_akhir'] = $query->sisa_stock;
+            $item['stock_fisik_pagi'] = isset($opname->stock_fisik_pagi) ? $opname->stock_fisik_pagi : "";
+            $item['stock_fisik_malam'] = isset($opname->stock_fisik_malam) ? $opname->stock_fisik_malam : "";
           }
         }
 

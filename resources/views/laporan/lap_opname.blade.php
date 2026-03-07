@@ -138,8 +138,8 @@
 										<td class="nowrap">{{ $key->nama_item }}</td>
 
 										<td class="nowrap" align="center">
-											{{ $key->stock_awal ?? 'Tidak' }}
-											<input type="hidden" name="total_stock_{{$key->id}}" value="{{ $key->stock }}" >
+											{{ $key->stock_awal ?? '0' }}
+											<input type="hidden" name="stock_awal_{{$key->id}}" value="{{ $key->stock_awal }}" >
 										</td>
 										<td class="nowrap" align="center">	
 											<input type="numeric" autocomplete="off" name="stock_fisik_pagi_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('stock_fisik_pagi_'.$key->id) }} @else {{$key->stock_fisik_pagi}} @endif" style="width: 80px;">	
