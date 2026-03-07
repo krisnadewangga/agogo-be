@@ -2537,26 +2537,25 @@ class LaporanController extends Controller
            $item['stock_awal'] = 0;
            $item['produksi'] = 0;
            $item['selisih_pagi'] = 0;
+           $item['selisih_malam'] = 0;
            $item['terjual'] = 0;
         }
         
         if(isset($opname->id)){
           $item['stock_toko'] = $opname->stock_toko;
           $item['stock_akhir'] = $opname->stock_akhir;
-          $item['selisih_malam'] = $query->stock_akhir - ($opname->stock_fisik_malam ?? 0);
+          $item['selisih_malam'] = $opname->stock_akhir - ($opname->stock_fisik_malam ?? 0);
           $item['stock_fisik_pagi'] = $opname->stock_fisik_pagi ?? "";
           $item['stock_fisik_malam'] = $opname->stock_fisik_malam ?? "";
         }else{
           $item['stock_toko'] = '';
           if(isset($query->id)){
             $item['stock_akhir'] =  $item->stock;
-            $item['selisih_malam'] = $item->stock - ($opname->stock_fisik_malam ?? 0);
             $item['stock_fisik_pagi'] = $opname->stock_fisik_pagi ?? "";
             $item['stock_fisik_malam'] = $opname->stock_fisik_malam ?? "";
 
           }else{
             $item['stock_akhir'] = $item->stock;
-            $item['selisih_malam'] = $item->stock - ($opname->stock_fisik_malam ?? 0);
             $item['stock_fisik_pagi'] = $opname->stock_fisik_pagi ?? "";
             $item['stock_fisik_malam'] = $opname->stock_fisik_malam ?? "";
           }
