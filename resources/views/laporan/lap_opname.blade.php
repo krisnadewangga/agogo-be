@@ -114,15 +114,18 @@
 								<th>Kode Barang</th>
 								<th>Nama Menu</th>
 
-								<th ><center>Stok Akhir Komputer</center></th>
-								<th ><center>Stok Akhir Fisik Malam</center></th>
 								<th ><center>Stok Awal Komputer</center></th>
 								<th ><center>Stok Awal Fisik Pagi</center></th>
+								<th ><center>Selisih Pagi</center></th>
+								<th ><center>Produksi</center></th>
+								<th ><center>Terjual</center></th>
+
+								<th ><center>Stok Akhir Komputer</center></th>
+								<th ><center>Stok Akhir Fisik Malam</center></th>
+								<th ><center>Selisih Malam</center></th>
 								
-								<th ><center>Stok Masuk</center></th>
-								<th ><center>Stok Akhir</center></th>
 								<th ><center>Stok Update</center></th>
-								<th ><center>Stok Toko</center></th>
+								<th ><center>Stok Opname</center></th>
 							</tr>
 						</thead>
 						<tbody style=" font-size:14px;">
@@ -134,28 +137,37 @@
 									<td class="nowrap">{{ $key->nama_item }}</td>
 
 									<td class="nowrap" align="center">
-										{{ $key->stock_akhir_komputer ?? '0' }}
-										<input type="hidden" name="total_stock_akhir_komputer_{{$key->id}}" value="{{ $key->stock_akhir_komputer }}" >
+										{{ $key->stock_awal ?? 'Tidak' }}
+										<input type="hidden" name="total_stock_{{$key->id}}" value="{{ $key->stock }}" >
 									</td>
 									<td class="nowrap" align="center">	
-										<input type="numeric" autocomplete="off" name="stock_akhir_fisik_malam_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('stock_akhir_fisik_malam_'.$key->id) }} @else {{$key->stock_akhir_fisik_malam}} @endif" style="width: 80px;">	
+										<input type="numeric" autocomplete="off" name="stock_fisik_pagi_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('stock_fisik_pagi_'.$key->id) }} @else {{$key->stock_fisik_pagi}} @endif" style="width: 80px;">	
 									</td>
 									<td class="nowrap" align="center">
-										{{ $key->stock_awal_komputer ?? '0' }}
-										<input type="hidden" name="total_stock_awal_komputer_{{$key->id}}" value="{{ $key->stock_awal_komputer }}" >
+										{{ $key->selisih_pagi ?? '0' }}
+										<input type="hidden" name="selisih_pagi_{{$key->id}}" value="{{ $key->selisih_pagi }}" >
 									</td>
-									<td class="nowrap" align="center">	
-										<input type="numeric" autocomplete="off" name="stock_awal_fisik_pagi_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('stock_awal_fisik_pagi_'.$key->id) }} @else {{$key->stock_awal_fisik_pagi}} @endif" style="width: 80px;">	
+									<td class="nowrap" align="center">
+										{{ $key->produksi ?? '0' }}
+										<input type="hidden" name="produksi_{{$key->id}}" value="{{ $key->produksi }}" >
+									</td>
+									<td class="nowrap" align="center">
+										{{ $key->terjual ?? '0' }}
+										<input type="hidden" name="terjual_{{$key->id}}" value="{{ $key->terjual }}" >
 									</td>
 
 									<td class="nowrap" align="center">
-										{{ $key->stock_masuk }}
-										<input type="hidden" name="total_stock_masuk_{{$key->id}}" value="{{ $key->stock_masuk }}" >
+										{{ $key->stock_akhir ?? '0' }}
+										<input type="hidden" name="stock_akhir_{{$key->id}}" value="{{ $key->stock_akhir }}" >
+									</td>
+									<td class="nowrap" align="center">	
+										<input type="numeric" autocomplete="off" name="stock_fisik_malam_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('stock_fisik_malam_'.$key->id) }} @else {{$key->stock_fisik_malam}} @endif" style="width: 80px;">	
 									</td>
 									<td class="nowrap" align="center">
-										{{ $key->stock_akhir }}
-										<input type="hidden" name="total_stock_akhir_{{$key->id}}" value="{{ $key->stock_akhir }}" >
+										{{ $key->selisih_malam ?? '0' }}
+										<input type="hidden" name="selisih_malam_{{$key->id}}" value="{{ $key->selisih_malam }}" >
 									</td>
+
 									<td class="nowrap" align="center">
 										@if($key->stock_toko === '')
 											-
@@ -164,9 +176,7 @@
 										@endif
 									</td>
 									<td class="nowrap" align="center">	
-										
-										<input type="numeric" autocomplete="off" name="total_stock_toko_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('total_stock_toko_'.$key->id) }} @else {{$key->stock_toko}} @endif" style="width: 80px;">
-										
+										<input type="numeric" autocomplete="off" name="stock_toko_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('stock_toko_'.$key->id) }} @else {{$key->stock_toko}} @endif" style="width: 80px;">
 									</td>
 									
 								</tr>

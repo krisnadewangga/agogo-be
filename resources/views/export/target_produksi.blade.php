@@ -2,122 +2,146 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>LAPORAN TARGET REALISASI DAN PRODUKSI</title>
     <style>
-        body{
-            padding: 0;
-            margin: 0;
-        }
-     
-      .page{
-            font-size: 24px !important; 
-            max-width: 80em;
-            margin: 0 auto;
-        }
-        table 
-        { 
-        table-layout:auto !important; 
-        width: 100% !important;
+        /* Memastikan border dihitung di dalam lebar elemen */
+        * { box-sizing: border-box; }
+
+        @page { size: A4; margin: 10mm; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+
+        /* Container utama menggunakan tabel agar kolom kiri & kanan tidak terpisah */
+        .wrapper-table {
+            width: 100%;
+            border: none;
+            table-layout: fixed;
         }
 
-
-        table th,
-        table td{
-            text-align: center;
+        .wrapper-table td {
+            vertical-align: top;
+            border: none;
+            padding: 0 5px; /* Jarak antar kolom */
         }
-        table.layout{
+
+        /* Styling Tabel Data (Roti) */
+        .data-table {
             width: 100%;
             border-collapse: collapse;
-        }
-        table.display{
-            margin: 1em 0;
-        }
-        table.display th,
-        table.display td{
-            border-bottom: 1px solid black;
-            padding: .2em 0,8em;
+            border: 1.5px solid black; /* Border luar lebih tebal sesuai foto */
         }
 
-        table.display th{ background: #fff; }
-        table.display td{ background: #fff; }
-
-        table.responsive-table{
-            box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
+        .data-table th, .data-table td {
+            border: 1px solid black;
+            padding: 4px;
+            font-size: 14px;
+            height: 22px;
+            vertical-align: middle;
         }
 
-        .listcust {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            display:table;
-            border-spacing: 10px;
-            border-collapse: separate;
-            list-style-type: none;
+        .data-table th {
+            background-color: #f2f2f2;
+            text-align: center;
         }
 
-        .customer {
-            padding-left: 600px;
-        }
-        hr { 
+        .header-info {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
             display: block;
-            margin-top: 0.5em;
-            margin-bottom: 0.5em;
-            margin-left: auto;
-            margin-right: auto;
-            border-style: inset;
-            border-width: 1px;
-            } 
+        }
+
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+
+        /* Lebar kolom dalam tabel */
+        .col-nama { width: 50%; }
+        .col-qty { width: 15%; }
+        .col-ket { width: 20%; }
+
+        .bold { 
+            font-weight: bold; 
+        }
     </style>
 </head>
 <body>
-        
-    <table border="0">
-        <tr>
-            <td>
-                 <img src="{{ asset('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>     
-            </td>
-            <td  style="width: 70%; text-align: right;">
-                <h4 style="">LAPORAN TARGET REALISASI DAN PRODUKSI</h4>
-                <p >Tanggal : {{ $start_tanggal }}</p>
-            </td>
-        </tr>
-    </table>
-    <hr>
+    @php
+        $filtered = collect($data)->filter(function ($item) {
+            return $item->target_produksi != '' || $item->realisasi_produksi != 0;
+        });
 
-    <div class="page">
-         <table class="layout display responsive-table">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th style="text-align:center;">Kode Menu</th>
-                    <th style="text-align:center;">Nama Menu</th>
-                    <th style="text-align:center;">Target Produksi</th>
-                    <th style="text-align:center;">Realisasi Produksi</th>
-                </tr>
-            </thead>
-            <tbody>
-               @php $no=1;@endphp
-               @forelse($data as $key)
-                    @if($key->target_produksi != '' || $key->realisasi_produksi != 0)
-                    <tr>
-                        <td align="center" style="text-align:center;">{{ $no++ }}</td>
-                        <td style="text-align:center;">{{ $key['code'] }}</td>
-                        <td style="text-align:center;">{{ $key['nama_item'] }}</td>
-                        <td style="text-align:center;">{{ $key->target_produksi == '' ? 'Tidak ada Target' : $key->target_produksi }}</td>
-                        <td  style="text-align:center;">
-                            {{$key->realisasi_produksi == 0 ? 'Belum ada produksi' : $key->realisasi_produksi}}
-                        </td>
-                    </tr>
-                    @endif
-               @empty
-                <tr>
-                    <td class="text-center" colspan="5">Tidak ada data target produksi hari ini</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>  
-    </div>
+        $rowsPerColumn = 45;
+        $chunks = $filtered->chunk($rowsPerColumn * 2);
+    @endphp
+
+    @forelse($chunks as $chunk)
+        <table class="wrapper-table">
+            <tr>
+                @php
+                    $leftChunk = $chunk->slice(0, $rowsPerColumn);
+                    $rightChunk = $chunk->slice($rowsPerColumn, $rowsPerColumn);
+
+                    $explode = explode("/", $start_tanggal );
+                    $tanggal_cetak = $explode[1]."/".$explode[0]."/".$explode[2];
+
+                    $setTanggalCetak = \Carbon\Carbon::parse($tanggal_cetak)->locale('id')->isoFormat('dddd, D MMMM YYYY');
+                @endphp
+
+                <td>
+                    <div class="header-info">
+                        Target Produksi Hari : <u>{{ $setTanggalCetak }}</u>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="col-nama">NAMA BARANG/KUE</th>
+                                <th class="col-qty">TARGET</th>
+                                <th class="col-qty">REALISASI</th>
+                                <th class="col-ket">KET</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($leftChunk as $item)
+                                <tr>
+                                    <td class="text-left">{{ $item->nama_item }}</td>
+                                    <td class="text-center bold">{{ $item->target_produksi }}</td>
+                                    <td class="text-center bold">{{ $item->realisasi_produksi ?: '' }}</td>
+                                    <td class="text-center">{{ $item->keterangan ?? '' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </td>
+
+                <td>
+                    <div class="header-info">
+                        Target Produksi Hari : <u>{{ $setTanggalCetak }}</u>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="col-nama">NAMA BARANG/KUE</th>
+                                <th class="col-qty">TARGET</th>
+                                <th class="col-qty">REALISASI</th>
+                                <th class="col-ket">KET</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($rightChunk as $item)
+                                <tr>
+                                    <td class="text-left">{{ $item->nama_item }}</td>
+                                    <td class="text-center bold">{{ $item->target_produksi }}</td>
+                                    <td class="text-center bold">{{ $item->realisasi_produksi ?: '' }}</td>
+                                    <td class="text-center">{{ $item->keterangan ?? '' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <!-- <div class="page-break"></div> -->
+    @empty
+        <p>Data tidak tersedia.</p>
+    @endforelse
 </body>
 </html>

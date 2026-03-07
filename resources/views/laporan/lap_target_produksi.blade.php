@@ -130,7 +130,7 @@
 									<td class="nowrap" align="center">
 										<input type="numeric" autocomplete="off" name="target_produksi_{{$key->id}}" class="form-control" value="{{ old('target_produksi_'.$key->id, $key->target_produksi) }}" style="width: 80px;">
 									</td>
-									<td class="nowrap">{{ $key->realisasi_produksi == 0 ? "Tidak ada Produksi" : $key->realisasi_produksi }}</td>
+									<td class="nowrap">{{ $key->realisasi_produksi == "" ? "Tidak ada Produksi" : $key->realisasi_produksi }}</td>
 								</tr>
 							@endforeach
 						</tbody>

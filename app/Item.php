@@ -46,7 +46,7 @@ class Item extends Model
 
    public function Produksi()
    {
-     return $this->hasMany(Produks::class);
+     return $this->hasMany(Produksi::class);
    }
 
    public function Opname()

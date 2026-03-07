@@ -93,9 +93,14 @@
                     <th>No.</th>
                     <th style="text-align:center;">Kode Menu</th>
                     <th style="text-align:center;">Nama Menu</th>
-                    <th style="text-align:center;">Stock Masuk</th>
-                    <th style="text-align:center;">Stock Akhir</th>
-                    <th style="text-align:center;">Stock Update</th>
+                    <th style="text-align:center;">Stock Awal Komputer</th>
+                    <th style="text-align:center;">Stock Awal Fisik Pagi</th>
+                    <th style="text-align:center;">Selisih Pagi</th>
+                    <th style="text-align:center;">Produksi</th>
+                    <th style="text-align:center;">Terjual</th>
+                    <th style="text-align:center;">Stock Akhir Komputer</th>
+                    <th style="text-align:center;">Stock Akhir Fisik Malam</th>
+                    <th style="text-align:center;">Selilih Malam</th>
                     <th style="text-align:center;">Stock Toko</th>
                 </tr>
             </thead>
@@ -106,20 +111,15 @@
                         <td align="center" style="text-align:center;">{{ $no++ }}</td>
                         <td style="text-align:center;">{{ $key['code'] }}</td>
                         <td style="text-align:center;">{{ $key['nama_item'] }}</td>
-                        <td style="text-align:center;" >{{ $key->stock_masuk }}</td>
+                        <td style="text-align:center;" >{{ $key->stock_awal }}</td>
+                        <td  style="text-align:center;">{{ $key->stock_fisik_pagi }}</td>
+                        <td  style="text-align:center;">{{ $key->selisih_pagi }}</td>
+                        <td  style="text-align:center;">{{ $key->produksi }}</td>
+                        <td  style="text-align:center;">{{ $key->terjual }}</td>
                         <td  style="text-align:center;">{{ $key->stock_akhir }}</td>
-                        <td  style="text-align:center;">
-                            @if($key->stock_toko === '')
-                                -
-                            @else
-                                {{ $key->stock_toko }}
-                            @endif
-                        </td>
-                        <td  style="text-align:center;">
-                            @if($key->stock_toko !== 'belum')
-                                {{ $key->stock_toko }}
-                            @endif
-                        </td>
+                        <td  style="text-align:center;">{{ $key->stock_fisik_malam }}</td>
+                        <td  style="text-align:center;">{{ $key->selisih_malam }}</td>
+                        <td  style="text-align:center;">{{ $key->stock_toko }}</td>
                     </tr>
                @empty
                 <tr>
