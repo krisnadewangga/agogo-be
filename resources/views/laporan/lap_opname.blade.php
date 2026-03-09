@@ -132,6 +132,7 @@
 						<tbody style=" font-size:14px;">
 							@php $no=1; @endphp
 							@foreach($item as $key)
+                   				@if($key->stock_awal !== 0 || $key->stock_akhir !== 0 || $key->produksi !== 0 || $key->terjual !== 0)
 								<tr>
 									<td class="nowrap" align="center">{{ $no++ }}</td>
 									<td class="nowrap">{{ $key->code }}</td>
@@ -189,6 +190,7 @@
 									</td>
 									
 								</tr>
+								@endif
 							@endforeach
 						</tbody>
 						
