@@ -204,12 +204,12 @@
 					@endif
 					<div class="form-group">
 						<label>Username</label>
-						<input type="text" id="username" name="username" class="form-control">
+						<input type="text" id="app_username" name="app_username" class="form-control">
 					</div>
 
 					<div class="form-group">
 						<label>Password</label>
-						<input type="password" id="password" name="password" class="form-control">
+						<input type="password" id="app_password" name="app_password" class="form-control">
 					</div>
 				   
 					<div class="text-right">
