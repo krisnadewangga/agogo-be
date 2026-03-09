@@ -2476,6 +2476,11 @@ class LaporanController extends Controller
               'stock_toko' => $stock_toko
             ]);
           }
+
+          // Update sisa_stock di item berdasarkan stock_toko
+          if(!empty($stock_toko)) {
+            Item::where('id', $key->id)->update(['stock' => $stock_toko]);
+          }
         }
       }
 

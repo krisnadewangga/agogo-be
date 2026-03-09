@@ -182,7 +182,11 @@
 											@endif
 										</td>
 										<td class="nowrap" align="center">	
-											<input type="numeric" autocomplete="off" name="stock_toko_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('stock_toko_'.$key->id) }} @else {{$key->stock_toko}} @endif" style="width: 80px;">
+											@if($key->stock_toko !== '' && $key->stock_toko !== null)
+												Opname Sudah Disimpan
+											@else
+												<input type="numeric" autocomplete="off" name="stock_toko_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('stock_toko_'.$key->id) }} @else {{$key->stock_toko}} @endif" style="width: 80px;">
+											@endif
 										</td>
 										
 									</tr>
