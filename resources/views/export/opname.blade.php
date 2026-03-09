@@ -27,6 +27,9 @@
         table td{
             text-align: center;
         }
+        table th{
+            font-size: 14px !important;
+        }
         table.layout{
             width: 100%;
             border-collapse: collapse;
@@ -76,7 +79,7 @@
     <table border="0">
         <tr>
             <td>
-                 <img src="{{ asset('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>     
+                 <!-- <img src="{{ asset('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>      -->
             </td>
             <td  style="width: 70%; text-align: right;">
                 <h4 style="">LAPORAN OPNAME</h4>
@@ -102,7 +105,7 @@
                     <th style="text-align:center;">Stock Akhir Komputer</th>
                     <th style="text-align:center;">Stock Akhir Fisik Malam</th>
                     <th style="text-align:center;">Selilih Malam</th>
-                    <th style="text-align:center;">Stock Toko</th>
+                    <th style="text-align:center;">Stock Opname</th>
                 </tr>
             </thead>
             <tbody>
@@ -114,15 +117,15 @@
                             <td style="text-align:center;">{{ $key['code'] }}</td>
                             <td style="text-align:center;">{{ $key['nama_item'] }}</td>
                             <td style="text-align:center;" >{{ $key->stock_awal }}</td>
-                            <td  style="text-align:center;">{{ $key->stock_fisik_pagi }}</td>
-                            <td  style="text-align:center;">{{ $key->selisih_pagi }}</td>
-                            <td  style="text-align:center;">{{ $key->produksi }}</td>
-                            <td  style="text-align:center;">{{ $key->rusak }}</td>
-                            <td  style="text-align:center;">{{ $key->terjual }}</td>
-                            <td  style="text-align:center;">{{ $key->stock_akhir }}</td>
-                            <td  style="text-align:center;">{{ $key->stock_fisik_malam }}</td>
-                            <td  style="text-align:center;">{{ $key->selisih_malam }}</td>
-                            <td  style="text-align:center;">{{ $key->stock_toko }}</td>
+                            <td style="text-align:center;">{{ $key->stock_fisik_pagi }}</td>
+                            <td style="text-align:center;">{{ $key->selisih_pagi }}</td>
+                            <td style="text-align:center;">{{ $key->produksi }}</td>
+                            <td style="text-align:center;">{{ $key->rusak }}</td>
+                            <td style="text-align:center;">{{ $key->terjual }}</td>
+                            <td style="text-align:center;">{{ $key->stock_akhir }}</td>
+                            <td style="text-align:center;">{{ $key->stock_fisik_malam }}</td>
+                            <td style="text-align:center;">{{ $key->selisih_malam }}</td>
+                            <td style="text-align:center;">{{ $key->stock_toko }}</td>
                         </tr>
                     @endif
                @empty
