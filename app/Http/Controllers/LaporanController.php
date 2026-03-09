@@ -1484,7 +1484,7 @@ class LaporanController extends Controller
 
       // $user = $request->user();
       // $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
-      $user = $req->user();
+      $user = $request->user();
       $role = Aproval::where('user_id',$user->id)->where('rule','3')->count();
    
       if($role == 0)
@@ -2441,18 +2441,18 @@ class LaporanController extends Controller
     public function PostOpname(Request $request)
     {
       $req = $request->all();
-
       if(empty($req['username']) || empty($req['password']))
         return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username dan Password harus diisi')->withInput();
-
+      
       if(!Auth::attempt(['name' => $req['username'], 'password' => $req['password']]))
         return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username Atau Password Salah')->withInput();
-
+      
+      // dd($req);
       // $user = Auth::user();
       // $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
-      $user = $req->user();
+      $user = $request->user();
       $role = Aproval::where('user_id',$user->id)->where('rule','4')->count();
-
+      // dd($role);
       if($role == 0)
         return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','User Tidak Punya Akses')->withInput();
 

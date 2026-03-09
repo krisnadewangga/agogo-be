@@ -138,7 +138,7 @@
 					</table>
 					<label class="btn btn-success" onclick="aproval()">Simpan</label>
 
-					@component("components.modal", ["id" => "modal_input" ,"kop_modal" => "Aproval Simpan Opname"])
+					@component("components.modal", ["id" => "modal_input" ,"kop_modal" => "Aproval Simpan Target Produksi"])
 						@if (session('error_auth'))
 						 	@component("components.alert_error", ["type" => "error"])
 								{{ session('error_auth') }}
