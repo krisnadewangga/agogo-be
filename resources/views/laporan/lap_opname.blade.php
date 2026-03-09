@@ -106,7 +106,7 @@
 			<form method="POST" action="{{ route('post_opname') }}" >
 				@csrf
 				<input type="text" name="tanggal" value="{{ $tanggal_form }}" hidden>
-	        	<div class="table-responsive" style="margin-top: 10px;">
+				<div class="table-responsive" style="margin-top: 10px;">
 					<table class=" table  table-bordered" >
 						<thead style=" font-size:14px;">
 							<tr>
@@ -194,31 +194,30 @@
 						
 					</table>
 					<label class="btn btn-success" onclick="aproval()">Simpan</label>
+				</div>
 
-					@component("components.modal", ["id" => "modal_input" ,"kop_modal" => "Aproval Simpan Opname"])
-						@if (session('error_auth'))
-						 	@component("components.alert_error", ["type" => "error"])
-								{{ session('error_auth') }}
-							@endcomponent
-						@endif
-						<div class="form-group">
-							<label>Username</label>
-							<input type="text" id="username" name="username" class="form-control">
-						</div>
+				@component("components.modal", ["id" => "modal_input" ,"kop_modal" => "Aproval Simpan Opname"])
+					@if (session('error_auth'))
+						@component("components.alert_error", ["type" => "error"])
+							{{ session('error_auth') }}
+						@endcomponent
+					@endif
+					<div class="form-group">
+						<label>Username</label>
+						<input type="text" id="username" name="username" class="form-control">
+					</div>
 
-						<div class="form-group">
-							<label>Password</label>
-							<input type="password" id="password" name="password" class="form-control">
-						</div>
-				       
-				        <div class="text-right">
-				        	 <button type="submit" class="btn btn-success btn-sm">Proses</button>
-				        </div>
-					@endcomponent
-
-				</form>
-			</div>
-        </div>
+					<div class="form-group">
+						<label>Password</label>
+						<input type="password" id="password" name="password" class="form-control">
+					</div>
+				   
+					<div class="text-right">
+						 <button type="submit" class="btn btn-success btn-sm">Proses</button>
+					</div>
+				@endcomponent
+			</form>
+		</div>
 
         <script type="text/javascript">
         	$(document).ready(function(){

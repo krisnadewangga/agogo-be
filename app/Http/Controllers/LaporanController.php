@@ -1483,8 +1483,8 @@ class LaporanController extends Controller
       return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username Atau Password Salah')->withInput();        
 
       $user = $request->user();
-      // $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2','7'])->count();
-      $role = Aproval::where('user_id',$user->id)->where('rule','4')->count();
+      $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
+      // $role = Aproval::where('user_id',$user->id)->where('rule','4')->count();
    
       if($role == 0)
       return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','User Tidak Punya Akses')->withInput();        
@@ -2448,7 +2448,8 @@ class LaporanController extends Controller
         return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username Atau Password Salah')->withInput();
 
       $user = $request->user();
-      $role = Aproval::where('user_id',$user->id)->where('rule','3')->count();
+      $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
+      // $role = Aproval::where('user_id',$user->id)->where('rule','4')->count();
 
       if($role == 0)
         return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','User Tidak Punya Akses')->withInput();
