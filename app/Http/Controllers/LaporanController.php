@@ -2443,7 +2443,10 @@ class LaporanController extends Controller
       $req = $request->all();
 
       if(empty($req['username']) || empty($req['password']))
-        return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username dan Password harus diisi')->withInput();
+        return redirect()->back()
+          ->with('gagal_modal','simpan')
+          ->with('error_auth','Username dan Password harus diisi')
+          ->withInput();
 
       if(!Auth::attempt(['name' => $req['username'], 'password' => $req['password']]))
         return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username Atau Password Salah')->withInput();

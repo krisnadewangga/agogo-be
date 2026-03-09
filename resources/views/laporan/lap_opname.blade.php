@@ -204,18 +204,31 @@
 					@endif
 					<div class="form-group">
 						<label>Username</label>
-						<input type="text" id="username" name="username" class="form-control">
+						<input type="text" id="username" name="username" class="form-control" required>
 					</div>
 
 					<div class="form-group">
 						<label>Password</label>
-						<input type="password" id="password" name="password" class="form-control">
+						<input type="password" id="password" name="password" class="form-control" required>
 					</div>
 				   
 					<div class="text-right">
-						 <button type="submit" class="btn btn-success btn-sm">Proses</button>
+						 <button type="submit" class="btn btn-success btn-sm" onclick="validateForm()">Proses</button>
 					</div>
 				@endcomponent
+
+				<script type="text/javascript">
+					function validateForm() {
+						var username = document.getElementById('username').value;
+						var password = document.getElementById('password').value;
+						
+						if(username === '' || password === '') {
+							alert('Username dan Password harus diisi');
+							return false;
+						}
+						return true;
+					}
+				</script>
 			</form>
 		</div>
 
