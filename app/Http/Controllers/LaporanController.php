@@ -2441,13 +2441,13 @@ class LaporanController extends Controller
     public function PostOpname(Request $request)
     {
       $req = $request->all();
+      dd($req);
       if(empty($req['username']) || empty($req['password']))
         return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username dan Password harus diisi')->withInput();
       
       if(!Auth::attempt(['name' => $req['username'], 'password' => $req['password']]))
         return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username Atau Password Salah')->withInput();
       
-      // dd($req);
       // $user = Auth::user();
       // $role = Role::where('user_id',$user->id)->whereIn('level_id',['1','2'])->count();
       $user = $request->user();
