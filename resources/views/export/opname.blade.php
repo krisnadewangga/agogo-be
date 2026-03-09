@@ -108,7 +108,7 @@
             <tbody>
                @php $no=1;@endphp
                @forelse($data as $key)
-                    @if($key->stock_awal || $key->stock_akhir || $key->produksi || $key->terjual)
+                    @if($key->stock_awal !== 0 || $key->stock_akhir !== 0 || $key->produksi !== 0 || $key->terjual !== 0)
                         <tr>
                             <td align="center" style="text-align:center;">{{ $no++ }}</td>
                             <td style="text-align:center;">{{ $key['code'] }}</td>
