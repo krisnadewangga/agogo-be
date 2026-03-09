@@ -2454,31 +2454,36 @@ class LaporanController extends Controller
       $item = Item::where('status_aktif','1')->select('id')->get();
 
       foreach ($item as $key) {
-        $stock_fisik_pagi = $req['stock_fisik_pagi_'.$key->id] ?? 0;
-        $stock_fisik_malam = $req['stock_fisik_malam_'.$key->id] ?? 0;
+        $stock_fisik_pagi = $req['stock_fisik_pagi_'.$key->id] ?? NULL;
+        $stock_fisik_malam = $req['stock_fisik_malam_'.$key->id] ?? NULL;
         $stock_toko = $req['stock_toko_'.$key->id] ?? NULL;
 
-        if(!empty($stock_fisik_pagi) || !empty($stock_fisik_malam) || !empty($stock_toko)) {
+        if($stock_fisik_pagi !== NULL || $stock_fisik_malam !== NULL || $stock_toko !== NULL) {
           $opname = Opname::where('item_id',$key->id)->whereDate('tanggal',$tanggal)->first();
 
+          $updateData = [];
+          if($stock_fisik_pagi !== NULL) {
+            $updateData['stock_fisik_pagi'] = $stock_fisik_pagi;
+          }
+          if($stock_fisik_malam !== NULL) {
+            $updateData['stock_fisik_malam'] = $stock_fisik_malam;
+          }
+          if($stock_toko !== NULL) {
+            $updateData['stock_toko'] = $stock_toko;
+          }
+
           if(isset($opname->id)){
-            $opname->update([
-              'stock_fisik_pagi' => $stock_fisik_pagi,
-              'stock_fisik_malam' => $stock_fisik_malam,
-              'stock_toko' => $stock_toko
-            ]);
+            $opname->update($updateData);
           }else{
-            Opname::create([
+            $createData = [
               'item_id' => $key->id,
               'tanggal' => $tanggal,
-              'stock_fisik_pagi' => $stock_fisik_pagi,
-              'stock_fisik_malam' => $stock_fisik_malam,
-              'stock_toko' => $stock_toko
-            ]);
+            ] + $updateData;
+            Opname::create($createData);
           }
 
           // Update sisa_stock di item berdasarkan stock_toko
-          if(!empty($stock_toko)) {
+          if($stock_toko !== NULL) {
             Item::where('id', $key->id)->update(['stock' => $stock_toko]);
           }
         }
