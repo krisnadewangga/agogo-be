@@ -2441,7 +2441,7 @@ class LaporanController extends Controller
     public function PostOpname(Request $request)
     {
       $req = $request->all();
-      dd($req);
+      // dd($req);
       if(empty($req['app_username']) || empty($req['app_password']))
         return redirect()->back()->with('gagal_modal','simpan')->with('error_auth','Username dan Password harus diisi')->withInput();
       
