@@ -118,6 +118,7 @@
 								<th ><center>Stok Awal Fisik Pagi</center></th>
 								<th ><center>Selisih Pagi</center></th>
 								<th ><center>Produksi</center></th>
+								<th ><center>Rusak</center></th>
 								<th ><center>Terjual</center></th>
 
 								<th ><center>Stok Akhir Komputer</center></th>
@@ -151,6 +152,10 @@
 										<td class="nowrap" align="center">
 											{{ $key->produksi ?? '0' }}
 											<input type="hidden" name="produksi_{{$key->id}}" value="{{ $key->produksi }}" >
+										</td>
+										<td class="nowrap" align="center">
+											{{ $key->rusak ?? '0' }}
+											<input type="hidden" name="rusak_{{$key->id}}" value="{{ $key->rusak }}" >
 										</td>
 										<td class="nowrap" align="center">
 											{{ $key->terjual ?? '0' }}

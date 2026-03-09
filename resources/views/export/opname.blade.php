@@ -97,6 +97,7 @@
                     <th style="text-align:center;">Stock Awal Fisik Pagi</th>
                     <th style="text-align:center;">Selisih Pagi</th>
                     <th style="text-align:center;">Produksi</th>
+                    <th style="text-align:center;">Rusak</th>
                     <th style="text-align:center;">Terjual</th>
                     <th style="text-align:center;">Stock Akhir Komputer</th>
                     <th style="text-align:center;">Stock Akhir Fisik Malam</th>
@@ -107,20 +108,23 @@
             <tbody>
                @php $no=1;@endphp
                @forelse($data as $key)
-                    <tr>
-                        <td align="center" style="text-align:center;">{{ $no++ }}</td>
-                        <td style="text-align:center;">{{ $key['code'] }}</td>
-                        <td style="text-align:center;">{{ $key['nama_item'] }}</td>
-                        <td style="text-align:center;" >{{ $key->stock_awal }}</td>
-                        <td  style="text-align:center;">{{ $key->stock_fisik_pagi }}</td>
-                        <td  style="text-align:center;">{{ $key->selisih_pagi }}</td>
-                        <td  style="text-align:center;">{{ $key->produksi }}</td>
-                        <td  style="text-align:center;">{{ $key->terjual }}</td>
-                        <td  style="text-align:center;">{{ $key->stock_akhir }}</td>
-                        <td  style="text-align:center;">{{ $key->stock_fisik_malam }}</td>
-                        <td  style="text-align:center;">{{ $key->selisih_malam }}</td>
-                        <td  style="text-align:center;">{{ $key->stock_toko }}</td>
-                    </tr>
+                    @if($key->stock_awal || $key->stock_akhir || $key->produksi || $key->terjual)
+                        <tr>
+                            <td align="center" style="text-align:center;">{{ $no++ }}</td>
+                            <td style="text-align:center;">{{ $key['code'] }}</td>
+                            <td style="text-align:center;">{{ $key['nama_item'] }}</td>
+                            <td style="text-align:center;" >{{ $key->stock_awal }}</td>
+                            <td  style="text-align:center;">{{ $key->stock_fisik_pagi }}</td>
+                            <td  style="text-align:center;">{{ $key->selisih_pagi }}</td>
+                            <td  style="text-align:center;">{{ $key->produksi }}</td>
+                            <td  style="text-align:center;">{{ $key->rusak }}</td>
+                            <td  style="text-align:center;">{{ $key->terjual }}</td>
+                            <td  style="text-align:center;">{{ $key->stock_akhir }}</td>
+                            <td  style="text-align:center;">{{ $key->stock_fisik_malam }}</td>
+                            <td  style="text-align:center;">{{ $key->selisih_malam }}</td>
+                            <td  style="text-align:center;">{{ $key->stock_toko }}</td>
+                        </tr>
+                    @endif
                @empty
                 <tr>
                     <td class="text-center" colspan="5">Tidak ada data opname hari ini</td>
