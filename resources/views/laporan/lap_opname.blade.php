@@ -175,7 +175,7 @@
 										</td>
 
 										<td class="nowrap" align="center">
-											@if($key->stock_toko === '')
+											@if($key->stock_toko === '' || $key->stock_toko === null)
 												-
 											@else
 												{{ $key->stock_toko }}

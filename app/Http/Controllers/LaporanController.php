@@ -2510,7 +2510,7 @@ class LaporanController extends Controller
            $item['produksi'] = $query->produksi1;
            $item['rusak'] = $query->ket_rusak + $query->ket_lain;
            $item['selisih_pagi'] = $query->stock_awal - (isset($opname->stock_fisik_pagi) ? $opname->stock_fisik_pagi : 0);
-           $item['selisih_malam'] = isset($query->id) ? $query->sisa_stock + $query->produksi1 - $query->total_penjualan - $item['rusak'] - (isset($opname->stock_fisik_malam) ? $opname->stock_fisik_malam : 0) : 0;
+           $item['selisih_malam'] = $query->sisa_stock + $query->produksi1 - $query->total_penjualan - $item['rusak'] - (isset($opname->stock_fisik_malam) ? $opname->stock_fisik_malam : 0);
            $item['terjual'] = $query->total_penjualan;
         }else{
            $item['stock_masuk'] = 0;
@@ -2524,22 +2524,14 @@ class LaporanController extends Controller
         
         if(isset($opname->id)){
           $item['stock_toko'] = $opname->stock_toko;
-          $item['stock_akhir'] = isset($query->id) ? $query->sisa_stock + $query->produksi1 - $query->total_penjualan - $item['rusak'] : 0;
-          $item['selisih_malam'] = (isset($query->id) ? $query->sisa_stock : 0) - (isset($opname->stock_fisik_malam) ? $opname->stock_fisik_malam : 0);
           $item['stock_fisik_pagi'] = isset($opname->stock_fisik_pagi) ? $opname->stock_fisik_pagi : "";
           $item['stock_fisik_malam'] = isset($opname->stock_fisik_malam) ? $opname->stock_fisik_malam : "";
+          $item['stock_akhir'] = isset($query->id) ? $query->sisa_stock + $query->produksi1 - $query->total_penjualan - $item['rusak'] : 0;
         }else{
           $item['stock_toko'] = '';
-          if(isset($query->id)){
-            $item['stock_akhir'] =  $query->sisa_stock + $query->produksi1 - $query->total_penjualan - $item['rusak'];
-            $item['stock_fisik_pagi'] = isset($opname->stock_fisik_pagi) ? $opname->stock_fisik_pagi : "";
-            $item['stock_fisik_malam'] = isset($opname->stock_fisik_malam) ? $opname->stock_fisik_malam : "";
-
-          }else{
-            $item['stock_akhir'] = 0;
-            $item['stock_fisik_pagi'] = isset($opname->stock_fisik_pagi) ? $opname->stock_fisik_pagi : "";
-            $item['stock_fisik_malam'] = isset($opname->stock_fisik_malam) ? $opname->stock_fisik_malam : "";
-          }
+          $item['stock_fisik_pagi'] = "";
+          $item['stock_fisik_malam'] = "";
+          $item['stock_akhir'] = isset($query->id) ? $query->sisa_stock + $query->produksi1 - $query->total_penjualan - $item['rusak'] : 0;
         }
 
       });
