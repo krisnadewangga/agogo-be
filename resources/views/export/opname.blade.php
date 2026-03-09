@@ -26,8 +26,6 @@
         table th,
         table td{
             text-align: center;
-        }
-        table th{
             font-size: 14px !important;
         }
         table.layout{
@@ -79,16 +77,14 @@
     <table border="0">
         <tr>
             <td>
-                 <!-- <img src="{{ asset('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>      -->
+                 <img src="{{ asset('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>     
             </td>
             <td  style="width: 70%; text-align: right;">
                 <h4 style="">LAPORAN OPNAME</h4>
-                <p >Tanggal : {{ $start_tanggal }}</p>
+                <span >Tanggal : {{ $start_tanggal }}</span>
             </td>
         </tr>
     </table>
-    <hr>
-
     <div class="page">
          <table class="layout display responsive-table">
             <thead>
