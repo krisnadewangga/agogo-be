@@ -2491,6 +2491,7 @@ class LaporanController extends Controller
           // Update sisa_stock di item berdasarkan stock_toko
           if($stock_toko !== NULL) {
             Item::where('id', $key->id)->update(['stock' => $stock_toko]);
+            Produksi::where('item_id', $key->id)->update(['stock_awal' => $stock_toko]);
           }
         }
       }
