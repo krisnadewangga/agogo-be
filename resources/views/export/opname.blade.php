@@ -93,6 +93,7 @@
                     <th style="text-align:center;">Kode Menu</th>
                     <th style="text-align:center;">Nama Menu</th>
                     <th style="text-align:center;">Stock Awal Komputer</th>
+                    <th style="text-align:center;">Stock Asli</th>
                     <th style="text-align:center;">Stock Awal Fisik Pagi</th>
                     <th style="text-align:center;">Selisih Pagi</th>
                     <th style="text-align:center;">Produksi</th>
@@ -100,7 +101,7 @@
                     <th style="text-align:center;">Terjual</th>
                     <th style="text-align:center;">Stock Akhir Komputer</th>
                     <th style="text-align:center;">Stock Akhir Fisik Malam</th>
-                    <th style="text-align:center;">Selilih Malam</th>
+                    <th style="text-align:center;">Selisih Malam</th>
                     <th style="text-align:center;">Stock Opname</th>
                 </tr>
             </thead>
@@ -112,7 +113,8 @@
                             <td align="center" style="text-align:center;">{{ $no++ }}</td>
                             <td style="text-align:center;">{{ $key['code'] }}</td>
                             <td style="text-align:center;">{{ $key['nama_item'] }}</td>
-                            <td style="text-align:center;" >{{ $key->stock_awal }}</td>
+                            <td style="text-align:center;">{{ $key->stock_awal }}</td>
+                            <td style="text-align:center;">{{ $key->sisa_stock }}</td>
                             <td style="text-align:center;">{{ $key->stock_fisik_pagi }}</td>
                             <td style="text-align:center;">{{ $key->selisih_pagi }}</td>
                             <td style="text-align:center;">{{ $key->produksi }}</td>

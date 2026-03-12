@@ -115,6 +115,7 @@
 								<th>Nama Menu</th>
 
 								<th ><center>Stok Awal Komputer</center></th>
+								<th ><center>Stock Asli</center></th>
 								<th ><center>Stok Awal Fisik Pagi</center></th>
 								<th ><center>Selisih Pagi</center></th>
 								<th ><center>Produksi</center></th>
@@ -140,6 +141,10 @@
 									<td class="nowrap" align="center">
 										{{ $key->stock_awal ?? '0' }}
 										<input type="hidden" name="stock_awal_{{$key->id}}" value="{{ $key->stock_awal }}" >
+									</td>
+									<td class="nowrap" align="center">
+										{{ $key->sisa_stock ?? '0' }}
+										<input type="hidden" name="sisa_stock_{{$key->id}}" value="{{ $key->sisa_stock }}" >
 									</td>
 									<td class="nowrap" align="center">	
 										<input type="numeric" autocomplete="off" name="stock_fisik_pagi_{{$key->id}}" class="form-control" value="@if(session('error_auth')) {{ old('stock_fisik_pagi_'.$key->id) }} @else {{$key->stock_fisik_pagi}} @endif" style="width: 80px;">	
