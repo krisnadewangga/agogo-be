@@ -6,7 +6,7 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="text-center mb-4">STRUK PEMBELIAN</h5>
+                    <h5 class="text-center mb-4">{{$transaksi->for_ps == '1' ? 'STRUK PESANAN' : 'STRUK PEMBELIAN'}}</h5>
                     <hr>
                     
                     <!-- No Invoice -->
@@ -48,6 +48,12 @@
                     <div class="row mb-2">
                         <div class="col-6">Subtotal</div>
                         <div class="col-6 text-right">Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}</div>
+                        @if($transaksi->for_ps == '1')
+                        <div class="col-6">Add Fee</div>
+                        <div class="col-6 text-right">Rp {{ number_format($transaksi->Preorder->add_fee, 0, ',', '.') }}</div>
+                        <div class="col-6">Diskon</div>
+                        <div class="col-6 text-right">Rp {{ number_format($transaksi->Preorder->discount, 0, ',', '.') }}</div>
+                        @endif
                     </div>
                     
                     <!-- Grand Total -->
@@ -61,15 +67,22 @@
                     <!-- Pembayaran -->
                     <div class="row mb-2">
                         <div class="col-6">Pembayaran</div>
+                        @if($transaksi->for_ps == '1')
+                        <div class="col-6 text-right">(UANG MUKA) Rp {{ number_format($transaksi->Preorder->uang_muka, 0, ',', '.') }}</div>
+                        <div class="col-6 text-right">(CASH) Rp {{ number_format($transaksi->Preorder->uang_dibayar, 0, ',', '.') }}</div>
+                        @else
                         <div class="col-6 text-right">(CASH) Rp {{ number_format($transaksi->cash, 0, ',', '.') }}</div>
                         <div class="col-6 text-right">(TRANSFER) Rp {{ number_format($transaksi->transfer, 0, ',', '.') }}</div>
                         <div class="col-6 text-right">(QRIS) Rp {{ number_format($transaksi->qris, 0, ',', '.') }}</div>
+                        @endif
                     </div>
                     
                     <!-- Uang Kembali -->
                     <div class="row mb-3">
                         <div class="col-6">Uang Kembali</div>
-                        <div class="col-6 text-right">Rp {{$transaksi->uang_kembali }}</div>
+                        @if($transaksi->for_ps == '1')
+                        <div class="col-6 text-right">Rp {{$transaksi->Preorder->uang_kembali }}</div>
+                        @endif
                     </div>
                     
                     <hr>

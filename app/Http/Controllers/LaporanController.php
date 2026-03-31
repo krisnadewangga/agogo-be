@@ -1304,25 +1304,19 @@ class LaporanController extends Controller
       $opsi_sort = ['1' => 'ASC', '2' => 'DESC'];
 
       $transaksi = Transaksi::selectRaw("transaksi.*,
-                        (SELECT name FROM users WHERE id = transaksi.kasir_id) as nama_kasir")
-                  ->whereDate('tgl_bayar', $data[0])
-                  ->where('status', '!=', '3')
-                  ->orderBy($sort_by[$data[1]], $opsi_sort[$data[2]])
-                  ->get();
+            (SELECT name FROM users WHERE id = transaksi.kasir_id) as nama_kasir")
+          ->whereDate('tgl_bayar', $data[0])
+          ->where('status', '!=', '3')
+          ->orderBy($sort_by[$data[1]], $opsi_sort[$data[2]])
+          ->get();
 
       $transaksi->map(function($transaksi) {
         $transaksi['nama'] = $transaksi->User->name;
         $transaksi['tgl_bayar_format'] = $transaksi->tgl_bayar->format('d/m/Y H:i');
         $transaksi['total_bayar_format'] = number_format($transaksi->total_bayar, '0', '', '.');
-        
-        if ($transaksi->metode_pembayaran == '1') {
-          $transaksi['metode_pembayaran_text'] = 'Top Up';
-        } elseif ($transaksi->metode_pembayaran == '2') {
-          $transaksi['metode_pembayaran_text'] = 'Bank Transfer';
-        } elseif ($transaksi->metode_pembayaran == '3') {
-          $transaksi['metode_pembayaran_text'] = 'Bayar Ditoko';
-        } elseif ($transaksi->metode_pembayaran == '4') {
-          $transaksi['metode_pembayaran_text'] = 'COD';
+      
+        if($transaksi->for_ps == '1') {
+          $preorder = $transaksi->Preorder;
         }
       });
 
