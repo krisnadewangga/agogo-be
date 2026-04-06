@@ -113,7 +113,7 @@ public function postOrder(Request $request)
   $req_transaksi = ['user_id' => $req[0]['user_id'],
                     'no_transaksi' => $no_transaksi,
                     'total_transaksi' => $req[0]['subtotal'],
-                    'total_bayar' => $req[0]['total'],
+                    'total_bayar' => $req[0]['dibayar'],
                     'status' => '5',
                     'jalur' => '2',
                     'biaya_pengiriman' => '0',

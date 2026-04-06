@@ -59,7 +59,7 @@
                     <!-- Grand Total -->
                     <div class="row mb-3">
                         <div class="col-6"><strong>Grand Total</strong></div>
-                        <div class="col-6 text-right"><strong>Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</strong></div>
+                        <div class="col-6 text-right"><strong>Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}</strong></div>
                     </div>
                     
                     <hr>
@@ -71,7 +71,7 @@
                         <div class="col-6 text-right">(UANG MUKA) Rp {{ number_format($transaksi->Preorder->uang_muka, 0, ',', '.') }}</div>
                         <div class="col-6 text-right">(CASH) Rp {{ number_format($transaksi->Preorder->uang_dibayar, 0, ',', '.') }}</div>
                         @else
-                        <div class="col-6 text-right">(CASH) Rp {{ number_format($transaksi->cash, 0, ',', '.') }}</div>
+                        <div class="col-6 text-right">(CASH) Rp {{ number_format($transaksi->cash + ($transaksi->total_bayar - $transaksi->total_transaksi), 0, ',', '.') }}</div>
                         <div class="col-6 text-right">(TRANSFER) Rp {{ number_format($transaksi->transfer, 0, ',', '.') }}</div>
                         <div class="col-6 text-right">(QRIS) Rp {{ number_format($transaksi->qris, 0, ',', '.') }}</div>
                         @endif
@@ -81,7 +81,9 @@
                     <div class="row mb-3">
                         <div class="col-6">Uang Kembali</div>
                         @if($transaksi->for_ps == '1')
-                        <div class="col-6 text-right">Rp {{$transaksi->Preorder->uang_kembali }}</div>
+                        <div class="col-6 text-right">Rp {{ number_format($transaksi->Preorder->uang_kembali, 0, ',', '.') }}</div>
+                        @else
+                        <div class="col-6 text-right">Rp {{ number_format($transaksi->total_bayar - $transaksi->total_transaksi, 0, ',', '.') }}</div>
                         @endif
                     </div>
                     
