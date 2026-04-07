@@ -1320,7 +1320,7 @@ class LaporanController extends Controller
         }
       });
 
-      dump($transaksi);
+      // dump($transaksi);
 
       return $transaksi;
     }
