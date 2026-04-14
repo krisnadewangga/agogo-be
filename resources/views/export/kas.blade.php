@@ -67,7 +67,7 @@
 </head>
 <body>
         <div class="header">
-                <img src="{{ asset('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>        
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('assets/dist/img/agogo-report.png'))) }}" alt="Image" height="100px"/>        
                 <div style="float:right;margin-top:-30px">
                     <h3>LAPORAN PENDAPATAN KASIR</h3>
                     <p style="margin-left:120px">Tanggal Transaksi : {{$start_tanggal}}</p>

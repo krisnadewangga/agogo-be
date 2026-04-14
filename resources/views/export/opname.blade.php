@@ -77,7 +77,7 @@
     <table border="0">
         <tr>
             <td>
-                 <img src="{{ asset('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>     
+                 <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('assets/dist/img/agogo-report.png'))) }}" alt="Image" height="100px"/>     
             </td>
             <td  style="width: 70%; text-align: right;">
                 <h4 style="">LAPORAN OPNAME</h4>

@@ -76,7 +76,8 @@
 </head>
 <body>
         <div class="header">
-                <img src="{{ asset('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>        
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('assets/dist/img/agogo-report.png'))) }}" alt="Image" height="100px"/>
+                <!-- <img src="{{ public_path('assets/dist/img/agogo-report.png') }}" alt="Image" height="100px"/>         -->
                 <div style="float:right;margin-top:-30px">
                     <h3>LAPORAN PRODUKSI</h3>
                     <p style="margin-left:120px">Tanggal Produksi : {{$start_tanggal}}</p>
@@ -106,8 +107,8 @@
                     @foreach($data as $key)
                         <tr>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ $no++ }}</td>
-                            <td align="center" style="text-align:center;border-bottom:0px">{{ $key->Item->code }}</td>
-                            <td style="text-align:center;border-bottom:0px">{{ $key->Item->nama_item }}</td>
+                            <td align="center" style="text-align:center;border-bottom:0px">{{ $key->code }}</td>
+                            <td style="text-align:center;border-bottom:0px">{{ $key->nama_item }}</td>
                             <td align="center" style="text-align:center;border-bottom:0px">{{ number_format($key->produksi1 + $key->produksi2 + $key->produksi3,'0','','.') }}</td>
                             <td style="text-align:center;border-bottom:0px">{{ $key->catatan }}</td>
                         </tr>
