@@ -24,7 +24,6 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-        Passport::routes();
         
         Gate::define('add_users', function($user){
             $roles = $user->Roles->pluck('level_id')->toArray();

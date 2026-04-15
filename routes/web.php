@@ -44,6 +44,12 @@ Route::resource('/versi','VersiController');
 Route::get('/tax','VersiController@showPajak')->name('tax_set');
 Route::POST('/tax_update','VersiController@updatePajak')->name('tax_update');
 Route::resource('/set_tanggal','SetTanggalController');
+Route::get('/backup_database', 'BackupDatabaseController@index')->name('backup_database.index');
+Route::post('/backup_database', 'BackupDatabaseController@store')->name('backup_database.store');
+Route::post('/backup_database/download', 'BackupDatabaseController@download')->name('backup_database.download');
+Route::post('/backup_database/delete', 'BackupDatabaseController@destroy')->name('backup_database.destroy');
+Route::post('/backup_database/restore', 'BackupDatabaseController@restore')->name('backup_database.restore');
+Route::post('/backup_database/truncate', 'BackupDatabaseController@truncate')->name('backup_database.truncate');
 
 Route::POST('/store_gambarItem','ItemController@store_gambarItem')->name('store_gambarItem');
 Route::GET('/ganti_gambar_utama/{id}','ItemController@ganti_gambar_utama')->name('ganti_gambar_utama');

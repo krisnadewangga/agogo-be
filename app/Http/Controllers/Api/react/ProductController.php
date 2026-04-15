@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\api\react;
+namespace App\Http\Controllers\Api\react;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

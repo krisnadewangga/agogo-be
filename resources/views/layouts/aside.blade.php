@@ -76,6 +76,7 @@
                <li id="sm_versi"><a href="{{ route('versi.index') }}"><i class="fa fa-circle-o"></i> <span>Update Versi</span></a></li>
                <li id="sm_st"><a href="{{ route('set_tanggal.index') }}"><i class="fa fa-circle-o"></i> <span>Set Tanggal Produksi</span></a></li>
                <li id="sm_st"><a href="{{ route('tax_set') }}"><i class="fa fa-circle-o"></i> <span>Set Pajak</span></a></li>
+               <li id="sm_backup_db"><a href="{{ route('backup_database.index') }}"><i class="fa fa-circle-o"></i> <span>Backup Database</span></a></li>
                 
             </ul>
           </li>

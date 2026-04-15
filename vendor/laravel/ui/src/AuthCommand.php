@@ -4,7 +4,9 @@ namespace Laravel\Ui;
 
 use Illuminate\Console\Command;
 use InvalidArgumentException;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'ui:auth')]
 class AuthCommand extends Command
 {
     /**
@@ -58,14 +60,13 @@ class AuthCommand extends Command
         }
 
         $this->ensureDirectoriesExist();
-
         $this->exportViews();
 
         if (! $this->option('views')) {
             $this->exportBackend();
         }
 
-        $this->info('Authentication scaffolding generated successfully.');
+        $this->components->info('Authentication scaffolding generated successfully.');
     }
 
     /**
@@ -93,7 +94,7 @@ class AuthCommand extends Command
     {
         foreach ($this->views as $key => $value) {
             if (file_exists($view = $this->getViewPath($value)) && ! $this->option('force')) {
-                if (! $this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
+                if (! $this->components->confirm("The [$value] view already exists. Do you want to replace it?")) {
                     continue;
                 }
             }
@@ -112,10 +113,34 @@ class AuthCommand extends Command
      */
     protected function exportBackend()
     {
-        file_put_contents(
-            app_path('Http/Controllers/HomeController.php'),
-            $this->compileControllerStub()
-        );
+        $this->callSilent('ui:controllers');
+
+        $controller = app_path('Http/Controllers/HomeController.php');
+
+        if (file_exists($controller) && ! $this->option('force')) {
+            if ($this->components->confirm("The [HomeController.php] file already exists. Do you want to replace it?", true)) {
+                file_put_contents($controller, $this->compileStub('controllers/HomeController'));
+            }
+        } else {
+            file_put_contents($controller, $this->compileStub('controllers/HomeController'));
+        }
+
+        $baseController = app_path('Http/Controllers/Controller.php');
+
+        if (file_exists($baseController) && ! $this->option('force')) {
+            if ($this->components->confirm("The [Controller.php] file already exists. Do you want to replace it?", true)) {
+                file_put_contents($baseController, $this->compileStub('controllers/Controller'));
+            }
+        } else {
+            file_put_contents($baseController, $this->compileStub('controllers/Controller'));
+        }
+
+        if (! file_exists(database_path('migrations/0001_01_01_000000_create_users_table.php'))) {
+            copy(
+                __DIR__.'/../stubs/migrations/2014_10_12_100000_create_password_resets_table.php',
+                base_path('database/migrations/2014_10_12_100000_create_password_resets_table.php')
+            );
+        }
 
         file_put_contents(
             base_path('routes/web.php'),
@@ -125,16 +150,17 @@ class AuthCommand extends Command
     }
 
     /**
-     * Compiles the "HomeController" stub.
+     * Compiles the given stub.
      *
+     * @param  string  $stub
      * @return string
      */
-    protected function compileControllerStub()
+    protected function compileStub($stub)
     {
         return str_replace(
             '{{namespace}}',
             $this->laravel->getNamespace(),
-            file_get_contents(__DIR__.'/Auth/stubs/controllers/HomeController.stub')
+            file_get_contents(__DIR__.'/Auth/stubs/'.$stub.'.stub')
         );
     }
 

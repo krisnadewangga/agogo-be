@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class ArrayLock extends Lock
 {
@@ -87,6 +87,10 @@ class ArrayLock extends Lock
      */
     protected function getCurrentOwner()
     {
+        if (! $this->exists()) {
+            return null;
+        }
+
         return $this->store->locks[$this->name]['owner'];
     }
 

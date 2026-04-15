@@ -3,14 +3,11 @@
 namespace Laravel\Passport\Http\Middleware;
 
 use Closure;
-use Illuminate\Auth\AuthenticationException;
-use Laminas\Diactoros\ResponseFactory;
-use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\Diactoros\StreamFactory;
-use Laminas\Diactoros\UploadedFileFactory;
+use Laravel\Passport\Exceptions\AuthenticationException;
 use Laravel\Passport\TokenRepository;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\ResourceServer;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 
 abstract class CheckCredentials
@@ -43,6 +40,21 @@ abstract class CheckCredentials
     }
 
     /**
+     * Specify the scopes for the middleware.
+     *
+     * @param  array|string  $scopes
+     * @return string
+     */
+    public static function using(...$scopes)
+    {
+        if (is_array($scopes[0])) {
+            return static::class.':'.implode(',', $scopes[0]);
+        }
+
+        return static::class.':'.implode(',', $scopes);
+    }
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -50,15 +62,15 @@ abstract class CheckCredentials
      * @param  mixed  ...$scopes
      * @return mixed
      *
-     * @throws \Illuminate\Auth\AuthenticationException
+     * @throws \Laravel\Passport\Exceptions\AuthenticationException
      */
     public function handle($request, Closure $next, ...$scopes)
     {
         $psr = (new PsrHttpFactory(
-            new ServerRequestFactory,
-            new StreamFactory,
-            new UploadedFileFactory,
-            new ResponseFactory
+            new Psr17Factory,
+            new Psr17Factory,
+            new Psr17Factory,
+            new Psr17Factory
         ))->createRequest($request);
 
         try {
@@ -75,7 +87,7 @@ abstract class CheckCredentials
     /**
      * Validate the scopes and token on the incoming request.
      *
-     * @param  \Psr\Http\Message\ServerRequestInterface $psr
+     * @param  \Psr\Http\Message\ServerRequestInterface  $psr
      * @param  array  $scopes
      * @return void
      *
@@ -96,12 +108,12 @@ abstract class CheckCredentials
      * @param  \Laravel\Passport\Token  $token
      * @return void
      *
-     * @throws \Illuminate\Auth\AuthenticationException
+     * @throws \Laravel\Passport\Exceptions\AuthenticationException
      */
     abstract protected function validateCredentials($token);
 
     /**
-     * Validate token credentials.
+     * Validate token scopes.
      *
      * @param  \Laravel\Passport\Token  $token
      * @param  array  $scopes

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Token extends Model
 {
+    use ResolvesInheritedScopes;
+
     /**
      * The database table used by the model.
      *
@@ -42,23 +44,8 @@ class Token extends Model
     protected $casts = [
         'scopes' => 'array',
         'revoked' => 'bool',
+        'expires_at' => 'datetime',
     ];
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = [
-        'expires_at',
-    ];
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
 
     /**
      * Get the client that the token belongs to.
@@ -71,6 +58,16 @@ class Token extends Model
     }
 
     /**
+     * Get the refresh token associated with the token.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function refreshToken()
+    {
+        return $this->hasOne(Passport::refreshTokenModel(), 'access_token_id');
+    }
+
+    /**
      * Get the user that the token belongs to.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -79,7 +76,9 @@ class Token extends Model
     {
         $provider = config('auth.guards.api.provider');
 
-        return $this->belongsTo(config('auth.providers.'.$provider.'.model'));
+        $model = config('auth.providers.'.$provider.'.model');
+
+        return $this->belongsTo($model, 'user_id', (new $model)->getKeyName());
     }
 
     /**
@@ -105,27 +104,6 @@ class Token extends Model
         }
 
         return false;
-    }
-
-    /**
-     * Resolve all possible scopes.
-     *
-     * @param  string  $scope
-     * @return array
-     */
-    protected function resolveInheritedScopes($scope)
-    {
-        $parts = explode(':', $scope);
-
-        $partsCount = count($parts);
-
-        $scopes = [];
-
-        for ($i = 1; $i <= $partsCount; $i++) {
-            $scopes[] = implode(':', array_slice($parts, 0, $i));
-        }
-
-        return $scopes;
     }
 
     /**
@@ -157,5 +135,15 @@ class Token extends Model
     public function transient()
     {
         return false;
+    }
+
+    /**
+     * Get the current connection name for the model.
+     *
+     * @return string|null
+     */
+    public function getConnectionName()
+    {
+        return $this->connection ?? config('passport.connection');
     }
 }

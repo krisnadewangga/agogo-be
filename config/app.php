@@ -169,7 +169,6 @@ return [
          * Package Service Providers...
          */
         Intervention\Image\ImageServiceProvider::class,
-        LaravelFCM\FCMServiceProvider::class,
         Laravel\Passport\PassportServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         Ixudra\Curl\CurlServiceProvider::class,
@@ -234,9 +233,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Image' => Intervention\Image\Facades\Image::class,
-        'FCM'      => LaravelFCM\Facades\FCM::class,
-        'FCMGroup' => LaravelFCM\Facades\FCMGroup::class, // Optional
-        'PDF' => Barryvdh\DomPDF\Facade::class,
+        'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
         'Curl'          => 'Ixudra\Curl\Facades\Curl'
 
     ],

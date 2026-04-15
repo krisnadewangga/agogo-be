@@ -2,11 +2,16 @@
 
 namespace Laravel\Passport;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Laravel\Passport\Database\Factories\ClientFactory;
 
 class Client extends Model
 {
+    use HasFactory;
+    use ResolvesInheritedScopes;
+
     /**
      * The database table used by the model.
      *
@@ -37,10 +42,20 @@ class Client extends Model
      */
     protected $casts = [
         'grant_types' => 'array',
+        'scopes' => 'array',
         'personal_access_client' => 'bool',
         'password_client' => 'bool',
         'revoked' => 'bool',
     ];
+
+    /**
+     * The temporary plain-text client secret.
+     *
+     * This is only available during the request that created the client.
+     *
+     * @var string|null
+     */
+    public $plainSecret;
 
     /**
      * Bootstrap the model and its traits.
@@ -52,7 +67,7 @@ class Client extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            if (config('passport.client_uuids')) {
+            if (Passport::clientUuids()) {
                 $model->{$model->getKeyName()} = $model->{$model->getKeyName()} ?: (string) Str::orderedUuid();
             }
         });
@@ -65,8 +80,10 @@ class Client extends Model
      */
     public function user()
     {
+        $provider = $this->provider ?: config('auth.guards.api.provider');
+
         return $this->belongsTo(
-            config('auth.providers.'.config('auth.guards.api.provider').'.model')
+            config("auth.providers.{$provider}.model")
         );
     }
 
@@ -91,6 +108,37 @@ class Client extends Model
     }
 
     /**
+     * The temporary non-hashed client secret.
+     *
+     * This is only available once during the request that created the client.
+     *
+     * @return string|null
+     */
+    public function getPlainSecretAttribute()
+    {
+        return $this->plainSecret;
+    }
+
+    /**
+     * Set the value of the secret attribute.
+     *
+     * @param  string|null  $value
+     * @return void
+     */
+    public function setSecretAttribute($value)
+    {
+        $this->plainSecret = $value;
+
+        if (is_null($value) || ! Passport::$hashesClientSecrets) {
+            $this->attributes['secret'] = $value;
+
+            return;
+        }
+
+        $this->attributes['secret'] = password_hash($value, PASSWORD_BCRYPT);
+    }
+
+    /**
      * Determine if the client is a "first party" client.
      *
      * @return bool
@@ -107,6 +155,46 @@ class Client extends Model
      */
     public function skipsAuthorization()
     {
+        return false;
+    }
+
+    /**
+     * Determine if the client has the given grant type.
+     *
+     * @param  string  $grantType
+     * @return bool
+     */
+    public function hasGrantType($grantType)
+    {
+        if (! isset($this->attributes['grant_types']) || ! is_array($this->grant_types)) {
+            return true;
+        }
+
+        return in_array($grantType, $this->grant_types);
+    }
+
+    /**
+     * Determine whether the client has the given scope.
+     *
+     * @param  string  $scope
+     * @return bool
+     */
+    public function hasScope($scope)
+    {
+        if (! isset($this->attributes['scopes']) || ! is_array($this->scopes)) {
+            return true;
+        }
+
+        $scopes = Passport::$withInheritedScopes
+            ? $this->resolveInheritedScopes($scope)
+            : [$scope];
+
+        foreach ($scopes as $scope) {
+            if (in_array($scope, $this->scopes)) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -138,5 +226,25 @@ class Client extends Model
     public function getIncrementing()
     {
         return Passport::clientUuids() ? false : $this->incrementing;
+    }
+
+    /**
+     * Get the current connection name for the model.
+     *
+     * @return string|null
+     */
+    public function getConnectionName()
+    {
+        return $this->connection ?? config('passport.connection');
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
+    {
+        return ClientFactory::new();
     }
 }

@@ -1,18 +1,29 @@
 <?php
 namespace App\Helpers;
 use Illuminate\Support\Facades\Mail;
-use LaravelFCM\Message\OptionsBuilder;
-use LaravelFCM\Message\PayloadDataBuilder;
-use LaravelFCM\Message\PayloadNotificationBuilder;
-use LaravelFCM\Message\Topics;
+use Illuminate\Support\Facades\Http;
 use App\Events\PusherEvent;
 use App\Notifikasi;
-use FCM;
 use Ixudra\Curl\Facades\Curl;
 use Carbon\Carbon;
 
 
 class SendNotif{
+
+    private static function sendFcmRequest(array $payload)
+    {
+        $serverKey = config('fcm.http.server_key');
+        $endpoint = config('fcm.http.server_send_url', 'https://fcm.googleapis.com/fcm/send');
+
+        if (empty($serverKey)) {
+            return null;
+        }
+
+        return Http::withHeaders([
+            'Authorization' => 'key=' . $serverKey,
+            'Content-Type' => 'application/json',
+        ])->post($endpoint, $payload);
+    }
 
  	public static function sendNotifikasi($token, $pengirim, $pesan, $gambar){
 
@@ -28,20 +39,11 @@ class SendNotif{
         $res['data']['payload'] =  $payload;
         $res['data']['timestamp'] = date('Y-m-d G:i:s');
 
-	    $optionBuiler = new OptionsBuilder();
-	    $optionBuiler->setTimeToLive(60*20);
-
-	    $notificationBuilder = new PayloadNotificationBuilder($pengirim);
-	    $notificationBuilder->setBody($pesan)->setSound('default');
-
-	    $dataBuilder = new PayloadDataBuilder();
-	     $dataBuilder->addData($res);
-
-	    $option = $optionBuiler->build();
-	    $notification = $notificationBuilder->build();
-	    $data = $dataBuilder->build();
-
-	    $downstreamResponse = FCM::sendTo($token, $option, null, $data);
+        self::sendFcmRequest([
+            'registration_ids' => is_array($token) ? $token : [$token],
+            'time_to_live' => 60 * 20,
+            'data' => $res,
+        ]);
     }
 
 
@@ -49,28 +51,18 @@ class SendNotif{
 
     public static function sendTopic($judul,$pesan)
     {
-        $notificationBuilder = new PayloadNotificationBuilder($judul);
-        $notificationBuilder->setBody($pesan)
-                            ->setSound('default');
-
-        $notification = $notificationBuilder->build();
-
-        $topic = new Topics();
-        $topic->topic('global');
-
-        $topicResponse = FCM::sendToTopic($topic, null, $notification, null);
-
-        $topicResponse->isSuccess();
-        $topicResponse->shouldRetry();
-        $topicResponse->error();
+        self::sendFcmRequest([
+            'to' => '/topics/global',
+            'notification' => [
+                'title' => $judul,
+                'body' => $pesan,
+                'sound' => 'default',
+            ],
+        ]);
     }
 
      public static function sendTopicWithData($pengirim,$judul,$pesan,$gambar)
     {
-        $notificationBuilder = new PayloadNotificationBuilder($judul);
-        $notificationBuilder->setBody($pesan)
-                            ->setSound('default');
-
         $payload = array();
         $payload['team'] = 'indonesia';
         $payload['score'] = '5.6';
@@ -82,37 +74,16 @@ class SendNotif{
         $res['data']['image'] = asset('upload/images-400/'.$gambar);
         $res['data']['payload'] =  $payload;
         $res['data']['timestamp'] = date('Y-m-d G:i:s');
-        $topic = new Topics();
-        $topic->topic('global');
 
-
-        $optionBuiler = new OptionsBuilder();
-        $optionBuiler->setTimeToLive(60*20);
-
-        $notificationBuilder = new PayloadNotificationBuilder($pengirim);
-        $notificationBuilder->setBody($pesan)->setSound('default');
-
-        $dataBuilder = new PayloadDataBuilder();
-         $dataBuilder->addData($res);
-
-        $option = $optionBuiler->build();
-        $notification = $notificationBuilder->build();
-        $data = $dataBuilder->build();
-
-        $topicResponse = FCM::sendToTopic($topic, $option, null, $data);
-
-
-        $topicResponse->isSuccess();
-        $topicResponse->shouldRetry();
-        $topicResponse->error();
+        self::sendFcmRequest([
+            'to' => '/topics/global',
+            'time_to_live' => 60 * 20,
+            'data' => $res,
+        ]);
     }
 
     public static function sendTopicWithUserId($pengirim,$judul,$pesan,$gambar, $id_user,$namaTable, $id)
     {
-        $notificationBuilder = new PayloadNotificationBuilder($judul);
-        $notificationBuilder->setBody($pesan)
-                            ->setSound('default');
-
         $payload = array();
         $payload['team'] = 'indonesia';
         $payload['score'] = '5.6';
@@ -128,32 +99,11 @@ class SendNotif{
         $res['data']['table'] = $namaTable;
         $res['data']['timestamp'] = date('Y-m-d G:i:s');
 
-
-
-        $topic = new Topics();
-	    // ganti topic(user
-        $topic->topic('userAgogo'.$id_user);
-
-
-        $optionBuiler = new OptionsBuilder();
-        $optionBuiler->setTimeToLive(60*20);
-
-        $notificationBuilder = new PayloadNotificationBuilder($pengirim);
-        $notificationBuilder->setBody($pesan)->setSound('default');
-
-        $dataBuilder = new PayloadDataBuilder();
-         $dataBuilder->addData($res);
-
-        $option = $optionBuiler->build();
-        $notification = $notificationBuilder->build();
-        $data = $dataBuilder->build();
-
-        $topicResponse = FCM::sendToTopic($topic, $option, null, $data);
-
-
-        $topicResponse->isSuccess();
-        $topicResponse->shouldRetry();
-        $topicResponse->error();
+        self::sendFcmRequest([
+            'to' => '/topics/userAgogo'.$id_user,
+            'time_to_live' => 60 * 20,
+            'data' => $res,
+        ]);
     }
 
     public static function SendNotifPus($pengirim_id,$pengirim_nama,$penerima_id,$judul_id,$judul,$jenis_notif)

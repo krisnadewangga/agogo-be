@@ -14,18 +14,18 @@ class RefreshToken extends Model
     protected $table = 'oauth_refresh_tokens';
 
     /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
      * The "type" of the primary key ID.
      *
      * @var string
      */
     protected $keyType = 'string';
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
 
     /**
      * The guarded attributes on the model.
@@ -41,15 +41,7 @@ class RefreshToken extends Model
      */
     protected $casts = [
         'revoked' => 'bool',
-    ];
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = [
-        'expires_at',
+        'expires_at' => 'datetime',
     ];
 
     /**
@@ -87,5 +79,15 @@ class RefreshToken extends Model
     public function transient()
     {
         return false;
+    }
+
+    /**
+     * Get the current connection name for the model.
+     *
+     * @return string|null
+     */
+    public function getConnectionName()
+    {
+        return $this->connection ?? config('passport.connection');
     }
 }

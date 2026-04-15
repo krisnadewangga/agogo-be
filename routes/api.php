@@ -73,8 +73,7 @@ Route::group([
     'prefix' => 'auth'
 ], function () {
     Route::post('login', 'Api\react\UserController@login');
-    Route::post('signup', 'AuthController@signup');
-    Route::get('logout', 'AuthController@logout');
+    Route::post('signup', 'Api\UserController@register');
     Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
     Route::group([
       'middleware' => 'auth:api'

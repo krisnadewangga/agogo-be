@@ -5,6 +5,8 @@ namespace Laravel\Passport\Bridge;
 use DateTime;
 use Illuminate\Contracts\Events\Dispatcher;
 use Laravel\Passport\Events\AccessTokenCreated;
+use Laravel\Passport\Events\AccessTokenRevoked;
+use Laravel\Passport\Passport;
 use Laravel\Passport\TokenRepository;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
@@ -46,7 +48,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null)
     {
-        return new AccessToken($userIdentifier, $scopes, $clientEntity);
+        return new Passport::$accessTokenEntity($userIdentifier, $scopes, $clientEntity);
     }
 
     /**
@@ -77,7 +79,9 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function revokeAccessToken($tokenId)
     {
-        $this->tokenRepository->revokeAccessToken($tokenId);
+        if ($this->tokenRepository->revokeAccessToken($tokenId)) {
+            $this->events->dispatch(new AccessTokenRevoked($tokenId));
+        }
     }
 
     /**
