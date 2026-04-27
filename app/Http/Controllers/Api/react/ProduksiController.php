@@ -226,7 +226,7 @@ public function getTrxByProduct($id) {
         ->first();
 
         
-        $stock_awal = $getStock->stock_awal;
+        $stock_awal = $getStock ? $getStock->stock_awal : 0;
 
             // dd($curent_date);
 
@@ -280,10 +280,9 @@ public function postProduction(Request $request)
         ], 400);
 
     }else{
-        $ubah_tanggal = null;
-        $ubah_tanggal = $request[0]['ubah_tanggal'];
+        $ubah_tanggal = $request[0]['ubah_tanggal'] ?? null;
     
-        if(!Auth::attempt(['name' => $request[0]['username_approval'], 'password' => $request[0]['pin_approval']]))
+        if(!Auth::attempt(['name' => $request[0]['username_approval'] ?? '', 'password' => $request[0]['pin_approval'] ?? '']))
             return response()->json([
               'status' => 'failed',
               'message' => 'Invalid Username / PIN'
