@@ -2,6 +2,8 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/agogobak/pos.new-agogo-bakery.com
-    - /bin/cp -R app $DEPLOYPATH
-    - /bin/cp -R resources $DEPLOYPATH
-    - /bin/cp -R routes $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/cp -a ./. $DEPLOYPATH/
+    - cd $DEPLOYPATH && composer install --no-dev --optimize-autoloader --no-interaction
+    - cd $DEPLOYPATH && php artisan optimize:clear
+    - cd $DEPLOYPATH && php artisan config:cache
