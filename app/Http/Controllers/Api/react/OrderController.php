@@ -504,7 +504,7 @@ public function keepOrder(Request $request)
            'a.uang_dibayar',
            'a.uang_kembali',
            'transaksi.created_at')
-         ->where('a.status','UNPAID')
+         ->where('transaksi.status','7')
          ->get();
          return response()->json($sel,200);
        }
