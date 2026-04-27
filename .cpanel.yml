@@ -4,6 +4,7 @@ deployment:
     - export DEPLOYPATH=/home/agogobak/pos.new-agogo-bakery.com
     - /bin/mkdir -p $DEPLOYPATH
     - /bin/cp -a ./. $DEPLOYPATH/
+    - cd $DEPLOYPATH && rm -rf vendor composer.lock
     - cd $DEPLOYPATH && composer install --no-dev --optimize-autoloader --no-interaction
     - cd $DEPLOYPATH && php artisan optimize:clear
     - cd $DEPLOYPATH && php artisan config:cache
