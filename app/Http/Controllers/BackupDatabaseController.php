@@ -42,6 +42,11 @@ class BackupDatabaseController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'age_range' => 'nullable|in:30,90,120,150,180',
+        ]);
+
+        $age = $request->input('age_range');
         $connection = config('database.default');
         $driver = config("database.connections.$connection.driver");
         $databaseName = config("database.connections.$connection.database");
@@ -87,7 +92,18 @@ class BackupDatabaseController extends Controller
                 $dump[] = 'DROP TABLE IF EXISTS `' . $table . '`;';
                 $dump[] = $createSql . ';';
 
-                $rows = DB::table($table)->get();
+                if (!empty($age)) {
+                    $dateCol = $this->getDateColumn($table);
+                    if ($dateCol !== null) {
+                        $rows = DB::table($table)
+                            ->where($dateCol, '>=', DB::raw('DATE_SUB(NOW(), INTERVAL ' . intval($age) . ' DAY)'))
+                            ->get();
+                    } else {
+                        $rows = DB::table($table)->get();
+                    }
+                } else {
+                    $rows = DB::table($table)->get();
+                }
                 foreach ($rows as $row) {
                     $rowData = (array) $row;
                     $columns = array_keys($rowData);
@@ -116,7 +132,12 @@ class BackupDatabaseController extends Controller
 
             $dump[] = 'SET FOREIGN_KEY_CHECKS=1;';
 
-            $fileName = 'backup-all-' . date('Ymd-His') . '.sql';
+            $suffix = '';
+            if (!empty($age)) {
+                $suffix = '-last-' . intval($age) . 'd';
+            }
+
+            $fileName = 'backup-all' . $suffix . '-' . date('Ymd-His') . '.sql';
             $relativePath = 'backups/' . $fileName;
             $disk->put($relativePath, implode(PHP_EOL, $dump));
 
@@ -247,9 +268,11 @@ class BackupDatabaseController extends Controller
     {
         $request->validate([
             'table_name' => 'required|string',
+            'age_range' => 'nullable|in:30,90,120,150,180',
         ]);
 
         $target = $request->input('table_name');
+        $age = $request->input('age_range');
         $tables = $this->getTableNames();
 
         if ($target !== '__ALL__' && !in_array($target, $tables, true)) {
@@ -261,6 +284,36 @@ class BackupDatabaseController extends Controller
 
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
+            if (!empty($age)) {
+                // Delete rows older than given age (in days) if table has a date column
+                $deletedCount = 0;
+                if ($target === '__ALL__') {
+                    foreach ($tables as $table) {
+                        $dateCol = $this->getDateColumn($table);
+                        if ($dateCol !== null) {
+                            $count = DB::table($table)
+                                ->where($dateCol, '<', DB::raw('DATE_SUB(NOW(), INTERVAL ' . intval($age) . ' DAY)'))
+                                ->delete();
+                            $deletedCount += $count;
+                        }
+                    }
+                } else {
+                    $dateCol = $this->getDateColumn($target);
+                    if ($dateCol === null) {
+                        return redirect()->back()->with('error', 'Tabel tidak memiliki kolom tanggal untuk melakukan penghapusan berdasarkan umur data.');
+                    }
+
+                    $deletedCount = DB::table($target)
+                        ->where($dateCol, '<', DB::raw('DATE_SUB(NOW(), INTERVAL ' . intval($age) . ' DAY)'))
+                        ->delete();
+                }
+
+                DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+                return redirect()->back()->with('success', 'Penghapusan data berdasarkan umur selesai. Total baris dihapus: ' . number_format($deletedCount));
+            }
+
+            // No age filter provided — perform full truncate
             if ($target === '__ALL__') {
                 foreach ($tables as $table) {
                     DB::unprepared('TRUNCATE TABLE `' . str_replace('`', '``', $table) . '`');
@@ -294,6 +347,34 @@ class BackupDatabaseController extends Controller
             })
             ->values()
             ->all();
+    }
+
+    /**
+     * Try to find a sensible date/datetime column for filtering by age.
+     * Returns column name or null.
+     */
+    private function getDateColumn($table)
+    {
+        try {
+            $cols = collect(DB::select("SHOW COLUMNS FROM `{$table}`"))->map(function ($c) {
+                $arr = (array) $c;
+                return $arr['Field'] ?? array_values($arr)[0];
+            })->values()->all();
+
+            $candidates = ['created_at', 'updated_at', 'tanggal', 'tgl', 'date', 'created', 'updated', 'waktu'];
+
+            $lowerCols = array_map('strtolower', $cols);
+            foreach ($candidates as $cand) {
+                $idx = array_search($cand, $lowerCols, true);
+                if ($idx !== false) {
+                    return $cols[$idx];
+                }
+            }
+        } catch (\Throwable $e) {
+            // ignore and return null
+        }
+
+        return null;
     }
 
     private function executeSqlDump($sql)

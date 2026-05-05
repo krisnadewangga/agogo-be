@@ -32,10 +32,25 @@
 
             <form method="POST" action="{{ route('backup_database.store') }}">
                 @csrf
-                <div style="padding-top: 5px;">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-database"></i> Buat Backup Database
-                    </button>
+                <div class="row">
+                    <div class="col-md-6" style="padding-top:5px;">
+                        <div class="form-group">
+                            <label>Rentang Waktu (hari) untuk Backup</label>
+                            <select name="age_range" class="form-control">
+                                <option value="">Semua Data</option>
+                                <option value="30">30 hari</option>
+                                <option value="90">90 hari</option>
+                                <option value="120">120 hari</option>
+                                <option value="150">150 hari</option>
+                                <option value="180">180 hari</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="padding-top: 25px; text-align: left;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-database"></i> Buat Backup Database
+                        </button>
+                    </div>
                 </div>
             </form>
 
@@ -101,6 +116,17 @@
                                 @foreach($tables as $table)
                                     <option value="{{ $table }}">{{ $table }}</option>
                                 @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Hapus data lebih lama dari (hari)</label>
+                            <select name="age_range" class="form-control">
+                                <option value="">-- Tidak Memfilter --</option>
+                                <option value="30">30 hari</option>
+                                <option value="90">90 hari</option>
+                                <option value="120">120 hari</option>
+                                <option value="150">150 hari</option>
+                                <option value="180">180 hari</option>
                             </select>
                         </div>
                     </div>
