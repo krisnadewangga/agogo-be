@@ -245,6 +245,9 @@ Route::get('/debug-cookie', function (\Illuminate\Http\Request $request) {
     $count = (int) $request->cookie('agogo_debug_count', 0) + 1;
     $appUrl = env('APP_URL', 'https://pos.agogo-bakery.com');
     
+    // Log for debugging
+    \Log::info('debug-cookie route called', ['count' => $count, 'timestamp' => time()]);
+    
     // Use Laravel's proper cookie queueing system with web middleware
     \Illuminate\Support\Facades\Cookie::queue(
         'agogo_debug_count',
@@ -257,6 +260,8 @@ Route::get('/debug-cookie', function (\Illuminate\Http\Request $request) {
         false, // raw
         'lax'
     );
+    
+    \Log::info('Cookie queued successfully');
     
     $response = response()->json([
         'cookie_present' => $request->hasCookie('agogo_debug_count'),
