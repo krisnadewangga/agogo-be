@@ -242,6 +242,12 @@ Route::get('/debug-session', function () {
 })->middleware('web');
 
 Route::get('/debug-cookie', function (\Illuminate\Http\Request $request) {
+    // Override CORS config to ensure credentials work
+    header('Access-Control-Allow-Origin: ' . env('APP_URL', 'https://pos.agogo-bakery.com'));
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    
     $count = (int) $request->cookie('agogo_debug_count', 0) + 1;
 
     \Illuminate\Support\Facades\Cookie::queue(cookie(
