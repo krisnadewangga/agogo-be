@@ -49,20 +49,22 @@ class LoginController extends Controller
      */
     protected function attemptLogin(Request $request)
     {
+        // Temporarily simplified for debugging - remove role check
         $email = $request->email;
-        $user = User::where('email',$email)
-                    ->whereIn('id', function($q){
-                        return $q->select('user_id')
-                                 ->from('roles')
-                                 ->whereIn('level_id',['1','2','7']);
-                    })
-                    ->first();
+        $user = User::where('email', $email)->first();
+        
+        \Log::info('Login attempt', ['email' => $email, 'user_found' => isset($user->id)]);
+        
         if(isset($user->id)){
+            \Log::info('User found', ['user_id' => $user->id, 'status' => $user->status_aktif]);
             $request->merge(['status_aktif' => '1']);
-            return $this->guard()->attempt(
-                $this->credentials($request), $request->filled('remember')
-            );
+            $creds = $this->credentials($request);
+            \Log::info('Credentials', $creds);
+            $attempt = $this->guard()->attempt($creds, $request->filled('remember'));
+            \Log::info('Auth attempt result', ['result' => $attempt]);
+            return $attempt;
         }else{
+            \Log::warning('User not found', ['email' => $email]);
             throw ValidationException::withMessages([
                 $this->username() => [trans('auth.failed')],
             ]);
