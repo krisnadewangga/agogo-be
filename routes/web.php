@@ -218,4 +218,24 @@ Route::get('/debug-session', function () {
     ], 200, [], JSON_PRETTY_PRINT);
 })->middleware('web');
 
+Route::get('/debug-cookie', function (\Illuminate\Http\Request $request) {
+    $count = (int) $request->cookie('agogo_debug_count', 0) + 1;
+
+    return response()->json([
+        'cookie_present' => $request->hasCookie('agogo_debug_count'),
+        'cookie_value' => $request->cookie('agogo_debug_count'),
+        'debug_count' => $count,
+    ], 200, [], JSON_PRETTY_PRINT)->cookie(
+        'agogo_debug_count',
+        (string) $count,
+        60,
+        '/',
+        null,
+        false,
+        false,
+        false,
+        'lax'
+    );
+})->middleware('web');
+
 
