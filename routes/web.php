@@ -258,17 +258,19 @@ Route::get('/debug-cookie', function (\Illuminate\Http\Request $request) {
         'lax'
     );
     
-    $response = response()->json([
+    // Return as plain text instead of JSON to check if middleware processes headers
+    $data = json_encode([
         'cookie_present' => $request->hasCookie('agogo_debug_count'),
         'cookie_value' => $request->cookie('agogo_debug_count'),
         'debug_count' => $count,
         'app_url' => $appUrl,
         'cache_buster' => time(),
-    ], 200, [], JSON_PRETTY_PRINT);
+    ], JSON_PRETTY_PRINT);
     
-    // Add debug header to verify route execution
-    $response->header('X-Debug-Route-Executed', 'yes');
-    $response->header('X-Debug-Queued-Cookies', 'agogo_debug_count=' . $count);
+    $response = response($data, 200, [
+        'Content-Type' => 'application/json; charset=UTF-8',
+        'X-Debug-Executed' => 'true',
+    ]);
     
     return $response;
 })->middleware('web');
