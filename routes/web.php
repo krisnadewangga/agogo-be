@@ -245,12 +245,6 @@ Route::get('/debug-cookie', function (\Illuminate\Http\Request $request) {
     $count = (int) $request->cookie('agogo_debug_count', 0) + 1;
     $appUrl = env('APP_URL', 'https://pos.agogo-bakery.com');
     
-    // Create cookie manually without middleware interference
-    $cookieStr = sprintf(
-        'agogo_debug_count=%s; Path=/; Max-Age=3600; HttpOnly; Secure; SameSite=Lax',
-        urlencode((string) $count)
-    );
-    
     $response = response()->json([
         'cookie_present' => $request->hasCookie('agogo_debug_count'),
         'cookie_value' => $request->cookie('agogo_debug_count'),
@@ -258,14 +252,13 @@ Route::get('/debug-cookie', function (\Illuminate\Http\Request $request) {
         'app_url' => $appUrl,
     ], 200, [], JSON_PRETTY_PRINT);
     
-    // Set all headers manually to bypass middleware
-    return $response
-        ->header('Set-Cookie', $cookieStr)
-        ->header('Access-Control-Allow-Origin', $appUrl)
-        ->header('Access-Control-Allow-Credentials', 'true')
-        ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-        ->header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
-        ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    // Set headers directly on response object
+    $response->headers->set('Set-Cookie', 'agogo_debug_count='.$count.'; Path=/; Max-Age=3600; Secure; SameSite=Lax');
+    $response->headers->set('Access-Control-Allow-Origin', $appUrl);
+    $response->headers->set('Access-Control-Allow-Credentials', 'true');
+    $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    
+    return $response;
 });
 
 
