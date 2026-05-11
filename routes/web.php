@@ -269,4 +269,12 @@ Route::get('/debug-cookie', function (\Illuminate\Http\Request $request) {
     return $response;
 })->middleware('web');
 
+Route::get('/debug-cors-config', function () {
+    return response()->json([
+        'cors_paths' => config('cors.paths'),
+        'cors_allowed_origins' => config('cors.allowed_origins'),
+        'cors_supports_credentials' => config('cors.supports_credentials'),
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
 
