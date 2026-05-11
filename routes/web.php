@@ -178,6 +178,12 @@ Route::get('/tes_event',function(){
 
 });
 
-
+Route::get('/debug-clear-cache', function() {
+    Artisan::call('route:clear');
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('view:clear');
+    return "Semua cache telah dibersihkan!";
+});
 
 
