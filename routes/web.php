@@ -203,4 +203,19 @@ Route::get('/debug-server', function () {
     return response()->json($payload, 200, [], JSON_PRETTY_PRINT);
 })->middleware('web');
 
+Route::get('/debug-session', function () {
+    $count = session('debug_count', 0) + 1;
+    session(['debug_count' => $count]);
+
+    return response()->json([
+        'session_id' => session()->getId(),
+        'debug_count' => $count,
+        'has_session_cookie' => request()->hasCookie(config('session.cookie')),
+        'cookie_name' => config('session.cookie'),
+        'session_domain' => config('session.domain'),
+        'session_secure' => config('session.secure'),
+        'session_same_site' => config('session.same_site'),
+    ], 200, [], JSON_PRETTY_PRINT);
+})->middleware('web');
+
 
