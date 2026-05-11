@@ -14,7 +14,7 @@
             <p class="login-box-msg" style="margin-top: 10px;">Silahkan Masukan Email dan Password Anda!!!</p>
         </div>
         <div style="margin-top: 0px; margin-bottom: 10px;">
-          <form method="POST" action="{{ route('login') }}" id="login-form">
+          <form method="POST" action="{{ route('login') }}">
           @csrf
           
           <div class="form-group has-feedback @error('email') has-error @enderror ">    
@@ -44,18 +44,13 @@
           <div class="row">
             
             <div class="col-md-12">
-              <button type="submit" class="btn btn-primary btn-block btn-flat" id="login-btn">Login</button>
+              <button type="submit" class="btn btn-primary btn-block btn-flat">Login</button>
             </div>
             
           </div>
         
             </form>
         </div>
-        <script>
-        document.getElementById('login-form').addEventListener('submit', function(e) {
-            console.log('Form submitted');
-        });
-        </script>
       </div>
       <!-- /.login-box-body -->
     </div>
