@@ -21,7 +21,7 @@ return [
      * You can enable CORS for 1 or multiple paths.
      * Example: ['api/*']
      */
-    'paths' => ['api/*'],
+    'paths' => ['api/*', 'login', 'logout', 'debug-*'],
 
     /*
     * Matches the request method. `[*]` allows all methods.
@@ -31,7 +31,7 @@ return [
     /*
      * Matches the request origin. `[*]` allows all origins.
      */
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [env('APP_URL', 'https://pos.agogo-bakery.com')],
 
     /*
      * Matches the request origin with, similar to `Request::is()`
@@ -56,5 +56,5 @@ return [
     /*
      * Sets the Access-Control-Allow-Credentials header.
      */
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 ];
