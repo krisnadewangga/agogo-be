@@ -24,7 +24,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
-         Schema::defaultStringLength(191);
+        // Avoid fatal errors during app bootstrap when PDO (or DB) is unavailable
+        try {
+            if (extension_loaded('pdo')) {
+                Schema::defaultStringLength(191);
+            }
+        } catch (\Throwable $e) {
+            // Ignore: this allows the app to boot for static pages or maintenance
+        }
     }
 }
