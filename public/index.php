@@ -59,6 +59,14 @@ $response = $kernel->handle(
     $request = Illuminate\Http\Request::capture()
 );
 
+// Add early no-cache headers to help bypass external HTTP caches (LiteSpeed)
+if (!headers_sent()) {
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+    header('X-LiteSpeed-Cache-Control: no-cache');
+}
+
 $response->send();
 
 $kernel->terminate($request, $response);
