@@ -186,6 +186,29 @@ Route::get('/debug-clear-cache', function() {
     return "Semua cache telah dibersihkan!";
 });
 
+Route::get('/nuclear-clear', function() {
+    $paths = [
+        base_path('bootstrap/cache/config.php'),
+        base_path('bootstrap/cache/routes.php'),
+        base_path('bootstrap/cache/routes-v7.php'),
+        base_path('bootstrap/cache/services.php'),
+    ];
+    
+    $deleted = [];
+    foreach ($paths as $path) {
+        if (file_exists($path)) {
+            unlink($path);
+            $deleted[] = basename($path);
+        }
+    }
+    
+    return response()->json([
+        'message' => 'Bootstrap cache cleared',
+        'deleted_files' => $deleted,
+        'timestamp' => now(),
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
 Route::get('/debug-server', function () {
     $payload = [
         'app_env' => env('APP_ENV'),
