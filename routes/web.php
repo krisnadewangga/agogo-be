@@ -186,4 +186,21 @@ Route::get('/debug-clear-cache', function() {
     return "Semua cache telah dibersihkan!";
 });
 
+Route::get('/debug-server', function () {
+    $payload = [
+        'app_env' => env('APP_ENV'),
+        'app_url' => config('app.url'),
+        'php_version' => PHP_VERSION,
+        'pdo_loaded' => extension_loaded('pdo'),
+        'pdo_mysql_loaded' => extension_loaded('pdo_mysql'),
+        'session_driver' => config('session.driver'),
+        'session_domain' => config('session.domain'),
+        'session_secure_cookie' => config('session.secure'),
+        'session_same_site' => config('session.same_site'),
+        'laravel_session_cookie' => config('session.cookie'),
+    ];
+
+    return response()->json($payload, 200, [], JSON_PRETTY_PRINT);
+})->middleware('web');
+
 
