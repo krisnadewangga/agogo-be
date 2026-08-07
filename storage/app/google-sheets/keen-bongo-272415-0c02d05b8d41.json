@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "keen-bongo-272415",
+  "private_key_id": "0c02d05b8d4121627da18533498d535ba52cae76",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDOkdiWiEB9tSJ1\nCJWqpVDyKYZGpr1QxAJ2n9vtl4EC2CCSLucfuGuv7TikSZq1v8gXX7HFF+pHKvIC\nccVGjhm1yAoymd3FMsXKFF/T8wkNfvIKaCLTrkJsJW/xh1rXGbQhpxsY0wDxSlk6\nHXA9hEFwUOjKs/SFA54WYeIWz5giySoFhhJdmxClmg00sQaWM9IetBkadwUPlfAU\nJupO2RkyDwhWiQPK3kvuY4QuKMGIxe3TniS9eXRAqUVtpqYOe9ZTpG0RSEJxk8m+\nNcPqslN3j6w9I9gssV92dXUn5pJ1oxqO4x8L1lLKfoHd08s7AW35DVvETG2cXMOg\nd1w/y7iFAgMBAAECggEAAnfpyLPN1jWgrUf62A0L8eU5OWhFTmos1v86qyZKjCSQ\nBIfnCq4hn0wmh1ndodIWuib1RVzMkddqCKagNLqV4ifkBMKA78iLlPjVFTn6kU43\nzzcGtslMbohPcoxIeWGi1xcy4UkD1ozYZDPMfWwPktoPkbcR+OaSNhVw5g7KugUe\n3Bw2rD+S86ZigvGdkJbXP69gwA6KY/TE6KKcIJVzvonr4CUG3cRoRJry8irESjpP\nXmlleklDM6aYsAUG3rnnRorSnv1uNQKXwjz5R5NixurHa06CwIrzOgwfDDpsUX1/\nTUdz4Im10WhZyhCOyu/3n0gilZKMC3sqsYOupOChoQKBgQD02mbvydYvwDjBXqO9\npyCfkPgRgXDuSylE+jHbjfgO53suVXULS+KQbSOYaSE1AV8gs5vnSYads7KR8VN4\nq0u0SJc6/OftO6HpRgDLVHPZfb5P6BqggbCG2ECifeKnbN6Ix57wtY7yGfvEF016\nhkJBH9w54SnusQnWa6XeQ/mp1QKBgQDX+UbKGzbadppJMBk2rhHHiHZ7iBQ4zz+0\npGd80pRZ851y1XC3BZKnwOwlWob9rfEmAur+IAH7pr//8KwoSFLEmZLPkYOWZnbg\nxwP9tjmqcyZ3GCc6Q/8QbZBs224Nn7P7GG4qRNIwnObLbbR349K9TBlbkzYsxXRN\nMYumL8P78QKBgFBmpwZ2MG7dn8VfXkUYbA35fHvDFWIqLBMKVPTTWXELcdd1GEnt\nUSg7rkSNwOm22ZXTZI4+BoYiS7DAnbgyB1nbvE0SXtX3juMaqYga4y+3qpZykMvD\nykN9Hzw8OgDgLvKbGgXQmG/HOHTbcgWZsIfR/m7DERHf8GsITh7+Ey1BAoGAdNEo\nMPk3WkL8gMm7WZAdncd6Dqc0COZQluy17RYZl+3lI8++/7/L62C2Wh31FhGXde/u\nGzZE3FD9WPpcpA06d4x5lDwo6JjThBEhX4HI/yD5lUFDNojA1antjHPDuyq+tvon\n3EUNS64SR8Y27wITYsBeluGxU9YZagd6eZEseIECgYBngla5MdtC098ziNlApcfr\naHRqVbJ+EdXdQblLQs5WQ9WjmaM99SVOt3A1x6iDDuTK289ElFwTjZ57PKH1cdFF\nHHiMrGx4kNo+x0cQ8msgdf9Pk5pSs4QaNEXfy/m2LZC9MY+eS5CK1a/mAqbhqqwY\nuH91+XyrWk0GnJ3qpXIPDQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "krisna-coba-local@keen-bongo-272415.iam.gserviceaccount.com",
+  "client_id": "104196475281438553673",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/krisna-coba-local%40keen-bongo-272415.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
