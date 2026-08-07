@@ -84,6 +84,11 @@ class SheetWebhookController extends Controller
                         'total_produksi' => $totalProduksi,
                         'sisa_stock'     => $sisaStock,
                     ]);
+
+                    // UPDATE KOLOM STOCK DI TABEL ITEM SEBAGAI SISA_STOCK
+                    $item->update([
+                        'stock' => $sisaStock
+                    ]);
                 } else {
                     // --- 2. JIKA RECORD BELUM ADA (CREATE NEW) ---
                     $produksi1 = $realisasiVal;
@@ -114,6 +119,11 @@ class SheetWebhookController extends Controller
                     $produksi->sisa_stock         = $sisaStock;
                     $produksi->created_at         = $targetDate . ' ' . date('H:i:s');
                     $produksi->save();
+
+                    // UPDATE KOLOM STOCK DI TABEL ITEM SEBAGAI SISA_STOCK
+                    $item->update([
+                        'stock' => $sisaStock
+                    ]);
                 }
             }
 
@@ -123,7 +133,7 @@ class SheetWebhookController extends Controller
         return response()->json([
             'status' => 'success',
             'processed' => $processed,
-            'message' => 'Target dan realisasi produksi berhasil diproses',
+            'message' => 'Target, realisasi produksi, dan stok item berhasil diproses',
         ], 200);
     }
 
