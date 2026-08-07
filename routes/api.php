@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\NotifExpired;
 use App\Helpers\SendNotif;
 use App\Produksi;
+use App\Http\Controllers\Api\react\SheetWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -149,6 +150,8 @@ Route::post('/ubahTanggal', 'Api\react\ProduksiController@ubahTanggal');
 
 Route::get('coba','Api\react\OrderController@Coba');
 
+// Google Sheets API
+Route::post('/google-sheets', [SheetWebhookController::class, 'store']);
 
 // Kurir Api
 Route::post('login_kurir','Api\KurirController@login');
