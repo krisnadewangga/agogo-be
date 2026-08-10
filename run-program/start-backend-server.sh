@@ -4,6 +4,11 @@ echo "=========================================="
 echo "      STARTING LARAVEL BACKEND SERVER     "
 echo "=========================================="
 
+# 🔹 Pindah otomatis ke direktori tempat script ini tersimpan (\XAMPP\htdocs\agogo-be)
+PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$PROJECT_DIR" || exit 1
+echo "Lokasi Project: $PROJECT_DIR"
+
 REPO_URL="https://github.com/krisnadewangga/agogo-be.git"
 TARGET_BRANCH="new"
 
