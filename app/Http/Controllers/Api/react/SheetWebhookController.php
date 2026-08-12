@@ -38,9 +38,10 @@ class SheetWebhookController extends Controller
                 continue;
             }
 
-            $targetValue = $this->resolveTargetValue($row);
+            $targetValue   = $this->resolveTargetValue($row);
             $realisasiValue = $this->extractValue($row, ['realisasi', 'realisasi_produksi', 'produksi1']);
-            $targetDate  = $this->resolveTargetDate($row);
+            $ketLainValue   = $this->extractValue($row, ['ket_lain', 'store_airmadidi', 'airmadidi']);
+            $targetDate     = $this->resolveTargetDate($row);
 
             // 1. OLAH DATA TARGET PRODUKSI
             if ($targetValue !== null) {
@@ -61,46 +62,66 @@ class SheetWebhookController extends Controller
                 }
             }
 
-            // 2. OLAH DATA REALISASI PRODUKSI (Masuk ke tabel 'produksi' kolom 'produksi1')
-            if ($realisasiValue !== null && $realisasiValue !== '') {
-                $realisasiVal = (float) str_replace([',', ' '], '', (string) $realisasiValue);
-
-                // Cari record produksi berdasarkan item_id dan tanggal
+            // 2. OLAH DATA PRODUKSI (REALISASI & STORE AIRMADIDI / KET_LAIN)
+            if (($realisasiValue !== null && $realisasiValue !== '') || ($ketLainValue !== null && $ketLainValue !== '')) {
+                
                 $recordProduksi = Produksi::where('item_id', $item->id)
                     ->whereDate('created_at', $targetDate)
                     ->first();
 
                 if ($recordProduksi) {
                     // --- 1. JIKA RECORD SUDAH ADA (UPDATE) ---
-                    $produksi1 = $realisasiVal;
+                    $produksi1 = ($realisasiValue !== null && $realisasiValue !== '') 
+                        ? (float) str_replace([',', ' '], '', (string) $realisasiValue) 
+                        : ($recordProduksi->produksi1 ?? 0);
+
+                    $ketLain = ($ketLainValue !== null && $ketLainValue !== '') 
+                        ? (float) str_replace([',', ' '], '', (string) $ketLainValue) 
+                        : ($recordProduksi->ket_lain ?? 0);
+
                     $totalProduksi = $produksi1 + ($recordProduksi->produksi2 ?? 0) + ($recordProduksi->produksi3 ?? 0);
-                    $stockAwal = $recordProduksi->stock_awal ?? 0;
+                    $stockAwal     = $recordProduksi->stock_awal ?? 0;
                     
-                    // Rumus sisa stock: total_produksi + stock_awal
-                    $sisaStock = $totalProduksi + $stockAwal;
+                    $ketRusak      = $recordProduksi->ket_rusak ?? 0;
+                    $totalLain     = $ketRusak + $ketLain;
+                    $totalPenjualan = $recordProduksi->total_penjualan ?? 0;
+
+                    // Rumus sisa stock: (total_produksi + stock_awal) - total_penjualan - total_lain
+                    $sisaStock = ($totalProduksi + $stockAwal) - $totalPenjualan - $totalLain;
 
                     $recordProduksi->update([
                         'produksi1'      => $produksi1,
                         'total_produksi' => $totalProduksi,
+                        'ket_lain'       => $ketLain,
+                        'total_lain'     => $totalLain,
                         'sisa_stock'     => $sisaStock,
                     ]);
 
-                    // UPDATE KOLOM STOCK DI TABEL ITEM SEBAGAI SISA_STOCK
+                    // Update stok barang di tabel items
                     $item->update([
                         'stock' => $sisaStock
                     ]);
                 } else {
                     // --- 2. JIKA RECORD BELUM ADA (CREATE NEW) ---
-                    $produksi1 = $realisasiVal;
-                    $produksi2 = 0;
-                    $produksi3 = 0;
+                    $produksi1 = ($realisasiValue !== null && $realisasiValue !== '') 
+                        ? (float) str_replace([',', ' '], '', (string) $realisasiValue) 
+                        : 0;
+
+                    $ketLain = ($ketLainValue !== null && $ketLainValue !== '') 
+                        ? (float) str_replace([',', ' '], '', (string) $ketLainValue) 
+                        : 0;
+
+                    $produksi2     = 0;
+                    $produksi3     = 0;
                     $totalProduksi = $produksi1 + $produksi2 + $produksi3;
+                    $stockAwal     = $item->stock ?? 0;
                     
-                    // Mengambil stock_awal dari data tabel `item` (atau 0 jika tidak ada)
-                    $stockAwal = $item->stock ?? 0;
-                    
-                    // Rumus sisa stock: total_produksi + stock_awal
-                    $sisaStock = $totalProduksi + $stockAwal;
+                    $ketRusak      = 0;
+                    $totalLain     = $ketRusak + $ketLain;
+                    $totalPenjualan = 0;
+
+                    // Rumus sisa stock: (total_produksi + stock_awal) - total_penjualan - total_lain
+                    $sisaStock = ($totalProduksi + $stockAwal) - $totalPenjualan - $totalLain;
 
                     $produksi = new Produksi();
                     $produksi->item_id             = $item->id;
@@ -111,16 +132,16 @@ class SheetWebhookController extends Controller
                     $produksi->penjualan_toko     = 0;
                     $produksi->penjualan_pemesanan= 0;
                     $produksi->total_penjualan    = 0;
-                    $produksi->ket_rusak          = 0;
-                    $produksi->ket_lain           = 0;
-                    $produksi->total_lain          = 0;
+                    $produksi->ket_rusak          = $ketRusak;
+                    $produksi->ket_lain           = $ketLain;
+                    $produksi->total_lain          = $totalLain;
                     $produksi->catatan            = 'tidak ada catatan';
                     $produksi->stock_awal         = $stockAwal;
                     $produksi->sisa_stock         = $sisaStock;
                     $produksi->created_at         = $targetDate . ' ' . date('H:i:s');
                     $produksi->save();
 
-                    // UPDATE KOLOM STOCK DI TABEL ITEM SEBAGAI SISA_STOCK
+                    // Update stok barang di tabel items
                     $item->update([
                         'stock' => $sisaStock
                     ]);
@@ -133,13 +154,12 @@ class SheetWebhookController extends Controller
         return response()->json([
             'status' => 'success',
             'processed' => $processed,
-            'message' => 'Target, realisasi produksi, dan stok item berhasil diproses',
+            'message' => 'Data berhasil diproses dan sisa stock diupdate',
         ], 200);
     }
 
     protected function resolveItem($row)
     {
-        // Ambil nilai yang dikirim dari Google Sheets
         $value = $this->extractValue($row, ['item_id', 'id', 'kode_item', 'kode', 'code', 'item_code', 'nama', 'nama_item']);
 
         if ($value === null || $value === '') {
@@ -148,13 +168,11 @@ class SheetWebhookController extends Controller
 
         $cleanValue = trim((string) $value);
 
-        // 1. Jika bernilai angka dan cocok dengan ID primary key
         if (is_numeric($cleanValue)) {
             $item = Item::find((int) $cleanValue);
             if ($item) return $item;
         }
 
-        // 2. Cari berdasarkan kolom 'nama_item' ATAU kolom 'code'
         return Item::where('nama_item', $cleanValue)
             ->orWhere('code', $cleanValue)
             ->first();

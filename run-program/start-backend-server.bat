@@ -3,7 +3,7 @@ setlocal EnableDelayedExpansion
 
 :: 0. TANGKAP PORT DARI VBSCRIPT (%1)
 set "TARGET_PORT=%1"
-if "!TARGET_PORT!"=="" set "TARGET_PORT=8000"
+if "!TARGET_PORT!"=="" set "TARGET_PORT=80"
 
 :: 1. CEK HAK AKSES ADMINISTRATOR
 openfiles >nul 2>&1
