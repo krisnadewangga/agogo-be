@@ -151,7 +151,7 @@ Route::post('/ubahTanggal', 'Api\react\ProduksiController@ubahTanggal');
 Route::get('coba','Api\react\OrderController@Coba');
 
 // Google Sheets API
-Route::post('/google-sheets', [SheetWebhookController::class, 'store']);
+Route::post('/google-sheets', [SheetWebhookController::class, 'handleSheetAction']);
 
 // Kurir Api
 Route::post('login_kurir','Api\KurirController@login');
