@@ -1312,7 +1312,7 @@ class LaporanController extends Controller
 
       $transaksi->map(function($transaksi) {
         $transaksi['nama'] = $transaksi->User->name;
-        $transaksi['tgl_bayar_format'] = $transaksi->tgl_bayar->format('d/m/Y H:i');
+        $transaksi['tgl_bayar_format'] = \Carbon\Carbon::parse($transaksi->tgl_bayar)->format('d/m/Y H:i');
         $transaksi['total_bayar_format'] = number_format($transaksi->total_bayar, '0', '', '.');
       
         if($transaksi->for_ps == '1') {
