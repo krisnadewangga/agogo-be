@@ -35,23 +35,59 @@ class SheetWebhookController extends Controller
         }
     }
 
-    // --- 1. SIMPAN TARGET PRODUKSI ---
+    // --- 1. SIMPAN TARGET PRODUKSI --- 
     private function saveTargetData(Request $request)
     {
-        $rows = $request->input('data', []);
-        $processed = 0;
+        try {
+            $rows = $request->input('data', []);
+            $processed = 0;
 
-        foreach ($rows as $row) {
-            // Logika simpan/update TargetProduksi
-            // Example:
-            // TargetProduksi::updateOrCreate([...]);
-            $processed++;
+            foreach ($rows as $row) {
+                $identifier = trim((string) ($row['code'] ?? '')); // Berisi Nama Barang atau Kode Barang dari sheet
+                $targetProduksi = array_key_exists('target', $row) ? $row['target'] : ($row['target_produksi'] ?? null);
+                $targetDate = $row['target_date'] ?? Carbon::today()->format('Y-m-d');
+
+                // Lewati jika identifier kosong atau kolom target tidak diisi
+                if ($identifier === '' || $targetProduksi === null || $targetProduksi === '') {
+                    continue;
+                }
+
+                // 1. Cari Item berdasarkan kolom 'nama_item' atau 'code' (Sesuai tabel items Anda)
+                $item = \App\Item::where('nama_item', $identifier)
+                    ->orWhere('code', $identifier)
+                    ->first();
+
+                if ($item) {
+                    // 2. Format tanggal target ke 'YYYY-MM-DD 00:00:00'
+                    $formattedTargetDate = Carbon::parse($targetDate)->format('Y-m-d 00:00:00');
+
+                    // 3. Update jika sudah ada, atau Buat Record Baru jika belum ada
+                    TargetProduksi::updateOrCreate(
+                        [
+                            'item_id'     => $item->id,
+                            'target_date' => $formattedTargetDate,
+                        ],
+                        [
+                            'target_produksi' => (float) $targetProduksi,
+                        ]
+                    );
+
+                    $processed++;
+                }
+            }
+
+            return response()->json([
+                'status'    => 'success',
+                'processed' => $processed
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine()
+            ], 500);
         }
-
-        return response()->json([
-            'status' => 'success',
-            'processed' => $processed
-        ], 200);
     }
 
     // --- 2. AMBIL/LOAD TARGET PRODUKSI ---
