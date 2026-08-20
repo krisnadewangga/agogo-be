@@ -148,12 +148,13 @@ class SheetWebhookController extends Controller
                         ->first();
 
                     // 2. Tentukan nilai dasar
-                    $stockAwal = $produksi ? (float)$produksi->stock_awal : (float)($item->stock ?? 0);
-                    $produksi1 = $hasProduksiInput ? (float)$row['realisasi'] : ($produksi ? (float)$produksi->produksi1 : 0);
+                    $stockAwal  = $produksi ? (float)$produksi->stock_awal : (float)($item->stock ?? 0);
+                    $produksi1  = $hasProduksiInput ? (float)$row['realisasi'] : ($produksi ? (float)$produksi->produksi1 : 0);
                     $ketLain    = $hasKetLainInput  ? (float)$row['ket_lain']  : ($produksi ? (float)$produksi->ket_lain  : 0);
+                    $terjual    = $produksi ? (float)$produksi->total_penjualan : 0;
 
                     // 3. Hitung sisa_stock & total
-                    $sisaStock     = $stockAwal + $produksi1 - $ketLain;
+                    $sisaStock     = $stockAwal + $produksi1 - $terjual - $ketLain;
                     $totalProduksi = $produksi1;
                     $totalLain     = $ketLain;
 
