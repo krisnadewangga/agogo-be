@@ -138,8 +138,7 @@ class SheetWebhookController extends Controller
                     continue;
                 }
 
-                $item = \App\Item::where('code', $code)
-                    ->first();
+                $item = \App\Item::where('code', $code)->first();
 
                 if ($item) {
                     // 1. Cari record produksi pada tanggal tersebut
@@ -151,6 +150,8 @@ class SheetWebhookController extends Controller
                     $stockAwal  = $produksi ? (float)$produksi->stock_awal : (float)($item->stock ?? 0);
                     $produksi1  = $hasProduksiInput ? (float)$row['realisasi'] : ($produksi ? (float)$produksi->produksi1 : 0);
                     $ketLain    = $hasKetLainInput  ? (float)$row['ket_lain']  : ($produksi ? (float)$produksi->ket_lain  : 0);
+                    
+                    // Ambil data penjualan eksisting untuk kalkulasi (tanpa mengubah nilainya nanti)
                     $terjual    = $produksi ? (float)$produksi->total_penjualan : 0;
 
                     // 3. Hitung sisa_stock & total
@@ -158,30 +159,39 @@ class SheetWebhookController extends Controller
                     $totalProduksi = $produksi1;
                     $totalLain     = $ketLain;
 
-                    // 4. Simpan / Update ke tabel produksi
-                    Produksi::updateOrCreate(
-                        [
-                            'item_id'    => $item->id,
-                            'created_at' => $targetDate . ' ' . Carbon::now()->format('H:i:s'),
-                        ],
-                        [
+                    // 4. Simpan atau Update ke tabel produksi
+                    if ($produksi) {
+                        // Update field jika data lama ditemukan (updated_at akan otomatis diperbarui oleh Laravel)
+                        $produksi->update([
+                            'stock_awal'     => $stockAwal,
+                            'produksi1'      => $produksi1,
+                            'total_produksi' => $totalProduksi,
+                            'ket_lain'       => $ketLain,
+                            'total_lain'     => $totalLain,
+                            'sisa_stock'     => $sisaStock,
+                        ]);
+                    } else {
+                        // Buat record baru jika belum ada
+                        Produksi::create([
+                            'item_id'             => $item->id,
+                            'created_at'          => $targetDate . ' ' . Carbon::now()->format('H:i:s'),
                             'stock_awal'          => $stockAwal,
                             'produksi1'           => $produksi1,
-                            'produksi2'           => $produksi ? $produksi->produksi2 : 0,
-                            'produksi3'           => $produksi ? $produksi->produksi3 : 0,
+                            'produksi2'           => 0,
+                            'produksi3'           => 0,
                             'total_produksi'      => $totalProduksi,
-                            'penjualan_toko'      => $produksi ? $produksi->penjualan_toko : 0,
-                            'penjualan_pemesanan' => $produksi ? $produksi->penjualan_pemesanan : 0,
-                            'total_penjualan'     => $produksi ? $produksi->total_penjualan : 0,
-                            'ket_rusak'           => $produksi ? $produksi->ket_rusak : 0,
+                            'penjualan_toko'      => 0,
+                            'penjualan_pemesanan' => 0,
+                            'total_penjualan'     => 0,
+                            'ket_rusak'           => 0,
                             'ket_lain'            => $ketLain,
                             'total_lain'          => $totalLain,
-                            'catatan'             => $produksi ? $produksi->catatan : 'tidak ada catatan',
+                            'catatan'             => 'tidak ada catatan',
                             'sisa_stock'          => $sisaStock,
-                        ]
-                    );
+                        ]);
+                    }
 
-                    // 5. ✅ UPDATE STOK DI TABEL ITEM HANYA JIKA TANGGAL LAPORAN ADALAH HARI INI
+                    // 5. UPDATE STOK DI TABEL ITEM HANYA JIKA TANGGAL LAPORAN ADALAH HARI INI
                     if ($targetDate === $todayStr) {
                         $item->update([
                             'stock' => $sisaStock
