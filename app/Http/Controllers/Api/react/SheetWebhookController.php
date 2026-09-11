@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Api\react; // ✅ Sesuaikan namespace dengan lokasi folder
+namespace App\Http\Controllers\Api\react;
 
-use App\Http\Controllers\Controller; // Jangan lupa import Controller utama
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\TargetProduksi;
 use App\Produksi;
+use App\Item;   // ✅ Import model Item agar tidak error
+use App\Opname; // ✅ Import model Opname
 
 class SheetWebhookController extends Controller
 {
@@ -29,7 +31,7 @@ class SheetWebhookController extends Controller
 
             default:
                 return response()->json([
-                    'status' => 'error',
+                    'status'  => 'error',
                     'message' => 'Action tidak valid atau belum ditentukan!'
                 ], 400);
         }
@@ -43,25 +45,21 @@ class SheetWebhookController extends Controller
             $processed = 0;
 
             foreach ($rows as $row) {
-                $identifier = trim((string) ($row['code'] ?? '')); // Berisi Nama Barang atau Kode Barang dari sheet
+                $identifier = trim((string) ($row['code'] ?? ''));
                 $targetProduksi = array_key_exists('target', $row) ? $row['target'] : ($row['target_produksi'] ?? null);
                 $targetDate = $row['target_date'] ?? Carbon::today()->format('Y-m-d');
 
-                // Lewati jika identifier kosong atau kolom target tidak diisi
                 if ($identifier === '' || $targetProduksi === null || $targetProduksi === '') {
                     continue;
                 }
 
-                // 1. Cari Item berdasarkan kolom 'nama_item' atau 'code' (Sesuai tabel items Anda)
-                $item = \App\Item::where('nama_item', $identifier)
+                $item = Item::where('nama_item', $identifier)
                     ->orWhere('code', $identifier)
                     ->first();
 
                 if ($item) {
-                    // 2. Format tanggal target ke 'YYYY-MM-DD 00:00:00'
                     $formattedTargetDate = Carbon::parse($targetDate)->format('Y-m-d 00:00:00');
 
-                    // 3. Update jika sudah ada, atau Buat Record Baru jika belum ada
                     TargetProduksi::updateOrCreate(
                         [
                             'item_id'     => $item->id,
@@ -123,56 +121,62 @@ class SheetWebhookController extends Controller
         try {
             $rows = $request->input('data', []);
             $processed = 0;
-            $todayStr = Carbon::today()->format('Y-m-d'); // Tanggal hari ini (YYYY-MM-DD)
+            $todayStr = Carbon::today()->format('Y-m-d');
 
             foreach ($rows as $row) {
                 $code = trim((string) ($row['code'] ?? ''));
                 $targetDate = $row['target_date'] ?? $todayStr;
 
-                // Ambil raw input dari payload Apps Script
-                $hasProduksiInput = array_key_exists('realisasi', $row) && $row['realisasi'] !== '' && $row['realisasi'] !== null;
-                $hasKetLainInput  = array_key_exists('ket_lain', $row) && $row['ket_lain'] !== '' && $row['ket_lain'] !== null;
+                // 1. Cek ketersediaan input dari payload Google Apps Script (Termasuk ket_rusak)
+                $hasProduksiInput   = array_key_exists('realisasi', $row) && $row['realisasi'] !== null && $row['realisasi'] !== '';
+                $hasKetLainInput    = array_key_exists('ket_lain', $row) && $row['ket_lain'] !== null && $row['ket_lain'] !== '';
+                $hasKetRusakInput   = array_key_exists('ket_rusak', $row) && $row['ket_rusak'] !== null && $row['ket_rusak'] !== '';
+                $hasFisikPagiInput  = array_key_exists('stock_fisik_pagi', $row) && $row['stock_fisik_pagi'] !== null && $row['stock_fisik_pagi'] !== '';
+                $hasFisikMalamInput = array_key_exists('stock_fisik_malam', $row) && $row['stock_fisik_malam'] !== null && $row['stock_fisik_malam'] !== '';
 
-                // Lewati jika kedua kolom tidak diisi di sheet
-                if ($code === '' || (!$hasProduksiInput && !$hasKetLainInput)) {
+                // Jika kode kosong ATAU tidak ada satu pun field bernilai/diisi, skip
+                if ($code === '' || (!$hasProduksiInput && !$hasKetLainInput && !$hasKetRusakInput && !$hasFisikPagiInput && !$hasFisikMalamInput)) {
                     continue;
                 }
 
-                $item = \App\Item::where('code', $code)->first();
+                $item = Item::where('code', $code)->first();
 
                 if ($item) {
-                    // 1. Cari record produksi pada tanggal tersebut
+                    // 2. Ambil data Produksi & Opname existing
                     $produksi = Produksi::where('item_id', $item->id)
                         ->whereDate('created_at', $targetDate)
                         ->first();
 
-                    // 2. Tentukan nilai dasar
+                    $opname = Opname::where('item_id', $item->id)
+                        ->whereDate('tanggal', $targetDate)
+                        ->first();
+
+                    // 3. Kalkulasi Nilai Produksi & Stok Rusak
                     $stockAwal  = $produksi ? (float)$produksi->stock_awal : (float)($item->stock ?? 0);
-                    $produksi1  = $hasProduksiInput ? (float)$row['realisasi'] : ($produksi ? (float)$produksi->produksi1 : 0);
-                    $ketLain    = $hasKetLainInput  ? (float)$row['ket_lain']  : ($produksi ? (float)$produksi->ket_lain  : 0);
+                    $produksi1  = $hasProduksiInput  ? (float)$row['realisasi'] : ($produksi ? (float)$produksi->produksi1 : 0);
+                    $ketLain    = $hasKetLainInput   ? (float)$row['ket_lain']  : ($produksi ? (float)$produksi->ket_lain  : 0);
+                    $ketRusak   = $hasKetRusakInput  ? (float)$row['ket_rusak'] : ($produksi ? (float)$produksi->ket_rusak : 0); // ✅ Fix Ambil Input
                     
-                    // Ambil data penjualan eksisting untuk kalkulasi (tanpa mengubah nilainya nanti)
                     $terjual    = $produksi ? (float)$produksi->total_penjualan : 0;
 
-                    // 3. Hitung sisa_stock & total
-                    $sisaStock     = $stockAwal + $produksi1 - $terjual - $ketLain;
+                    $sisaStock     = $stockAwal + $produksi1 - $terjual - $ketLain - $ketRusak;
+                    $stockAkhir    = $sisaStock; // Mengikuti formula sisa stok akhir
                     $totalProduksi = $produksi1;
                     $totalLain     = $ketLain;
 
-                    // 4. Simpan atau Update ke tabel produksi
+                    // 4. Save/Update Tabel Produksi
                     if ($produksi) {
-                        // Update field jika data lama ditemukan (updated_at akan otomatis diperbarui oleh Laravel)
                         $produksi->update([
                             'stock_awal'     => $stockAwal,
                             'produksi1'      => $produksi1,
                             'total_produksi' => $totalProduksi,
                             'ket_lain'       => $ketLain,
+                            'ket_rusak'      => $ketRusak, // ✅ Fix Update Data
                             'total_lain'     => $totalLain,
                             'sisa_stock'     => $sisaStock,
                         ]);
                     } else {
-                        // Buat record baru jika belum ada
-                        Produksi::create([
+                        $produksi = Produksi::create([
                             'item_id'             => $item->id,
                             'created_at'          => $targetDate . ' ' . Carbon::now()->format('H:i:s'),
                             'stock_awal'          => $stockAwal,
@@ -183,7 +187,7 @@ class SheetWebhookController extends Controller
                             'penjualan_toko'      => 0,
                             'penjualan_pemesanan' => 0,
                             'total_penjualan'     => 0,
-                            'ket_rusak'           => 0,
+                            'ket_rusak'           => $ketRusak, // ✅ Fix Simpan Data Baru
                             'ket_lain'            => $ketLain,
                             'total_lain'          => $totalLain,
                             'catatan'             => 'tidak ada catatan',
@@ -191,7 +195,30 @@ class SheetWebhookController extends Controller
                         ]);
                     }
 
-                    // 5. UPDATE STOK DI TABEL ITEM HANYA JIKA TANGGAL LAPORAN ADALAH HARI INI
+                    // 5. Kalkulasi & Simpan Nilai Stok Fisik Opname
+                    $stockFisikPagi = $hasFisikPagiInput 
+                        ? (float)$row['stock_fisik_pagi'] 
+                        : ($opname ? $opname->stock_fisik_pagi : $stockAwal);
+
+                    $stockFisikMalam = $hasFisikMalamInput 
+                        ? (float)$row['stock_fisik_malam'] 
+                        : ($opname ? $opname->stock_fisik_malam : $sisaStock);
+
+                    Opname::updateOrCreate(
+                        [
+                            'item_id' => $item->id,
+                            'tanggal' => $targetDate,
+                        ],
+                        [
+                            'stock_masuk'       => $produksi1,
+                            'stock_akhir'       => $stockAkhir,
+                            'stock_toko'        => $sisaStock,
+                            'stock_fisik_pagi'  => $stockFisikPagi,
+                            'stock_fisik_malam' => $stockFisikMalam,
+                        ]
+                    );
+
+                    // 6. Update Master Stok jika tanggal transaksi hari ini
                     if ($targetDate === $todayStr) {
                         $item->update([
                             'stock' => $sisaStock
@@ -221,20 +248,70 @@ class SheetWebhookController extends Controller
     {
         $date = $request->input('date') ?? $request->query('date', Carbon::today()->format('Y-m-d'));
 
-        $produksiData = Produksi::with('item')
-            ->whereDate('created_at', $date)
-            ->get();
+        // 1. Ambil seluruh item yang aktif
+        $items = Item::where('status_aktif', '1')->get();
+
+        // 2. Ambil data opname pada tanggal terkait
+        $opnameData = Opname::whereDate('tanggal', $date)
+            ->get()
+            ->keyBy('item_id');
 
         $result = [];
-        foreach ($produksiData as $p) {
-            if ($p->item) {
-                $result[] = [
-                    'code'      => trim((string)($p->item->code ?? $p->item->kode_item)),
-                    'nama_item' => trim((string)$p->item->nama_item),
-                    'produksi1' => (float)$p->produksi1,
-                    'ket_lain'  => (float)$p->ket_lain,
-                ];
+
+        foreach ($items as $item) {
+            $itemId = $item->id;
+            $opname = $opnameData->get($itemId);
+
+            // Cari transaksi produksi PADA tanggal terpilih
+            $produksi = Produksi::where('item_id', $itemId)
+                ->whereDate('created_at', $date)
+                ->first();
+
+            if ($produksi) {
+                $stockAwal  = (float)$produksi->stock_awal;
+                $produksi1  = (float)$produksi->produksi1;
+                $terjual    = (float)$produksi->total_penjualan;
+                $ketLain    = (float)$produksi->ket_lain;
+                $ketRusak   = (float)$produksi->ket_rusak;
+                $stockAkhir = (float)($produksi->sisa_stock ?? ($stockAwal + $produksi1 - $terjual - $ketLain - $ketRusak));
+            } else {
+                // Jika belum ada transaksi hari ini, cari stok dari transaksi produksi terakhir
+                $lastProduksi = Produksi::where('item_id', $itemId)
+                    ->whereDate('created_at', '<', $date)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+
+                if ($lastProduksi) {
+                    $stockAwal = (float)($lastProduksi->sisa_stock ?? $lastProduksi->stock_awal);
+                } else {
+                    $stockAwal = (float)($item->stock ?? 0);
+                }
+
+                $produksi1  = 0;
+                $terjual    = 0;
+                $ketLain    = 0;
+                $ketRusak   = 0;
+                $stockAkhir = $stockAwal;
             }
+
+            // Ambil data stok fisik dari Opname
+            $stockFisikPagi  = ($opname && !is_null($opname->stock_fisik_pagi))  ? (float)$opname->stock_fisik_pagi  : $stockAwal;
+            $stockFisikMalam = ($opname && !is_null($opname->stock_fisik_malam)) ? (float)$opname->stock_fisik_malam : null;
+
+            // ✅ FORMAT JSON LENGKAP UNTUK GOOGLE SHEETS
+            $result[] = [
+                'code'              => trim((string)($item->code ?? $item->kode_item)),
+                'nama_item'         => trim((string)$item->nama_item),
+                'stock_awal'        => $stockAwal,
+                'produksi1'         => $produksi1,
+                'penjualan_toko'    => $terjual,
+                'ket_lain'          => $ketLain,
+                'ket_rusak'         => $ketRusak,
+                'stock_akhir'       => $stockAkhir,
+                'sisa_stock'        => $stockAkhir,
+                'stock_fisik_pagi'  => $stockFisikPagi,
+                'stock_fisik_malam' => $stockFisikMalam,
+            ];
         }
 
         return response()->json([

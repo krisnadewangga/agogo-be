@@ -120,6 +120,7 @@
 								<th ><center>Selisih Pagi</center></th>
 								<th ><center>Produksi</center></th>
 								<th ><center>Rusak</center></th>
+								<th ><center>Airmadidi</center></th>
 								<th ><center>Terjual</center></th>
 
 								<th ><center>Stok Akhir Komputer</center></th>
@@ -160,6 +161,10 @@
 									<td class="nowrap" align="center">
 										{{ $key->rusak ?? '0' }}
 										<input type="hidden" name="rusak_{{$key->id}}" value="{{ $key->rusak }}" >
+									</td>
+									<td class="nowrap" align="center">
+										{{ $key->airmadidi ?? '0' }}
+										<input type="hidden" name="airmadidi_{{$key->id}}" value="{{ $key->airmadidi }}" >
 									</td>
 									<td class="nowrap" align="center">
 										{{ $key->terjual ?? '0' }}

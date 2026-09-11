@@ -2522,7 +2522,8 @@ class LaporanController extends Controller
            $item['stock_awal'] = $query->stock_awal;
            $item['sisa_stock'] = $query->sisa_stock;
            $item['produksi'] = $query->produksi1;
-           $item['rusak'] = $query->ket_rusak + $query->ket_lain;
+           $item['rusak'] = $query->ket_rusak;
+           $item['airmadidi'] = $query->ket_lain;
            $item['selisih_pagi'] = $query->sisa_stock - (isset($opname->stock_fisik_pagi) ? $opname->stock_fisik_pagi : 0);
            $item['selisih_malam'] = $query->stock_awal + $query->produksi1 - $query->total_penjualan - $item['rusak'] - (isset($opname->stock_fisik_malam) ? $opname->stock_fisik_malam : 0);
            $item['terjual'] = $query->total_penjualan;
@@ -2535,6 +2536,7 @@ class LaporanController extends Controller
            $item['selisih_malam'] = 0;
            $item['terjual'] = 0;
            $item['rusak'] = 0;
+           $item['airmadidi'] = 0;
         }
         
         if(isset($opname->id)){
