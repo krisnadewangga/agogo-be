@@ -133,9 +133,10 @@ class SheetWebhookController extends Controller
                 $hasKetRusakInput   = array_key_exists('ket_rusak', $row) && $row['ket_rusak'] !== null && $row['ket_rusak'] !== '';
                 $hasFisikPagiInput  = array_key_exists('stock_fisik_pagi', $row) && $row['stock_fisik_pagi'] !== null && $row['stock_fisik_pagi'] !== '';
                 $hasFisikMalamInput = array_key_exists('stock_fisik_malam', $row) && $row['stock_fisik_malam'] !== null && $row['stock_fisik_malam'] !== '';
+                $hasStockAwal  = array_key_exists('stock_awal', $row) && $row['stock_awal'] !== null && $row['stock_awal'] !== '';
 
                 // Jika kode kosong ATAU tidak ada satu pun field bernilai/diisi, skip
-                if ($code === '' || (!$hasProduksiInput && !$hasKetLainInput && !$hasKetRusakInput && !$hasFisikPagiInput && !$hasFisikMalamInput)) {
+                if ($code === '' || (!$hasProduksiInput && !$hasKetLainInput && !$hasKetRusakInput && !$hasFisikPagiInput && !$hasFisikMalamInput && !$hasStockAwal)) {
                     continue;
                 }
 
@@ -152,7 +153,7 @@ class SheetWebhookController extends Controller
                         ->first();
 
                     // 3. Kalkulasi Nilai Produksi & Stok Rusak
-                    $stockAwal  = $produksi ? (float)$produksi->stock_awal : (float)($item->stock ?? 0);
+                    $stockAwal   = $hasStockAwal  ? (float)$row['stock_awal'] : ($produksi ? (float)$produksi->stock_awal : 0); // ✅ Fix Ambil Input
                     $produksi1  = $hasProduksiInput  ? (float)$row['realisasi'] : ($produksi ? (float)$produksi->produksi1 : 0);
                     $ketLain    = $hasKetLainInput   ? (float)$row['ket_lain']  : ($produksi ? (float)$produksi->ket_lain  : 0);
                     $ketRusak   = $hasKetRusakInput  ? (float)$row['ket_rusak'] : ($produksi ? (float)$produksi->ket_rusak : 0); // ✅ Fix Ambil Input
