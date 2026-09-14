@@ -45,9 +45,9 @@ class SheetWebhookController extends Controller
             $processed = 0;
 
             foreach ($rows as $row) {
-                $identifier = trim((string) ($row['code'] ?? ''));
+                $identifier = trim((string) ($row['code'] ?? $row['kode_item'] ?? $row['nama_item'] ?? ''));
                 $targetProduksi = array_key_exists('target', $row) ? $row['target'] : ($row['target_produksi'] ?? null);
-                $targetDate = $row['target_date'] ?? Carbon::today()->format('Y-m-d');
+                $rawTargetDate = $row['target_date'] ?? $row['tanggal'] ?? $row['date'] ?? Carbon::today()->format('Y-m-d');
 
                 if ($identifier === '' || $targetProduksi === null || $targetProduksi === '') {
                     continue;
@@ -58,7 +58,11 @@ class SheetWebhookController extends Controller
                     ->first();
 
                 if ($item) {
-                    $formattedTargetDate = Carbon::parse($targetDate)->format('Y-m-d 00:00:00');
+                    try {
+                        $formattedTargetDate = Carbon::parse($rawTargetDate)->format('Y-m-d 00:00:00');
+                    } catch (\Exception $e) {
+                        $formattedTargetDate = Carbon::today()->format('Y-m-d 00:00:00');
+                    }
 
                     TargetProduksi::updateOrCreate(
                         [
@@ -124,23 +128,48 @@ class SheetWebhookController extends Controller
             $todayStr = Carbon::today()->format('Y-m-d');
 
             foreach ($rows as $row) {
-                $code = trim((string) ($row['code'] ?? ''));
-                $targetDate = $row['target_date'] ?? $todayStr;
+                $identifier = trim((string) ($row['code'] ?? $row['kode_item'] ?? $row['nama_item'] ?? ''));
+                $rawTargetDate = $row['target_date'] ?? $row['tanggal'] ?? $row['date'] ?? $todayStr;
+                try {
+                    $targetDate = Carbon::parse($rawTargetDate)->format('Y-m-d');
+                } catch (\Exception $e) {
+                    $targetDate = $todayStr;
+                }
 
-                // 1. Cek ketersediaan input dari payload Google Apps Script (Termasuk ket_rusak)
-                $hasProduksiInput   = array_key_exists('realisasi', $row) && $row['realisasi'] !== null && $row['realisasi'] !== '';
-                $hasKetLainInput    = array_key_exists('ket_lain', $row) && $row['ket_lain'] !== null && $row['ket_lain'] !== '';
-                $hasKetRusakInput   = array_key_exists('ket_rusak', $row) && $row['ket_rusak'] !== null && $row['ket_rusak'] !== '';
-                $hasFisikPagiInput  = array_key_exists('stock_fisik_pagi', $row) && $row['stock_fisik_pagi'] !== null && $row['stock_fisik_pagi'] !== '';
-                $hasFisikMalamInput = array_key_exists('stock_fisik_malam', $row) && $row['stock_fisik_malam'] !== null && $row['stock_fisik_malam'] !== '';
-                $hasStockAwal  = array_key_exists('stock_awal', $row) && $row['stock_awal'] !== null && $row['stock_awal'] !== '';
+                // 1. Cek ketersediaan input dari payload Google Apps Script (Termasuk ket_rusak & aliases)
+                $hasProduksiInput = (array_key_exists('realisasi', $row) && $row['realisasi'] !== null && $row['realisasi'] !== '')
+                    || (array_key_exists('produksi1', $row) && $row['produksi1'] !== null && $row['produksi1'] !== '')
+                    || (array_key_exists('produksi', $row) && $row['produksi'] !== null && $row['produksi'] !== '');
 
-                // Jika kode kosong ATAU tidak ada satu pun field bernilai/diisi, skip
-                if ($code === '' || (!$hasProduksiInput && !$hasKetLainInput && !$hasKetRusakInput && !$hasFisikPagiInput && !$hasFisikMalamInput && !$hasStockAwal)) {
+                $hasKetLainInput = (array_key_exists('ket_lain', $row) && $row['ket_lain'] !== null && $row['ket_lain'] !== '')
+                    || (array_key_exists('airmadidi', $row) && $row['airmadidi'] !== null && $row['airmadidi'] !== '')
+                    || (array_key_exists('lain', $row) && $row['lain'] !== null && $row['lain'] !== '');
+
+                $hasKetRusakInput = (array_key_exists('ket_rusak', $row) && $row['ket_rusak'] !== null && $row['ket_rusak'] !== '')
+                    || (array_key_exists('rusak', $row) && $row['rusak'] !== null && $row['rusak'] !== '');
+
+                $hasFisikPagiInput = (array_key_exists('stock_fisik_pagi', $row) && $row['stock_fisik_pagi'] !== null && $row['stock_fisik_pagi'] !== '')
+                    || (array_key_exists('stok_fisik_pagi', $row) && $row['stok_fisik_pagi'] !== null && $row['stok_fisik_pagi'] !== '')
+                    || (array_key_exists('fisik_pagi', $row) && $row['fisik_pagi'] !== null && $row['fisik_pagi'] !== '');
+
+                $hasFisikMalamInput = (array_key_exists('stock_fisik_malam', $row) && $row['stock_fisik_malam'] !== null && $row['stock_fisik_malam'] !== '')
+                    || (array_key_exists('stok_fisik_malam', $row) && $row['stok_fisik_malam'] !== null && $row['stok_fisik_malam'] !== '')
+                    || (array_key_exists('fisik_malam', $row) && $row['fisik_malam'] !== null && $row['fisik_malam'] !== '');
+
+                $hasStockAwal = (array_key_exists('stock_awal', $row) && $row['stock_awal'] !== null && $row['stock_awal'] !== '')
+                    || (array_key_exists('stok_awal', $row) && $row['stok_awal'] !== null && $row['stok_awal'] !== '');
+
+                $hasStockToko = (array_key_exists('stock_toko', $row) && $row['stock_toko'] !== null && $row['stock_toko'] !== '')
+                    || (array_key_exists('stok_toko', $row) && $row['stok_toko'] !== null && $row['stok_toko'] !== '');
+
+                // Jika identifier kosong ATAU tidak ada satu pun field bernilai/diisi, skip
+                if ($identifier === '' || (!$hasProduksiInput && !$hasKetLainInput && !$hasKetRusakInput && !$hasFisikPagiInput && !$hasFisikMalamInput && !$hasStockAwal && !$hasStockToko)) {
                     continue;
                 }
 
-                $item = Item::where('code', $code)->first();
+                $item = Item::where('code', $identifier)
+                    ->orWhere('nama_item', $identifier)
+                    ->first();
 
                 if ($item) {
                     // 2. Ambil data Produksi & Opname existing
@@ -152,27 +181,64 @@ class SheetWebhookController extends Controller
                         ->whereDate('tanggal', $targetDate)
                         ->first();
 
-                    // 3. Kalkulasi Nilai Produksi & Stok Rusak
-                    $stockAwal   = $hasStockAwal  ? (float)$row['stock_awal'] : ($produksi ? (float)$produksi->stock_awal : 0); // ✅ Fix Ambil Input
-                    $produksi1  = $hasProduksiInput  ? (float)$row['realisasi'] : ($produksi ? (float)$produksi->produksi1 : 0);
-                    $ketLain    = $hasKetLainInput   ? (float)$row['ket_lain']  : ($produksi ? (float)$produksi->ket_lain  : 0);
-                    $ketRusak   = $hasKetRusakInput  ? (float)$row['ket_rusak'] : ($produksi ? (float)$produksi->ket_rusak : 0); // ✅ Fix Ambil Input
-                    
-                    $terjual    = $produksi ? (float)$produksi->total_penjualan : 0;
+                    // 3. Cari stock awal fallback jika belum ada data produksi pada tanggal terkait
+                    if ($hasStockAwal) {
+                        $rawStockAwal = $row['stock_awal'] ?? $row['stok_awal'];
+                        $stockAwal = (float)$rawStockAwal;
+                    } elseif ($produksi) {
+                        $stockAwal = (float)$produksi->stock_awal;
+                    } else {
+                        $lastProduksi = Produksi::where('item_id', $item->id)
+                            ->whereDate('created_at', '<', $targetDate)
+                            ->orderBy('created_at', 'desc')
+                            ->first();
 
-                    $sisaStock     = $stockAwal + $produksi1 - $terjual - $ketLain - $ketRusak;
-                    $stockAkhir    = $sisaStock; // Mengikuti formula sisa stok akhir
-                    $totalProduksi = $produksi1;
+                        if ($lastProduksi) {
+                            $stockAwal = (float)($lastProduksi->sisa_stock ?? $lastProduksi->stock_awal);
+                        } else {
+                            $stockAwal = (float)($item->stock ?? 0);
+                        }
+                    }
+
+                    // 4. Kalkulasi Nilai Produksi, Ket Lain (Airmadidi), Ket Rusak
+                    if ($hasProduksiInput) {
+                        $rawProduksi = $row['realisasi'] ?? $row['produksi1'] ?? $row['produksi'] ?? 0;
+                        $produksi1 = (float)$rawProduksi;
+                    } else {
+                        $produksi1 = $produksi ? (float)$produksi->produksi1 : 0;
+                    }
+
+                    if ($hasKetLainInput) {
+                        $rawKetLain = $row['ket_lain'] ?? $row['airmadidi'] ?? $row['lain'] ?? 0;
+                        $ketLain = (float)$rawKetLain;
+                    } else {
+                        $ketLain = $produksi ? (float)$produksi->ket_lain : 0;
+                    }
+
+                    if ($hasKetRusakInput) {
+                        $rawKetRusak = $row['ket_rusak'] ?? $row['rusak'] ?? 0;
+                        $ketRusak = (float)$rawKetRusak;
+                    } else {
+                        $ketRusak = $produksi ? (float)$produksi->ket_rusak : 0;
+                    }
+
+                    $produksi2     = $produksi ? (float)$produksi->produksi2 : 0;
+                    $produksi3     = $produksi ? (float)$produksi->produksi3 : 0;
+                    $totalProduksi = $produksi1 + $produksi2 + $produksi3;
                     $totalLain     = $ketLain;
+                    $terjual       = $produksi ? (float)$produksi->total_penjualan : 0;
 
-                    // 4. Save/Update Tabel Produksi
+                    $sisaStock     = $stockAwal + $totalProduksi - $terjual - $ketLain - $ketRusak;
+                    $stockAkhir    = $sisaStock; // Mengikuti formula sisa stok akhir
+
+                    // 5. Save/Update Tabel Produksi
                     if ($produksi) {
                         $produksi->update([
                             'stock_awal'     => $stockAwal,
                             'produksi1'      => $produksi1,
                             'total_produksi' => $totalProduksi,
                             'ket_lain'       => $ketLain,
-                            'ket_rusak'      => $ketRusak, // ✅ Fix Update Data
+                            'ket_rusak'      => $ketRusak,
                             'total_lain'     => $totalLain,
                             'sisa_stock'     => $sisaStock,
                         ]);
@@ -188,7 +254,7 @@ class SheetWebhookController extends Controller
                             'penjualan_toko'      => 0,
                             'penjualan_pemesanan' => 0,
                             'total_penjualan'     => 0,
-                            'ket_rusak'           => $ketRusak, // ✅ Fix Simpan Data Baru
+                            'ket_rusak'           => $ketRusak,
                             'ket_lain'            => $ketLain,
                             'total_lain'          => $totalLain,
                             'catatan'             => 'tidak ada catatan',
@@ -196,30 +262,39 @@ class SheetWebhookController extends Controller
                         ]);
                     }
 
-                    // 5. Kalkulasi & Simpan Nilai Stok Fisik Opname
+                    // 6. Kalkulasi & Simpan Nilai Stok Fisik Opname
                     $stockFisikPagi = $hasFisikPagiInput 
-                        ? (float)$row['stock_fisik_pagi'] 
-                        : ($opname ? $opname->stock_fisik_pagi : $stockAwal);
+                        ? (float)($row['stock_fisik_pagi'] ?? $row['stok_fisik_pagi'] ?? $row['fisik_pagi']) 
+                        : ($opname ? $opname->stock_fisik_pagi : null);
 
                     $stockFisikMalam = $hasFisikMalamInput 
-                        ? (float)$row['stock_fisik_malam'] 
-                        : ($opname ? $opname->stock_fisik_malam : $sisaStock);
+                        ? (float)($row['stock_fisik_malam'] ?? $row['stok_fisik_malam'] ?? $row['fisik_malam']) 
+                        : ($opname ? $opname->stock_fisik_malam : null);
+
+                    $stockTokoVal = $hasStockToko
+                        ? (float)($row['stock_toko'] ?? $row['stok_toko'])
+                        : ($opname ? $opname->stock_toko : null);
+
+                    $opnamePayload = [
+                        'stock_masuk'       => $totalProduksi,
+                        'stock_akhir'       => $stockAkhir,
+                        'stock_fisik_pagi'  => $stockFisikPagi,
+                        'stock_fisik_malam' => $stockFisikMalam,
+                    ];
+
+                    if ($stockTokoVal !== null) {
+                        $opnamePayload['stock_toko'] = $stockTokoVal;
+                    }
 
                     Opname::updateOrCreate(
                         [
                             'item_id' => $item->id,
                             'tanggal' => $targetDate,
                         ],
-                        [
-                            'stock_masuk'       => $produksi1,
-                            'stock_akhir'       => $stockAkhir,
-                            'stock_toko'        => $sisaStock,
-                            'stock_fisik_pagi'  => $stockFisikPagi,
-                            'stock_fisik_malam' => $stockFisikMalam,
-                        ]
+                        $opnamePayload
                     );
 
-                    // 6. Update Master Stok jika tanggal transaksi hari ini
+                    // 7. Update Master Stok jika tanggal transaksi hari ini
                     if ($targetDate === $todayStr) {
                         $item->update([
                             'stock' => $sisaStock
@@ -296,7 +371,7 @@ class SheetWebhookController extends Controller
             }
 
             // Ambil data stok fisik dari Opname
-            $stockFisikPagi  = ($opname && !is_null($opname->stock_fisik_pagi))  ? (float)$opname->stock_fisik_pagi  : $stockAwal;
+            $stockFisikPagi  = ($opname && !is_null($opname->stock_fisik_pagi))  ? (float)$opname->stock_fisik_pagi  : null;
             $stockFisikMalam = ($opname && !is_null($opname->stock_fisik_malam)) ? (float)$opname->stock_fisik_malam : null;
 
             // ✅ FORMAT JSON LENGKAP UNTUK GOOGLE SHEETS
