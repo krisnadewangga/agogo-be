@@ -262,28 +262,34 @@ class SheetWebhookController extends Controller
                         ]);
                     }
 
-                    // 6. Kalkulasi & Simpan Nilai Stok Fisik Opname
-                    $stockFisikPagi = $hasFisikPagiInput 
-                        ? (float)($row['stock_fisik_pagi'] ?? $row['stok_fisik_pagi'] ?? $row['fisik_pagi']) 
-                        : ($opname ? $opname->stock_fisik_pagi : null);
-
-                    $stockFisikMalam = $hasFisikMalamInput 
-                        ? (float)($row['stock_fisik_malam'] ?? $row['stok_fisik_malam'] ?? $row['fisik_malam']) 
-                        : ($opname ? $opname->stock_fisik_malam : null);
-
-                    $stockTokoVal = $hasStockToko
-                        ? (float)($row['stock_toko'] ?? $row['stok_toko'])
-                        : ($opname ? $opname->stock_toko : null);
-
+                    // 6. Kalkulasi & Simpan Nilai Stok Fisik Opname (Pastikan tidak null untuk menghindari error NOT NULL MySQL)
                     $opnamePayload = [
-                        'stock_masuk'       => $totalProduksi,
-                        'stock_akhir'       => $stockAkhir,
-                        'stock_fisik_pagi'  => $stockFisikPagi,
-                        'stock_fisik_malam' => $stockFisikMalam,
+                        'stock_masuk' => $totalProduksi,
+                        'stock_akhir' => $stockAkhir,
                     ];
 
-                    if ($stockTokoVal !== null) {
-                        $opnamePayload['stock_toko'] = $stockTokoVal;
+                    if ($hasFisikPagiInput) {
+                        $opnamePayload['stock_fisik_pagi'] = (float)($row['stock_fisik_pagi'] ?? $row['stok_fisik_pagi'] ?? $row['fisik_pagi']);
+                    } elseif ($opname && !is_null($opname->stock_fisik_pagi)) {
+                        $opnamePayload['stock_fisik_pagi'] = $opname->stock_fisik_pagi;
+                    } else {
+                        $opnamePayload['stock_fisik_pagi'] = 0;
+                    }
+
+                    if ($hasFisikMalamInput) {
+                        $opnamePayload['stock_fisik_malam'] = (float)($row['stock_fisik_malam'] ?? $row['stok_fisik_malam'] ?? $row['fisik_malam']);
+                    } elseif ($opname && !is_null($opname->stock_fisik_malam)) {
+                        $opnamePayload['stock_fisik_malam'] = $opname->stock_fisik_malam;
+                    } else {
+                        $opnamePayload['stock_fisik_malam'] = 0;
+                    }
+
+                    if ($hasStockToko) {
+                        $opnamePayload['stock_toko'] = (float)($row['stock_toko'] ?? $row['stok_toko']);
+                    } elseif ($opname && !is_null($opname->stock_toko)) {
+                        $opnamePayload['stock_toko'] = $opname->stock_toko;
+                    } else {
+                        $opnamePayload['stock_toko'] = 0;
                     }
 
                     Opname::updateOrCreate(
@@ -349,7 +355,7 @@ class SheetWebhookController extends Controller
                 $terjual    = (float)$produksi->total_penjualan;
                 $ketLain    = (float)$produksi->ket_lain;
                 $ketRusak   = (float)$produksi->ket_rusak;
-                $stockAkhir = (float)($produksi->sisa_stock ?? ($stockAwal + $produksi1 - $terjual - $ketLain - $ketRusak));
+                $stockAkhir = (float)($stockAwal + $produksi1 - $terjual - $ketLain - $ketRusak);
             } else {
                 // Jika belum ada transaksi hari ini, cari stok dari transaksi produksi terakhir
                 $lastProduksi = Produksi::where('item_id', $itemId)
@@ -373,20 +379,32 @@ class SheetWebhookController extends Controller
             // Ambil data stok fisik dari Opname
             $stockFisikPagi  = ($opname && !is_null($opname->stock_fisik_pagi))  ? (float)$opname->stock_fisik_pagi  : null;
             $stockFisikMalam = ($opname && !is_null($opname->stock_fisik_malam)) ? (float)$opname->stock_fisik_malam : null;
+            $stockToko       = ($opname && !is_null($opname->stock_toko))        ? (float)$opname->stock_toko        : null;
 
-            // ✅ FORMAT JSON LENGKAP UNTUK GOOGLE SHEETS
+            $selisihPagi  = !is_null($stockFisikPagi)  ? ($stockAwal - $stockFisikPagi)   : null;
+            $selisihMalam = !is_null($stockFisikMalam) ? ($stockAkhir - $stockFisikMalam) : null;
+
+            // ✅ FORMAT JSON LENGKAP MENCERMINKAN LAPORAN OPNAME
             $result[] = [
                 'code'              => trim((string)($item->code ?? $item->kode_item)),
                 'nama_item'         => trim((string)$item->nama_item),
                 'stock_awal'        => $stockAwal,
-                'produksi1'         => $produksi1,
-                'penjualan_toko'    => $terjual,
-                'ket_lain'          => $ketLain,
-                'ket_rusak'         => $ketRusak,
-                'stock_akhir'       => $stockAkhir,
+                'stock_asli'        => $stockAkhir,
                 'sisa_stock'        => $stockAkhir,
                 'stock_fisik_pagi'  => $stockFisikPagi,
+                'selisih_pagi'      => $selisihPagi,
+                'produksi'          => $produksi1,
+                'produksi1'         => $produksi1,
+                'rusak'             => $ketRusak,
+                'ket_rusak'         => $ketRusak,
+                'airmadidi'         => $ketLain,
+                'ket_lain'          => $ketLain,
+                'terjual'           => $terjual,
+                'penjualan_toko'    => $terjual,
+                'stock_akhir'       => $stockAkhir,
                 'stock_fisik_malam' => $stockFisikMalam,
+                'selisih_malam'     => $selisihMalam,
+                'stock_toko'        => $stockToko,
             ];
         }
 
