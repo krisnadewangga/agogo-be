@@ -145,6 +145,9 @@ class SheetWebhookController extends Controller
                     || (array_key_exists('airmadidi', $row) && $row['airmadidi'] !== null && $row['airmadidi'] !== '')
                     || (array_key_exists('lain', $row) && $row['lain'] !== null && $row['lain'] !== '');
 
+                $hasTerjualBitung = (array_key_exists('terjual', $row) && $row['terjual'] !== null && $row['terjual'] !== '')
+                    || (array_key_exists('total_penjualan', $row) && $row['total_penjualan'] !== null && $row['total_penjualan'] !== '');
+
                 $hasKetRusakInput = (array_key_exists('ket_rusak', $row) && $row['ket_rusak'] !== null && $row['ket_rusak'] !== '')
                     || (array_key_exists('rusak', $row) && $row['rusak'] !== null && $row['rusak'] !== '');
 
@@ -217,6 +220,14 @@ class SheetWebhookController extends Controller
                         $ketLain = $produksi ? (float)$produksi->ket_lain : 0;
                     }
 
+                    if ($hasTerjualBitung) {
+                        $rawTerjual = $row['terjual'] ?? $row['total_penjualan'];
+                        $terjual = (float)$rawTerjual;
+                    } else {
+                        $terjual = $produksi ? (float)$produksi->total_penjualan : 0;
+                        
+                    }
+
                     if ($hasKetRusakInput) {
                         $rawKetRusak = $row['ket_rusak'] ?? $row['rusak'] ?? 0;
                         $ketRusak = (float)$rawKetRusak;
@@ -228,7 +239,6 @@ class SheetWebhookController extends Controller
                     $produksi3     = $produksi ? (float)$produksi->produksi3 : 0;
                     $totalProduksi = $produksi1 + $produksi2 + $produksi3;
                     $totalLain     = $ketLain;
-                    $terjual       = $produksi ? (float)$produksi->total_penjualan : 0;
 
                     $sisaStock     = $stockAwal + $totalProduksi - $terjual - $ketLain - $ketRusak;
                     $stockAkhir    = $sisaStock; // Mengikuti formula sisa stok akhir
@@ -243,6 +253,7 @@ class SheetWebhookController extends Controller
                             'ket_rusak'      => $ketRusak,
                             'total_lain'     => $totalLain,
                             'sisa_stock'     => $sisaStock,
+                            'total_penjualan'=> $terjual
                         ]);
                     } else {
                         $produksi = Produksi::create([
