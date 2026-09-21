@@ -172,13 +172,15 @@ class SheetWebhookController extends Controller
                     ->first();
 
                 if ($item) {
-                    // 2. Ambil data Produksi & Opname existing
+                    // 2. Ambil data Produksi & Opname existing (ambil record transaksi TERAKHIR hari ini)
                     $produksi = Produksi::where('item_id', $item->id)
                         ->whereDate('created_at', $targetDate)
+                        ->orderBy('id', 'desc')
                         ->first();
 
                     $opname = Opname::where('item_id', $item->id)
                         ->whereDate('tanggal', $targetDate)
+                        ->orderBy('id', 'desc')
                         ->first();
 
                     // 3. Cari stock awal fallback jika belum ada data produksi pada tanggal terkait
@@ -344,9 +346,10 @@ class SheetWebhookController extends Controller
             $itemId = $item->id;
             $opname = $opnameData->get($itemId);
 
-            // Cari transaksi produksi PADA tanggal terpilih
+            // Cari transaksi produksi PADA tanggal terpilih (ambil record transaksi TERAKHIR)
             $produksi = Produksi::where('item_id', $itemId)
                 ->whereDate('created_at', $date)
+                ->orderBy('id', 'desc')
                 ->first();
 
             if ($produksi) {
@@ -360,7 +363,7 @@ class SheetWebhookController extends Controller
                 // Jika belum ada transaksi hari ini, cari stok dari transaksi produksi terakhir
                 $lastProduksi = Produksi::where('item_id', $itemId)
                     ->whereDate('created_at', '<', $date)
-                    ->orderBy('created_at', 'desc')
+                    ->orderBy('id', 'desc')
                     ->first();
 
                 if ($lastProduksi) {
@@ -395,6 +398,7 @@ class SheetWebhookController extends Controller
                 'selisih_pagi'      => $selisihPagi,
                 'produksi'          => $produksi1,
                 'produksi1'         => $produksi1,
+                'produksi_bitung'   => max(0, $produksi1 - $ketLain),
                 'rusak'             => $ketRusak,
                 'ket_rusak'         => $ketRusak,
                 'airmadidi'         => $ketLain,
