@@ -145,8 +145,8 @@ class SheetWebhookController extends Controller
                     || (array_key_exists('airmadidi', $row) && $row['airmadidi'] !== null && $row['airmadidi'] !== '')
                     || (array_key_exists('lain', $row) && $row['lain'] !== null && $row['lain'] !== '');
 
-                $hasTerjualBitung = (array_key_exists('terjual', $row) && $row['terjual'] !== null && $row['terjual'] !== '')
-                    || (array_key_exists('total_penjualan', $row) && $row['total_penjualan'] !== null && $row['total_penjualan'] !== '');
+                // $hasTerjualBitung = (array_key_exists('terjual', $row) && $row['terjual'] !== null && $row['terjual'] !== '')
+                //     || (array_key_exists('total_penjualan', $row) && $row['total_penjualan'] !== null && $row['total_penjualan'] !== '');
 
                 $hasKetRusakInput = (array_key_exists('ket_rusak', $row) && $row['ket_rusak'] !== null && $row['ket_rusak'] !== '')
                     || (array_key_exists('rusak', $row) && $row['rusak'] !== null && $row['rusak'] !== '');
@@ -220,13 +220,12 @@ class SheetWebhookController extends Controller
                         $ketLain = $produksi ? (float)$produksi->ket_lain : 0;
                     }
 
-                    if ($hasTerjualBitung) {
-                        $rawTerjual = $row['terjual'] ?? $row['total_penjualan'];
-                        $terjual = (float)$rawTerjual;
-                    } else {
-                        $terjual = $produksi ? (float)$produksi->total_penjualan : 0;
-                        
-                    }
+                    // if ($hasTerjualBitung) {
+                    //     $rawTerjual = $row['terjual'] ?? $row['total_penjualan'];
+                    //     $terjual = (float)$rawTerjual;
+                    // } else {
+                    //     $terjual = $produksi ? (float)$produksi->total_penjualan : 0;
+                    // }
 
                     if ($hasKetRusakInput) {
                         $rawKetRusak = $row['ket_rusak'] ?? $row['rusak'] ?? 0;
@@ -242,6 +241,7 @@ class SheetWebhookController extends Controller
 
                     $sisaStock     = $stockAwal + $totalProduksi - $terjual - $ketLain - $ketRusak;
                     $stockAkhir    = $sisaStock; // Mengikuti formula sisa stok akhir
+                    $terjual = $produksi ? (float)$produksi->total_penjualan : 0;
 
                     // 5. Save/Update Tabel Produksi
                     if ($produksi) {
