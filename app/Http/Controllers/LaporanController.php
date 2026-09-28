@@ -1052,7 +1052,7 @@ class LaporanController extends Controller
         if($data->jenis == "2"){
           $data['nama'] = $data->Preorder->nama;
           $data['tgl_pesan'] = $data->created_at->format('d/m/Y');
-          $data['tgl_selesai'] = $data->Preorder->tgl_selesai->format('d/m/Y');
+          $data['tgl_selesai'] = Carbon::parse($data->Preorder->tgl_selesai)->format('d/m/Y');
           $data['jam'] = $data->Preorder->waktu_selesai;
           $data['total'] = $data->Preorder->total;
           $data['uang_muka'] = $data->Preorder->uang_muka;
@@ -1348,7 +1348,7 @@ class LaporanController extends Controller
       
       $transaksi['nama_kasir'] = $kasir->name;
       $transaksi['items'] = $items;
-      $transaksi['tgl_bayar_format'] = $transaksi->tgl_bayar->format('d/m/Y H:i');
+      $transaksi['tgl_bayar_format'] = Carbon::parse($transaksi->tgl_bayar)->format('d/m/Y H:i');
       $total_uang_bayar = $transaksi->cash + $transaksi->transfer + $transaksi->qris;
       $transaksi['total_uang_bayar'] = number_format($total_uang_bayar, 0, '', '.');
       $transaksi['uang_kembali'] = number_format($total_uang_bayar - $transaksi->total_bayar, 0, '', '.');
