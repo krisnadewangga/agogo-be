@@ -238,10 +238,11 @@ class SheetWebhookController extends Controller
                     $produksi3     = $produksi ? (float)$produksi->produksi3 : 0;
                     $totalProduksi = $produksi1 + $produksi2 + $produksi3;
                     $totalLain     = $ketLain;
+                    
+                    $terjual = $produksi ? (float)$produksi->total_penjualan : 0;
 
                     $sisaStock     = $stockAwal + $totalProduksi - $terjual - $ketLain - $ketRusak;
                     $stockAkhir    = $sisaStock; // Mengikuti formula sisa stok akhir
-                    $terjual = $produksi ? (float)$produksi->total_penjualan : 0;
 
                     // 5. Save/Update Tabel Produksi
                     if ($produksi) {
