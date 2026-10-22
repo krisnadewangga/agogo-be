@@ -149,6 +149,10 @@ Route::post('/post_opname','LaporanController@PostOpname')->name('post_opname');
 Route::post('/cari_opname','LaporanController@CariOpname')->name('cari_opname');
 Route::get('/export_opname','LaporanController@ExportOpname')->name('export_opname');
 
+Route::get('/selisih-stock', 'LaporanController@LapSelisihStock')->name('lap_selisih_stock');
+Route::post('/selisih-stock/cari', 'LaporanController@CariSelisihStock')->name('cari_selisih_stock');
+Route::get('/export_selisih_stock', 'LaporanController@ExportSelisihStock')->name('export_selisih_stock');
+
 Route::get('/list_promo_selesai', 'PromoController@listPromoSelesai')->name('list_promo_selesai');
 Route::resource('/setup_promo','PromoController');
 

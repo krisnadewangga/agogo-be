@@ -151,6 +151,7 @@
               <li id="sm_target_produksi"><a href="{{ route('lap_target_produksi') }}"><i class="fa fa-circle-o"></i> <span>Laporan Realisasi Produksi</span></a></li>
               <li id="sm_pergerakan_stock"><a href="{{ route('lap_pergerakan_stock') }}"><i class="fa fa-circle-o"></i> <span>Pergerakan Stock</span></a></li>
               <li id="sm_opname"><a href="{{ route('opname') }}"><i class="fa fa-circle-o"></i> <span>Opname</span></a></li>
+              <li id="sm_selisih"><a href="{{ route('lap_selisih_stock') }}"><i class="fa fa-circle-o"></i> <span>Selisih Barang</span></a></li>
             </ul>
           </li>
 

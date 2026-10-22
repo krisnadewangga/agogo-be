@@ -2566,5 +2566,188 @@ class LaporanController extends Controller
       }
 
     } 
+
+
+    // START LAPORAN SELISIH STOK PERIODE
+    public function LapSelisihStock(Request $request)
+    {
+        $dates = [
+            Carbon::now()->startOfMonth()->format('Y-m-d'),
+            Carbon::now()->format('Y-m-d'),
+            '1',
+            '1'
+        ];
+        
+        $data = [];
+        $input = [
+            'mt' => "",
+            'st' => "",
+            'sort_by' => '1',
+            'opsi_sort' => '1'
+        ];
+        
+        $menu_active = "laporan|selisih_stock|0";
+        return view('laporan.lap_selisih_stock', compact('menu_active', 'input', 'data'));
+    }
+
+    public function CariSelisihStock(Request $request)
+    {
+        $req = $request->all();
+        $validator = \Validator::make($req, [
+            'mt' => 'required|date_format:d/m/Y',
+            'st' => 'required|date_format:d/m/Y'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->with('gagal', 'simpan')->withInput();
+        }
+
+        $explode1 = explode('/', $req['mt']);
+        $explode2 = explode('/', $req['st']);
+
+        $mt = $explode1[2] . "-" . $explode1[1] . "-" . $explode1[0];
+        $st = $explode2[2] . "-" . $explode2[1] . "-" . $explode2[0];
+
+        $dates = [$mt, $st, $req['sort_by'] ?? '1', $req['opsi_sort'] ?? '1'];
+        $data = $this->SetDataSelisihStock($dates);
+
+        $input = [
+            'mt' => $req['mt'],
+            'st' => $req['st'],
+            'sort_by' => $req['sort_by'] ?? '1',
+            'opsi_sort' => $req['opsi_sort'] ?? '1'
+        ];
+        
+        $menu_active = "laporan|selisih_stock|0";
+        return view('laporan.lap_selisih_stock', compact('menu_active', 'input', 'data'));
+    }
+
+    public function SetDataSelisihStock($data)
+    {
+        $sort_by = [
+            '1' => 'code',
+            '2' => 'nama_item',
+            '3' => 'total_selisih_pagi',
+            '4' => 'total_selisih_malam',
+            '5' => 'total_selisih',
+            '6' => 'total_nominal_selisih'
+        ];
+        
+        $startDate = $data[0];
+        $endDate = $data[1];
+
+        if (empty($startDate) || empty($endDate)) {
+            return [
+                'data' => [],
+                'grandTotalNominal' => '0'
+            ];
+        }
+
+        $items = Item::where('status_aktif', '1')->get();
+        $resultCollection = collect();
+        $grandTotalNominal = 0;
+
+        foreach ($items as $item) {
+            $harga = (float) ($item->harga ?? 0);
+
+            $opnames = Opname::where('item_id', $item->id)
+                ->whereDate('tanggal', '>=', $startDate)
+                ->whereDate('tanggal', '<=', $endDate)
+                ->get();
+
+            $totalSelisihPagi = 0;
+            $totalSelisihMalam = 0;
+            $adaSelisih = false;
+
+            foreach ($opnames as $opname) {
+                $tgl = $opname->tanggal;
+                
+                $produksi = Produksi::where('item_id', $item->id)
+                    ->whereDate('created_at', $tgl)
+                    ->orderBy('id', 'DESC')
+                    ->first();
+
+                $stockAwalKomputer = $produksi ? $produksi->stock_awal : 0;
+                
+                if ($produksi) {
+                    $stockAkhirKomputer = $produksi->stock_awal + $produksi->produksi1 - $produksi->total_penjualan - $produksi->ket_rusak - $produksi->ket_lain;
+                } else {
+                    $stockAkhirKomputer = 0;
+                }
+
+                $fisikPagi = ($opname->stock_fisik_pagi !== '' && !is_null($opname->stock_fisik_pagi)) ? (float)$opname->stock_fisik_pagi : null;
+                $fisikMalam = ($opname->stock_fisik_malam !== '' && !is_null($opname->stock_fisik_malam)) ? (float)$opname->stock_fisik_malam : null;
+
+                $selisihPagi = (!is_null($fisikPagi)) ? ($stockAwalKomputer - $fisikPagi) : 0;
+                $selisihMalam = (!is_null($fisikMalam)) ? ($stockAkhirKomputer - $fisikMalam) : 0;
+
+                if ($selisihPagi != 0 || $selisihMalam != 0) {
+                    $adaSelisih = true;
+                }
+
+                $totalSelisihPagi += $selisihPagi;
+                $totalSelisihMalam += $selisihMalam;
+            }
+
+            $totalSelisihGabungan = $totalSelisihPagi + $totalSelisihMalam;
+            $totalNominalItem = $totalSelisihGabungan * $harga;
+
+            if ($adaSelisih || $totalSelisihPagi != 0 || $totalSelisihMalam != 0) {
+                $grandTotalNominal += $totalNominalItem;
+
+                $itemData = [
+                    'id' => $item->id,
+                    'code' => $item->code,
+                    'nama_item' => $item->nama_item,
+                    'harga' => 'Rp. ' . number_format($harga, 0, '', '.'),
+                    'total_selisih_pagi' => $totalSelisihPagi,
+                    'total_selisih_malam' => $totalSelisihMalam,
+                    'total_selisih' => $totalSelisihGabungan,
+                    'tampil_total_nominal' => 'Rp. ' . number_format($totalNominalItem, 0, '', '.'),
+                ];
+                $resultCollection->push((object)$itemData);
+            }
+        }
+
+        $sortByField = $sort_by[$data[2]] ?? 'code';
+        if ($data[3] == '2') {
+            $sortedData = $resultCollection->sortByDesc($sortByField)->values()->all();
+        } else {
+            $sortedData = $resultCollection->sortBy($sortByField)->values()->all();
+        }
+
+        return [
+            'data' => $sortedData,
+            'grandTotalNominal' => number_format($grandTotalNominal, 0, '', '.')
+        ];
+    }
+
     
+    public function ExportSelisihStock(Request $request)
+    {
+        $req = $request->all();
+
+        $mt = $req['mt'] ?? '';
+        $st = $req['st'] ?? '';
+        $sortBy = $req['sort_by'] ?? '1';
+        $opsiSort = $req['opsi_sort'] ?? '1';
+
+        if (empty($mt) || empty($st)) {
+            return redirect()->back()->with('error', 'Tanggal tidak boleh kosong');
+        }
+
+        $dates = [$mt, $st, $sortBy, $opsiSort];
+        $data = $this->SetDataSelisihStock($dates);
+
+        $explode = explode('-', $mt);
+        $explode1 = explode('-', $st);
+
+        $start_tanggal = $explode[2] . "/" . $explode[1] . "/" . $explode[0];
+        $end_tanggal = $explode1[2] . "/" . $explode1[1] . "/" . $explode1[0];
+
+        $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif', 'isRemoteEnabled' => true])
+            ->loadView('export.selisih_stock', compact('data', 'start_tanggal', 'end_tanggal'));
+
+        return $pdf->stream('laporan-selisih-stok-' . $start_tanggal . '-' . $end_tanggal . '.pdf');
+    }
 }
