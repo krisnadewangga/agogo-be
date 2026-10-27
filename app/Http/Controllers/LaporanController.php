@@ -2515,22 +2515,24 @@ class LaporanController extends Controller
                         ->whereDate('tanggal',$data[0])
                         ->first();
 
-                 
-
         if(isset($query->id)){
            $item['stock_masuk'] = $query->produksi1;
            $item['stock_awal'] = $query->stock_awal;
-           $item['sisa_stock'] = $query->sisa_stock;
+           $item['sisa_stock'] = $query->sisa_stock; // Ini adalah Stok Asli (sisa stok akhir malam)
            $item['produksi'] = $query->produksi1;
            $item['rusak'] = $query->ket_rusak;
            $item['airmadidi'] = $query->ket_lain;
            $item['terjual'] = $query->total_penjualan;
            $item['stock_akhir'] = $query->stock_awal + $query->produksi1 - $query->total_penjualan - $item['rusak'] - $item['airmadidi'];
+           
+           // KOREKSI RUMUS SELISIH PAGI: Stok Asli (sisa_stock) - Stok Awal Fisik Pagi
            $item['selisih_pagi'] = isset($opname->stock_fisik_pagi) && $opname->stock_fisik_pagi !== '' && !is_null($opname->stock_fisik_pagi)
-               ? $query->stock_awal - (float)$opname->stock_fisik_pagi 
+               ? (float)$query->sisa_stock - (float)$opname->stock_fisik_pagi 
                : 0;
+
+           // Selisih Malam: Stok Akhir Komputer - Stok Akhir Fisik Malam (hanya dihitung jika fisik malam diisi)
            $item['selisih_malam'] = isset($opname->stock_fisik_malam) && $opname->stock_fisik_malam !== '' && !is_null($opname->stock_fisik_malam)
-               ? $item['stock_akhir'] - (float)$opname->stock_fisik_malam 
+               ? (float)$item['stock_akhir'] - (float)$opname->stock_fisik_malam 
                : 0;
         }else{
            $item['stock_masuk'] = 0;
@@ -2557,15 +2559,12 @@ class LaporanController extends Controller
 
       });
 
-      
-
       if($data[2] == '1'){
          return $item->sortBy($sort_by[$data[1]])->values()->all();
       }elseif($data[2] == '2'){
          return $item->sortByDesc($sort_by[$data[1]])->values()->all();
       }
-
-    } 
+    }
 
 
     // START LAPORAN SELISIH STOK PERIODE
@@ -2608,14 +2607,15 @@ class LaporanController extends Controller
         $mt = $explode1[2] . "-" . $explode1[1] . "-" . $explode1[0];
         $st = $explode2[2] . "-" . $explode2[1] . "-" . $explode2[0];
 
-        $dates = [$mt, $st, $req['sort_by'] ?? '1', $req['opsi_sort'] ?? '1'];
+        $dates = [$mt, $st, $req['sort_by'] ?? '1', $req['opsi_sort'] ?? '1', $req['jenis_selisih'] ?? '1'];
         $data = $this->SetDataSelisihStock($dates);
 
         $input = [
             'mt' => $req['mt'],
             'st' => $req['st'],
             'sort_by' => $req['sort_by'] ?? '1',
-            'opsi_sort' => $req['opsi_sort'] ?? '1'
+            'opsi_sort' => $req['opsi_sort'] ?? '1',
+            'jenis_selisih' => $req['jenis_selisih'] ?? '1'
         ];
         
         $menu_active = "laporan|selisih_stock|0";
@@ -2629,23 +2629,28 @@ class LaporanController extends Controller
             '2' => 'nama_item',
             '3' => 'total_selisih_pagi',
             '4' => 'total_selisih_malam',
-            '5' => 'total_selisih',
-            '6' => 'total_nominal_selisih'
+            '5' => 'total_nominal_selisih'
         ];
         
         $startDate = $data[0];
         $endDate = $data[1];
+        $jenisSelisih = $data[4] ?? '1'; // 1: Keduanya, 2: Pagi Saja, 3: Malam Saja
 
         if (empty($startDate) || empty($endDate)) {
             return [
                 'data' => [],
+                'jenis_selisih' => $jenisSelisih,
+                'grandTotalNominalPagi' => '0',
+                'grandTotalNominalMalam' => '0',
                 'grandTotalNominal' => '0'
             ];
         }
 
         $items = Item::where('status_aktif', '1')->get();
         $resultCollection = collect();
-        $grandTotalNominal = 0;
+        
+        $grandTotalNominalPagi = 0;
+        $grandTotalNominalMalam = 0;
 
         foreach ($items as $item) {
             $harga = (float) ($item->harga ?? 0);
@@ -2667,7 +2672,7 @@ class LaporanController extends Controller
                     ->orderBy('id', 'DESC')
                     ->first();
 
-                $stockAwalKomputer = $produksi ? $produksi->stock_awal : 0;
+                $stokAsli = $produksi ? $produksi->sisa_stock : 0;
                 
                 if ($produksi) {
                     $stockAkhirKomputer = $produksi->stock_awal + $produksi->produksi1 - $produksi->total_penjualan - $produksi->ket_rusak - $produksi->ket_lain;
@@ -2678,22 +2683,48 @@ class LaporanController extends Controller
                 $fisikPagi = ($opname->stock_fisik_pagi !== '' && !is_null($opname->stock_fisik_pagi)) ? (float)$opname->stock_fisik_pagi : null;
                 $fisikMalam = ($opname->stock_fisik_malam !== '' && !is_null($opname->stock_fisik_malam)) ? (float)$opname->stock_fisik_malam : null;
 
-                $selisihPagi = (!is_null($fisikPagi)) ? ($stockAwalKomputer - $fisikPagi) : 0;
+                $selisihPagi = (!is_null($fisikPagi)) ? ($stokAsli - $fisikPagi) : 0;
                 $selisihMalam = (!is_null($fisikMalam)) ? ($stockAkhirKomputer - $fisikMalam) : 0;
 
-                if ($selisihPagi != 0 || $selisihMalam != 0) {
-                    $adaSelisih = true;
+                // Filter kondisi berdasarkan pilihan dropdown jenis selisih
+                if ($jenisSelisih == '2') { // Pagi saja
+                    if ($selisihPagi != 0) {
+                        $adaSelisih = true;
+                    }
+                } elseif ($jenisSelisih == '3') { // Malam saja
+                    if ($selisihMalam != 0) {
+                        $adaSelisih = true;
+                    }
+                } else { // Keduanya
+                    if ($selisihPagi != 0 || $selisihMalam != 0) {
+                        $adaSelisih = true;
+                    }
                 }
 
                 $totalSelisihPagi += $selisihPagi;
                 $totalSelisihMalam += $selisihMalam;
             }
 
-            $totalSelisihGabungan = $totalSelisihPagi + $totalSelisihMalam;
-            $totalNominalItem = $totalSelisihGabungan * $harga;
+            // Jika filter Pagi Saja, abaikan item yang total selisih paginya 0
+            if ($jenisSelisih == '2' && $totalSelisihPagi == 0) continue;
+            // Jika filter Malam Saja, abaikan item yang total selisih malamnya 0
+            if ($jenisSelisih == '3' && $totalSelisihMalam == 0) continue;
+
+            $totalNominalPagi = $totalSelisihPagi * $harga;
+            $totalNominalMalam = $totalSelisihMalam * $harga;
+            
+            // Tentukan total nominal item berdasarkan mode
+            if ($jenisSelisih == '2') {
+                $totalNominalItem = $totalNominalPagi;
+            } elseif ($jenisSelisih == '3') {
+                $totalNominalItem = $totalNominalMalam;
+            } else {
+                $totalNominalItem = $totalNominalPagi + $totalNominalMalam;
+            }
 
             if ($adaSelisih || $totalSelisihPagi != 0 || $totalSelisihMalam != 0) {
-                $grandTotalNominal += $totalNominalItem;
+                $grandTotalNominalPagi += $totalNominalPagi;
+                $grandTotalNominalMalam += $totalNominalMalam;
 
                 $itemData = [
                     'id' => $item->id,
@@ -2701,8 +2732,9 @@ class LaporanController extends Controller
                     'nama_item' => $item->nama_item,
                     'harga' => 'Rp. ' . number_format($harga, 0, '', '.'),
                     'total_selisih_pagi' => $totalSelisihPagi,
+                    'total_nominal_pagi' => 'Rp. ' . number_format($totalNominalPagi, 0, '', '.'),
                     'total_selisih_malam' => $totalSelisihMalam,
-                    'total_selisih' => $totalSelisihGabungan,
+                    'total_nominal_malam' => 'Rp. ' . number_format($totalNominalMalam, 0, '', '.'),
                     'tampil_total_nominal' => 'Rp. ' . number_format($totalNominalItem, 0, '', '.'),
                 ];
                 $resultCollection->push((object)$itemData);
@@ -2716,13 +2748,17 @@ class LaporanController extends Controller
             $sortedData = $resultCollection->sortBy($sortByField)->values()->all();
         }
 
+        $grandTotalFinal = ($jenisSelisih == '2') ? $grandTotalNominalPagi : (($jenisSelisih == '3') ? $grandTotalNominalMalam : ($grandTotalNominalPagi + $grandTotalNominalMalam));
+
         return [
             'data' => $sortedData,
-            'grandTotalNominal' => number_format($grandTotalNominal, 0, '', '.')
+            'jenis_selisih' => $jenisSelisih,
+            'grandTotalNominalPagi' => number_format($grandTotalNominalPagi, 0, '', '.'),
+            'grandTotalNominalMalam' => number_format($grandTotalNominalMalam, 0, '', '.'),
+            'grandTotalNominal' => number_format($grandTotalFinal, 0, '', '.')
         ];
     }
 
-    
     public function ExportSelisihStock(Request $request)
     {
         $req = $request->all();
@@ -2731,12 +2767,13 @@ class LaporanController extends Controller
         $st = $req['st'] ?? '';
         $sortBy = $req['sort_by'] ?? '1';
         $opsiSort = $req['opsi_sort'] ?? '1';
+        $jenisSelisih = $req['jenis_selisih'] ?? '1';
 
         if (empty($mt) || empty($st)) {
             return redirect()->back()->with('error', 'Tanggal tidak boleh kosong');
         }
 
-        $dates = [$mt, $st, $sortBy, $opsiSort];
+        $dates = [$mt, $st, $sortBy, $opsiSort, $jenisSelisih];
         $data = $this->SetDataSelisihStock($dates);
 
         $explode = explode('-', $mt);

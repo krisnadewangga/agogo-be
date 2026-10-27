@@ -42,7 +42,17 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Jenis Selisih Tampilan</label>
+                            <select name="jenis_selisih" class="form-control" id="jenis_selisih">
+                                <option value="1" {{ ($input['jenis_selisih'] ?? '1') == '1' ? 'selected' : '' }}>Keduanya (Pagi & Malam)</option>
+                                <option value="2" {{ ($input['jenis_selisih'] ?? '') == '2' ? 'selected' : '' }}>Selisih Pagi Saja</option>
+                                <option value="3" {{ ($input['jenis_selisih'] ?? '') == '3' ? 'selected' : '' }}>Selisih Malam Saja</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label>Sort By</label>
                             <select name="sort_by" class="form-control" id="sort_by">
@@ -50,12 +60,11 @@
                                 <option value="2" {{ ($input['sort_by'] ?? '') == '2' ? 'selected' : '' }}>Nama Item</option>
                                 <option value="3" {{ ($input['sort_by'] ?? '') == '3' ? 'selected' : '' }}>Total Selisih Pagi</option>
                                 <option value="4" {{ ($input['sort_by'] ?? '') == '4' ? 'selected' : '' }}>Total Selisih Malam</option>
-                                <option value="5" {{ ($input['sort_by'] ?? '') == '5' ? 'selected' : '' }}>Total Selisih</option>
-                                <option value="6" {{ ($input['sort_by'] ?? '') == '6' ? 'selected' : '' }}>Total Harga</option>
+                                <option value="5" {{ ($input['sort_by'] ?? '') == '5' ? 'selected' : '' }}>Total Harga</option>
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                          <label>Opsi Sort</label>
                          <select name="opsi_sort" class="form-control" id="opsi_sort">
                             <option value="1" {{ ($input['opsi_sort'] ?? '1') == '1' ? 'selected' : '' }}>Kecil Ke Besar</option>
@@ -63,7 +72,7 @@
                          </select>
                     </div>
                 </div>
-                <div style="margin-top: 5px;">
+                <div style="margin-top: 10px;">
                     <button class="btn btn-primary"><i class="fa fa-search"></i> Cari</button>
                     <a href="{{ route('lap_selisih_stock') }}" class="btn btn-warning"><i class="fa fa-refresh"></i> Reset</a>
                     <a href="javascript:export_pdf()" class="btn btn-success"><i class="fa fa-file-pdf-o"></i> Export PDF</a>
@@ -79,9 +88,14 @@
                             <th style="width: 40px; text-align: center;">No</th>
                             <th>Nama Item</th>
                             <th style="text-align: right;">Harga Item</th>
-                            <th style="text-align: center;">Total Selisih Pagi</th>
-                            <th style="text-align: center;">Total Selisih Malam</th>
-                            <th style="text-align: center;">Total Selisih</th>
+                            @if(($data['jenis_selisih'] ?? '1') == '1' || ($data['jenis_selisih'] ?? '1') == '2')
+                                <th style="text-align: center;">Total Selisih Pagi</th>
+                                <th style="text-align: right;">Total Rp. Pagi</th>
+                            @endif
+                            @if(($data['jenis_selisih'] ?? '1') == '1' || ($data['jenis_selisih'] ?? '1') == '3')
+                                <th style="text-align: center;">Total Selisih Malam</th>
+                                <th style="text-align: right;">Total Rp. Malam</th>
+                            @endif
                             <th style="text-align: right;">Total Harga</th>
                         </tr>
                     </thead>
@@ -92,21 +106,22 @@
                                     <td align="center"></td>
                                     <td class="nowrap">{{ $row->nama_item }}</td>
                                     <td class="nowrap text-right">{{ $row->harga }}</td>
-                                    <td class="nowrap text-center">
-                                        <span class="badge {{ $row->total_selisih_pagi != 0 ? 'bg-yellow' : 'bg-green' }}">
-                                            {{ $row->total_selisih_pagi }}
-                                        </span>
-                                    </td>
-                                    <td class="nowrap text-center">
-                                        <span class="badge {{ $row->total_selisih_malam != 0 ? 'bg-yellow' : 'bg-green' }}">
-                                            {{ $row->total_selisih_malam }}
-                                        </span>
-                                    </td>
-                                    <td class="nowrap text-center">
-                                        <span class="badge {{ $row->total_selisih != 0 ? 'bg-red' : 'bg-green' }}">
-                                            {{ $row->total_selisih }}
-                                        </span>
-                                    </td>
+                                    @if(($data['jenis_selisih'] ?? '1') == '1' || ($data['jenis_selisih'] ?? '1') == '2')
+                                        <td class="nowrap text-center">
+                                            <span class="badge {{ $row->total_selisih_pagi != 0 ? 'bg-yellow' : 'bg-green' }}">
+                                                {{ $row->total_selisih_pagi }}
+                                            </span>
+                                        </td>
+                                        <td class="nowrap text-right">{{ $row->total_nominal_pagi }}</td>
+                                    @endif
+                                    @if(($data['jenis_selisih'] ?? '1') == '1' || ($data['jenis_selisih'] ?? '1') == '3')
+                                        <td class="nowrap text-center">
+                                            <span class="badge {{ $row->total_selisih_malam != 0 ? 'bg-yellow' : 'bg-green' }}">
+                                                {{ $row->total_selisih_malam }}
+                                            </span>
+                                        </td>
+                                        <td class="nowrap text-right">{{ $row->total_nominal_malam }}</td>
+                                    @endif
                                     <td class="nowrap text-right"><b>{{ $row->tampil_total_nominal }}</b></td>
                                 </tr>
                             @endforeach
@@ -115,7 +130,13 @@
                     @if(!empty($data['data']))
                     <tfoot>
                         <tr style="font-size:14px; background-color: #f5f5f5;">
-                            <td colspan="6" class="text-right"><b>Grand Total Harga Selisih :</b></td>
+                            @php
+                                $colSpan = 3;
+                                if(($data['jenis_selisih'] ?? '1') == '1') $colSpan = 7;
+                                elseif(($data['jenis_selisih'] ?? '1') == '2') $colSpan = 5;
+                                elseif(($data['jenis_selisih'] ?? '1') == '3') $colSpan = 5;
+                            @endphp
+                            <td colspan="{{ $colSpan - 1 }}" class="text-right"><b>Grand Total :</b></td>
                             <td class="text-right"><b>Rp. {{ $data['grandTotalNominal'] }}</b></td>
                         </tr>
                     </tfoot>
@@ -148,6 +169,7 @@
                 var tanggal1 = $("#st").val();
                 var sort_by = $("#sort_by").val();
                 var opsi_sort = $("#opsi_sort").val();
+                var jenis_selisih = $("#jenis_selisih").val();
 
                 if (tanggal != "" && tanggal1 != "") {
                     var pisah = tanggal.split('/');
@@ -156,7 +178,7 @@
                     var mt = pisah[2] + "-" + pisah[1] + "-" + pisah[0];
                     var st = pisah1[2] + "-" + pisah1[1] + "-" + pisah1[0];
 
-                    window.open('{{ route("export_selisih_stock") }}?mt=' + mt + '&st=' + st + '&sort_by=' + sort_by + '&opsi_sort=' + opsi_sort, '_blank');
+                    window.open('{{ route("export_selisih_stock") }}?mt=' + mt + '&st=' + st + '&sort_by=' + sort_by + '&opsi_sort=' + opsi_sort + '&jenis_selisih=' + jenis_selisih, '_blank');
                 } else {
                     alert("Maaf! Pastikan Mulai Tanggal & Sampai Tanggal Tidak Kosong");
                 }
