@@ -56,37 +56,7 @@ class SetTanggalController extends Controller
             return redirect()->back()->with('error','Ada Kasir Yang Belum Menutup Kas '.$nama_kasir);
          }
 
-        $item = Item::select('id','stock as sisa_stock')->where('status_aktif','1')->get();
-        
-     
-          
-
-        foreach ($item as $key ) {
-          if($key['sisa_stock'] < 0){
-            $sisa_stock = 0;
-            Item::where('id',$key['id'])->update(['stock' => '0']);
-            
-          }else{
-            $sisa_stock = $key['sisa_stock'];
-          }
-
-          $array = ['item_id' => $key['id'],
-                     'produksi1' => 0,
-                     'produksi2' => 0,
-                     'produksi3' => 0,
-                     'total_produksi' => 0,
-                     'penjualan_toko' => 0,
-                     'penjualan_pemesanan' => 0,
-                     'total_penjualan' => 0,
-                     'ket_rusak' => 0,
-                     'ket_lain' => 0,
-                     'total_lain' => 0,
-                     'catatan' => 'tidak ada catatan',
-                     'stock_awal' => $sisa_stock,
-                     'sisa_stock' => $sisa_stock
-                   ];
-            Produksi::create($array);
-        }
+        \App\Helpers\TanggalHelper::executeSetTanggal($tgl_skrang);
 
         return redirect()->back()->with('success','Berhasil Set Tanggal Produksi '.Carbon::now()->format('d/m/Y'));
       }else{
